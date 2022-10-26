@@ -22,7 +22,8 @@ public enum Log {
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
-    column: UInt = #column) {
+    column: UInt = #column)
+  {
     log(
       .info, emoji: "ℹ️", string: string,
       file: file, function: function, line: line, column: column)
@@ -33,7 +34,8 @@ public enum Log {
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
-    column: UInt = #column) {
+    column: UInt = #column)
+  {
     log(
       .error, emoji: "⚠️", string: string,
       file: file, function: function, line: line, column: column)
@@ -44,7 +46,8 @@ public enum Log {
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
-    column: UInt = #column) -> Never {
+    column: UInt = #column) -> Never
+  {
     log(
       .fault, emoji: "❌", string: string,
       file: file, function: function, line: line, column: column)
@@ -59,7 +62,8 @@ public enum Log {
     file: String,
     function: String,
     line: UInt,
-    column _: UInt) {
+    column _: UInt)
+  {
     // swiftlint:disable:next force_unwrapping
     let url = URL(string: file.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
