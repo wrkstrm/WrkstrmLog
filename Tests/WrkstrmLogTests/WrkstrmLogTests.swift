@@ -6,7 +6,9 @@ final class WrkstrmLogTests: XCTestCase {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct
     // results.
-    XCTAssertEqual(WrkstrmLog().text, "Hello, World!")
+    Log.error("This is interesting.")
+    Log.verbose("This is a log.")
+    XCTAssert(true)
   }
 
   static var allTests = [("testExample", testExample)]
