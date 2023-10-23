@@ -1,6 +1,6 @@
 # `WrkstrmLog`
 
-[![wrkstrm-log](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-build.yml/badge.svg)](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-build.yml)
+[![WrkstrmLog](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-build.yml/badge.svg)](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-build.yml)
 
 `WrkstrmLog` is a logging library for iOS and macOS that implements four different types of logging systems. The library includes a folder called Lumberjack, which contains sample formatters that can be used as a basis for creating custom formatters.
 
