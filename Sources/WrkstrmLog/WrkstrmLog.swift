@@ -20,7 +20,6 @@ public enum Log {
   case use_os_log
   case use_swift_log
   
-  @inlinable
   static func formattedFunction(_ function: String) -> String {
     let functionString: String
     if let maxLength = maxFunctionLength {
