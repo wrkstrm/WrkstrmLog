@@ -1,30 +1,24 @@
-import Logging
 import os
+import Logging
 
-public extension Logging.Logger.Level {
-
-  var toOSType: OSLogType {
+extension Logging.Logger.Level {
+  
+  public var toOSType: OSLogType {
     switch self {
     case .critical:
-      .fault
-
+      return .fault
     case .info:
-      .info
-
+      return .info
     case .trace:
-      .info
-
+      return .info
     case .debug:
-      .debug
-
+      return .debug
     case .error:
-      .error
-
+      return .error
     case .notice:
-      .default
-
+      return .default
     case .warning:
-      .error
+      return .error
     }
   }
 }

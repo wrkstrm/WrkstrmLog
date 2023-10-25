@@ -20,7 +20,7 @@ let package = Package(
   targets: [
     .target(name: "Lumberjack", dependencies: []),
     .target(name: "WrkstrmLog", dependencies: [
-      .product(name: "Logging", package: "swift-log"),
+      .product(name: "Logging", package: "swift-log")
     ]),
     .target(name: "WSMLogger", dependencies: ["Lumberjack"]),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
