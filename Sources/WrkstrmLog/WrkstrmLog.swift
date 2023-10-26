@@ -12,13 +12,13 @@ let osLogger = OSLog(subsystem: "com.wrkstrm.os-log", category: "default")
 
 public enum Log {
 
-  public static var style: Log = .use_os_log
+  public static var style: Log = .os
 
   public static var maxFunctionLength: Int?
 
-  case use_print_log
-  case use_os_log
-  case use_swift_log
+  case print
+  case os
+  case swift
 
   static func formattedFunction(_ function: String) -> String {
     let functionString: String
@@ -86,10 +86,10 @@ public enum Log {
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
     switch style {
-    case .use_print_log:
+    case .print:
       print("\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
 
-    case .use_os_log:
+    case .os:
       os_log(
         level.toOSType,
         dso: dso,
@@ -99,7 +99,7 @@ public enum Log {
         line,
         functionString,
         string)
-    case .use_swift_log:
+    case .swift:
       swiftLogger.log(
         level: level,
         "\(line)|\(functionString)| \(string)",
