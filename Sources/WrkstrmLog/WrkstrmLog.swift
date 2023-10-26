@@ -87,7 +87,7 @@ public enum Log {
     let functionString = formattedFunction(function)
     switch style {
     case .print:
-      print("\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
+      Swift.print("\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
 
     case .os:
       os_log(
@@ -99,6 +99,7 @@ public enum Log {
         line,
         functionString,
         string)
+
     case .swift:
       swiftLogger.log(
         level: level,
