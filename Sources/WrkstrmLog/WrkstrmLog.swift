@@ -100,10 +100,10 @@ public enum Log {
              string)
     case .use_swift_log:
       swiftLogger.log(level: level, "\(line)|\(functionString)| \(string)",
-                        source: url.lastPathComponent,
-                        file: file,
-                        function: functionString,
-                        line: line)
+                      source: url.lastPathComponent,
+                      file: file,
+                      function: functionString,
+                      line: line)
     }
   }
 }
