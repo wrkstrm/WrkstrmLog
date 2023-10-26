@@ -1,9 +1,9 @@
-import os
 import Logging
+import os
 
-extension Logging.Logger.Level {
+public extension Logging.Logger.Level {
 
-  public var toOSType: OSLogType {
+  var toOSType: OSLogType {
     switch self {
     case .critical:
       return .fault

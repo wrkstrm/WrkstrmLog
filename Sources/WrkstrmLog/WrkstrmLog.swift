@@ -8,18 +8,18 @@ let swiftLogger: Logging.Logger = { () -> Logging.Logger in
   return logger
 }()
 
-let osLogger: OSLog = OSLog(subsystem: "com.wrkstrm.os-log", category: "default")
+let osLogger = OSLog(subsystem: "com.wrkstrm.os-log", category: "default")
 
 public enum Log {
-  
+
   public static var style: Log = .use_os_log
-  
+
   public static var maxFunctionLength: Int?
-  
+
   case use_print_log
   case use_os_log
   case use_swift_log
-  
+
   static func formattedFunction(_ function: String) -> String {
     let functionString: String
     if let maxLength = maxFunctionLength {
@@ -29,7 +29,7 @@ public enum Log {
     }
     return functionString
   }
-  
+
   public static func verbose(
     _ string: String,
     file: String = #file,
@@ -42,7 +42,7 @@ public enum Log {
       .info, emoji: "ℹ️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
   }
-  
+
   public static func error(
     _ string: String,
     file: String = #file,
@@ -55,7 +55,7 @@ public enum Log {
       .error, emoji: "⚠️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
   }
-  
+
   public static func `guard`(
     _ string: String = "",
     file: String = #file,
@@ -69,7 +69,7 @@ public enum Log {
       file: file, function: function, line: line, column: column, dso: dso)
     fatalError()
   }
-  
+
   // swiftlint:disable:next function_parameter_count
   static func log(
     _ level: Logging.Logger.Level,
@@ -88,22 +88,25 @@ public enum Log {
     switch style {
     case .use_print_log:
       print("\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
-      
+
     case .use_os_log:
-      os_log(level.toOSType,
-             dso: dso,
-             log: osLogger,
-             "%s-%i|%s| %s",
-             url.lastPathComponent,
-             line,
-             functionString,
-             string)
+      os_log(
+        level.toOSType,
+        dso: dso,
+        log: osLogger,
+        "%s-%i|%s| %s",
+        url.lastPathComponent,
+        line,
+        functionString,
+        string)
     case .use_swift_log:
-      swiftLogger.log(level: level, "\(line)|\(functionString)| \(string)",
-                      source: url.lastPathComponent,
-                      file: file,
-                      function: functionString,
-                      line: line)
+      swiftLogger.log(
+        level: level,
+        "\(line)|\(functionString)| \(string)",
+        source: url.lastPathComponent,
+        file: file,
+        function: functionString,
+        line: line)
     }
   }
 }
