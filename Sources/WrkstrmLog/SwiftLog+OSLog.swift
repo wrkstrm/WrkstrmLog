@@ -6,25 +6,25 @@ public extension Logging.Logger.Level {
   var toOSType: OSLogType {
     switch self {
     case .critical:
-      return .fault
+      .fault
 
     case .info:
-      return .info
+      .info
 
     case .trace:
-      return .info
+      .info
 
     case .debug:
-      return .debug
+      .debug
 
     case .error:
-      return .error
+      .error
 
     case .notice:
-      return .default
+      .default
 
     case .warning:
-      return .error
+      .error
     }
   }
 }

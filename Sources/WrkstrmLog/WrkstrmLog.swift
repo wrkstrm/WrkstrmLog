@@ -17,13 +17,10 @@ public enum Log: Hashable {
   case swift(system: String, category: String)
 
   static func formattedFunction(_ function: String) -> String {
-    let functionString: String
-    if let maxLength = maxFunctionLength {
-      functionString = String(function.prefix(maxLength))
-    } else {
-      functionString = function
+    guard let maxLength = maxFunctionLength else {
+      return function
     }
-    return functionString
+    return String(function.prefix(maxLength))
   }
 
   public static func verbose(
