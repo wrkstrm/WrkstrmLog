@@ -1154,7 +1154,7 @@ static NSArray *colors   = nil;
 }
 
 - (NSString *)loggerName {
-    return @"com.wrkstrm.logger";
+    return @"wrkstrm.logger";
 }
 
 /**

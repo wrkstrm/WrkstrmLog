@@ -4,7 +4,7 @@ import os
 
 public enum Log: Hashable {
 
-  public static var style: Log = .os(system: "com.wrkstrm.os-log", category: "default")
+  public static var style: Log = .os(system: "wrkstrm", category: "os-log")
 
   public static var maxFunctionLength: Int?
 
@@ -100,7 +100,7 @@ public enum Log: Hashable {
       let logger = Self.swiftLoggers[
         Self.style,
         default: {
-          var logger = Logger(label: "com.wrkstrm.swift-log.default")
+          var logger = Logger(label: "wrkstrm [swift-log]")
           logger.logLevel = .debug
           return logger
         }()
