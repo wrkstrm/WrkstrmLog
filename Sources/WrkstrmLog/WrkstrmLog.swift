@@ -4,17 +4,27 @@ import os
 
 public enum Log: Hashable {
 
-  public static var style: Log = .os(system: "wrkstrm", category: "os-log")
+  case print(system: String, category: String)
+  case os(system: String, category: String)
+  case swift(system: String, category: String)
+
+  public static var style: Log = .os(system: "wrkstrm", category: "os-log") {
+    didSet {
+      switch style {
+      case let .os(system, category):
+        osLoggers[style] = OSLog(subsystem: system, category: category)
+
+      default:
+        Swift.print("New Style: \(style)")
+      }
+    }
+  }
 
   public static var maxFunctionLength: Int?
 
   private static var swiftLoggers: [Log: Logging.Logger] = [:]
 
   private static var osLoggers: [Log: OSLog] = [:]
-
-  case print(system: String, category: String)
-  case os(system: String, category: String)
-  case swift(system: String, category: String)
 
   static func formattedFunction(_ function: String) -> String {
     guard let maxLength = maxFunctionLength else {
