@@ -106,7 +106,7 @@ public enum Log: Hashable {
         functionString,
         string)
 
-    case .swift(system: _, category: _):
+    case .swift:
       let logger = Self.swiftLoggers[
         Self.style,
         default: {
