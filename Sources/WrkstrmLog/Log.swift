@@ -45,8 +45,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     log(
       .info, emoji: "ℹ️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -58,8 +58,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     log(
       .error, emoji: "⚠️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -71,8 +71,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle) -> Never
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) -> Never {
     log(
       .critical, emoji: "❌", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -88,8 +88,8 @@ public struct Log: Hashable {
     function: String,
     line: UInt,
     column: UInt,
-    dso: UnsafeRawPointer)
-  {
+    dso: UnsafeRawPointer
+  ) {
     Log.shared.log(
       level, emoji: emoji, string: string, file: file, function: function, line: line,
       column: column, dso: dso)
@@ -101,8 +101,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     log(
       .info, emoji: "ℹ️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -114,8 +114,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     log(
       .error, emoji: "⚠️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -127,8 +127,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle) -> Never
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) -> Never {
     log(
       .critical, emoji: "❌", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -144,46 +144,46 @@ public struct Log: Hashable {
     function: String,
     line: UInt,
     column _: UInt,
-    dso: UnsafeRawPointer)
-  {
+    dso: UnsafeRawPointer
+  ) {
     // swiftlint:disable:next force_unwrapping
     let url = URL(string: file.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
     switch style {
-    case .print:
-      Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
+      case .print:
+        Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
 
-    case .os:
-      let logger = Self.osLoggers[
-        self, default: OSLog(subsystem: system, category: category)
-      ]
-      os_log(
-        level.toOSType,
-        dso: dso,
-        log: logger,
-        "%s-%i|%s| %s",
-        url.lastPathComponent,
-        line,
-        functionString,
-        string)
+      case .os:
+        let logger = Self.osLoggers[
+          self, default: OSLog(subsystem: system, category: category)
+        ]
+        os_log(
+          level.toOSType,
+          dso: dso,
+          log: logger,
+          "%s-%i|%s| %s",
+          url.lastPathComponent,
+          line,
+          functionString,
+          string)
 
-    case .swift:
-      let logger = Self.swiftLoggers[
-        self,
-        default: {
-          var logger = Logger(label: system)
-          logger.logLevel = .debug
-          return logger
-        }()
-      ]
-      logger.log(
-        level: level,
-        "\(line)|\(functionString)| \(string)",
-        source: url.lastPathComponent,
-        file: file,
-        function: functionString,
-        line: line)
+      case .swift:
+        let logger = Self.swiftLoggers[
+          self,
+          default: {
+            var logger = Logger(label: system)
+            logger.logLevel = .debug
+            return logger
+          }()
+        ]
+        logger.log(
+          level: level,
+          "\(line)|\(functionString)| \(string)",
+          source: url.lastPathComponent,
+          file: file,
+          function: functionString,
+          line: line)
     }
   }
 }
