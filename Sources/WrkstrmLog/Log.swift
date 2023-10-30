@@ -6,7 +6,6 @@ import os
 #endif  // canImport(os)
 
 public struct Log: Hashable {
-
   public enum Style {
     case print
     #if canImport(os)
