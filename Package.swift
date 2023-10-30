@@ -1,7 +1,7 @@
 // swift-tools-version:5.9
 import PackageDescription
 
-let package = Package(
+let package: Package = .init(
   name: "WrkstrmLog",
   platforms: [
     .iOS(.v15),
@@ -20,6 +20,12 @@ let package = Package(
       name: "WrkstrmLog",
       dependencies: [
         .product(name: "Logging", package: "swift-log"),
+      ],
+      swiftSettings: [
+        .unsafeFlags([
+          "-Xfrontend",
+          "-warn-long-expression-type-checking=50",
+        ]),
       ]),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ])
