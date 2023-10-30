@@ -2,31 +2,37 @@ import Foundation
 import Logging
 import os
 
-public enum Log: Hashable {
+public struct Log: Hashable {
 
-  case print(system: String, category: String)
-  case os(system: String, category: String)
-  case swift(system: String, category: String)
+  public enum Style {
+    case print
+    case os
+    case swift
+  }
 
-  public static var style: Log = .os(system: "wrkstrm", category: "os-log") {
+  public static var shared: Log = .init(system: "wrkstrm", category: "shared") {
     didSet {
-      switch style {
-      case let .os(system, category):
-        osLoggers[style] = OSLog(subsystem: system, category: category)
-
-      default:
-        Swift.print("New Style: \(style)")
-      }
+      shared.verbose("New Logger: \(shared)")
     }
   }
 
-  public static var maxFunctionLength: Int?
-
-  private static var swiftLoggers: [Log: Logging.Logger] = [:]
+  public var system: String
+  public var category: String
+  public var style: Style = .os
 
   private static var osLoggers: [Log: OSLog] = [:]
 
-  static func formattedFunction(_ function: String) -> String {
+  private static var swiftLoggers: [Log: Logging.Logger] = [:]
+
+  init(system: String, category: String, style: Style = .os) {
+    self.system = system
+    self.category = category
+    self.style = style
+  }
+
+  public var maxFunctionLength: Int?
+
+  func formattedFunction(_ function: String) -> String {
     guard let maxLength = maxFunctionLength else {
       return function
     }
@@ -81,48 +87,12 @@ public enum Log: Hashable {
     file: String,
     function: String,
     line: UInt,
-    column _: UInt,
+    column: UInt,
     dso: UnsafeRawPointer)
   {
-    // swiftlint:disable:next force_unwrapping
-    let url = URL(string: file.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
-    let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
-    let functionString = formattedFunction(function)
-    switch style {
-    case .print(let system, category: _):
-      Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
-
-    case let .os(system, category):
-      let logger = Self.osLoggers[
-        Self.style, default: OSLog(subsystem: system, category: category)
-      ]
-      os_log(
-        level.toOSType,
-        dso: dso,
-        log: logger,
-        "%s-%i|%s| %s",
-        url.lastPathComponent,
-        line,
-        functionString,
-        string)
-
-    case .swift:
-      let logger = Self.swiftLoggers[
-        Self.style,
-        default: {
-          var logger = Logger(label: "wrkstrm [swift-log]")
-          logger.logLevel = .debug
-          return logger
-        }()
-      ]
-      logger.log(
-        level: level,
-        "\(line)|\(functionString)| \(string)",
-        source: url.lastPathComponent,
-        file: file,
-        function: functionString,
-        line: line)
-    }
+    Log.shared.log(
+      level, emoji: emoji, string: string, file: file, function: function, line: line,
+      column: column, dso: dso)
   }
 
   public func verbose(
@@ -179,14 +149,14 @@ public enum Log: Hashable {
     // swiftlint:disable:next force_unwrapping
     let url = URL(string: file.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
-    let functionString = Self.formattedFunction(function)
-    switch self {
-    case .print(let system, category: _):
+    let functionString = formattedFunction(function)
+    switch style {
+    case .print:
       Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
 
-    case let .os(system, category):
+    case .os:
       let logger = Self.osLoggers[
-        Self.style, default: OSLog(subsystem: system, category: category)
+        self, default: OSLog(subsystem: system, category: category)
       ]
       os_log(
         level.toOSType,
@@ -198,9 +168,9 @@ public enum Log: Hashable {
         functionString,
         string)
 
-    case .swift(let system, category: _):
+    case .swift:
       let logger = Self.swiftLoggers[
-        Self.style,
+        self,
         default: {
           var logger = Logger(label: system)
           logger.logLevel = .debug
