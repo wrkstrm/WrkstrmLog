@@ -3,29 +3,29 @@ import Logging
 import os
 
 extension Logging.Logger.Level {
-
+  /// Converts an OSLogType to a Swift Log Logger Level.
   public var toOSType: OSLogType {
     switch self {
-      case .critical:
-        .fault
-
-      case .info:
-        .info
-
       case .trace:
-        .info
+        .debug
 
       case .debug:
         .debug
 
-      case .error:
-        .error
+      case .info:
+        .info
 
       case .notice:
         .default
 
       case .warning:
         .error
+
+      case .error:
+        .error
+
+      case .critical:
+        .fault
     }
   }
 }
