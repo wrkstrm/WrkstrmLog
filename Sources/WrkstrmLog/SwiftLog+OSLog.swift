@@ -1,3 +1,4 @@
+#if canImport(os)
 import Logging
 import os
 
@@ -28,3 +29,4 @@ extension Logging.Logger.Level {
     }
   }
 }
+#endif  // canImport(os)
