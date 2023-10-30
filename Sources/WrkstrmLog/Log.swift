@@ -1,12 +1,16 @@
 import Foundation
 import Logging
+#if canImport(os)
 import os
+#endif  // canImport(os)
 
 public struct Log: Hashable {
 
   public enum Style {
     case print
+#if canImport(os)
     case os
+#endif  // canImport(os)
     case swift
   }
 
@@ -18,13 +22,22 @@ public struct Log: Hashable {
 
   public var system: String
   public var category: String
-  public var style: Style = .os
 
-  private static var osLoggers: [Log: OSLog] = [:]
+#if canImport(os)
+public var style: Style = .os
+#else  // canImport(os)
+public var style: Style = .swiff
+#endif  // canImport(os)
 
   private static var swiftLoggers: [Log: Logging.Logger] = [:]
 
-  public init(system: String, category: String, style: Style = .os) {
+#if canImport(os)
+  private static var osLoggers: [Log: OSLog] = [:]
+
+public init(system: String, category: String, style: Style = .os) {
+#else  // canImport(os)
+public init(system: String, category: String, style: Style = .swift) {
+#endif // canImport(os)
     self.system = system
     self.category = category
     self.style = style
@@ -153,7 +166,7 @@ public struct Log: Hashable {
     switch style {
       case .print:
         Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
-
+#if canImport(os)
       case .os:
         let logger = Self.osLoggers[
           self, default: OSLog(subsystem: system, category: category)
@@ -167,7 +180,7 @@ public struct Log: Hashable {
           line,
           functionString,
           string)
-
+#endif // canImport(os)
       case .swift:
         let logger = Self.swiftLoggers[
           self,
