@@ -27,7 +27,7 @@ public struct Log: Hashable {
   #if canImport(os)
   public var style: Style = .os
   #else  // canImport(os)
-  public var style: Style = .swiff
+  public var style: Style = .swift
   #endif  // canImport(os)
 
   private static var swiftLoggers: [Log: Logging.Logger] = [:]
