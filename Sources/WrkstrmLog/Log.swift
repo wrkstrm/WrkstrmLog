@@ -24,7 +24,7 @@ public struct Log: Hashable {
 
   private static var swiftLoggers: [Log: Logging.Logger] = [:]
 
-  init(system: String, category: String, style: Style = .os) {
+  public init(system: String, category: String, style: Style = .os) {
     self.system = system
     self.category = category
     self.style = style
