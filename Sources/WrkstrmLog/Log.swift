@@ -1,5 +1,6 @@
 import Foundation
 import Logging
+
 #if canImport(os)
 import os
 #endif  // canImport(os)
@@ -8,9 +9,9 @@ public struct Log: Hashable {
 
   public enum Style {
     case print
-#if canImport(os)
+    #if canImport(os)
     case os
-#endif  // canImport(os)
+    #endif  // canImport(os)
     case swift
   }
 
@@ -23,25 +24,29 @@ public struct Log: Hashable {
   public var system: String
   public var category: String
 
-#if canImport(os)
-public var style: Style = .os
-#else  // canImport(os)
-public var style: Style = .swiff
-#endif  // canImport(os)
+  #if canImport(os)
+  public var style: Style = .os
+  #else  // canImport(os)
+  public var style: Style = .swiff
+  #endif  // canImport(os)
 
   private static var swiftLoggers: [Log: Logging.Logger] = [:]
 
-#if canImport(os)
+  #if canImport(os)
   private static var osLoggers: [Log: OSLog] = [:]
 
-public init(system: String, category: String, style: Style = .os) {
-#else  // canImport(os)
-public init(system: String, category: String, style: Style = .swift) {
-#endif // canImport(os)
+  public init(system: String, category: String, style: Style = .os) {
     self.system = system
     self.category = category
     self.style = style
   }
+  #else  // canImport(os)
+  public init(system: String, category: String, style: Style = .swift) {
+    self.system = system
+    self.category = category
+    self.style = style
+  }
+  #endif  // canImport(os)
 
   public var maxFunctionLength: Int?
 
@@ -166,21 +171,24 @@ public init(system: String, category: String, style: Style = .swift) {
     switch style {
       case .print:
         Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
-#if canImport(os)
-      case .os:
-        let logger = Self.osLoggers[
-          self, default: OSLog(subsystem: system, category: category)
-        ]
-        os_log(
-          level.toOSType,
-          dso: dso,
-          log: logger,
-          "%s-%i|%s| %s",
-          url.lastPathComponent,
-          line,
-          functionString,
-          string)
-#endif // canImport(os)
+
+      #if canImport(os)
+
+        case .os:
+          let logger = Self.osLoggers[
+            self, default: OSLog(subsystem: system, category: category)
+          ]
+          os_log(
+            level.toOSType,
+            dso: dso,
+            log: logger,
+            "%s-%i|%s| %s",
+            url.lastPathComponent,
+            line,
+            functionString,
+            string)
+      #endif  // canImport(os)
+
       case .swift:
         let logger = Self.swiftLoggers[
           self,
