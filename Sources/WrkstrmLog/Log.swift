@@ -14,7 +14,7 @@ public struct Log: Hashable {
     case swift
   }
 
-  public static var shared: Log = .init(system: "wrkstrm", category: "shared") {
+  public static var shared = Log(system: "wrkstrm", category: "shared") {
     didSet {
       shared.verbose("New Logger: \(shared)")
     }
