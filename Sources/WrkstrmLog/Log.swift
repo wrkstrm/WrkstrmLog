@@ -163,10 +163,10 @@ public struct Log: Hashable {
     column _: UInt,
     dso: UnsafeRawPointer
   ) {
-    // swiftlint:disable:next force_unwrapping
     let url: URL = .init(
       string:
         file
+        // swiftlint:disable:next force_unwrapping
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
@@ -175,6 +175,7 @@ public struct Log: Hashable {
         Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
 
       #if canImport(os)
+
         case .os:
           let logger = Self.osLoggers[
             self, default: OSLog(subsystem: system, category: category)
