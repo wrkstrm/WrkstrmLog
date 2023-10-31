@@ -164,7 +164,10 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer
   ) {
     // swiftlint:disable:next force_unwrapping
-    let url = URL(string: file.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+    let url: URL = .init(
+      string:
+        file
+        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
     switch style {
