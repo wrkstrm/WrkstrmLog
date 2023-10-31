@@ -4,10 +4,10 @@ import PackageDescription
 let package = Package(
   name: "WrkstrmLog",
   platforms: [
-    .iOS(.v15),
+    .iOS(.v16),
     .macOS(.v13),
-    .tvOS(.v12),
-    .watchOS(.v5),
+    .tvOS(.v16),
+    .watchOS(.v9),
   ],
   products: [
     .library(name: "WrkstrmLog", targets: ["WrkstrmLog"]),

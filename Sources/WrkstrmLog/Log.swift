@@ -175,6 +175,7 @@ public struct Log: Hashable {
         Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
 
       #if canImport(os)
+
         case .os:
           let logger = Self.osLoggers[
             self, default: OSLog(subsystem: system, category: category)

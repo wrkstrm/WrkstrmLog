@@ -2,8 +2,6 @@ import XCTest
 
 @testable import WrkstrmLog
 
-g
-
 final class WrkstrmLogTests: XCTestCase {
   func testExample() {
     Log.error("This is interesting.")
