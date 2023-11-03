@@ -1,10 +1,11 @@
+import Logging
+
 #if os(Linux)
 // Needed because DispatchQueue isn't Sendable on Linux
 @preconcurrency import Foundation
 #else
 import Foundation
 #endif
-import Logging
 
 #if canImport(os)
 import os
@@ -13,9 +14,9 @@ import os
 public struct Log: Hashable {
   public enum Style {
     case print
-    #if canImport(os)
+#if canImport(os)
     case os
-    #endif  // canImport(os)
+#endif  // canImport(os)
     case swift
   }
 
@@ -28,15 +29,15 @@ public struct Log: Hashable {
   public var system: String
   public var category: String
 
-  #if canImport(os)
+#if canImport(os)
   public var style: Style = .os
-  #else  // canImport(os)
+#else  // canImport(os)
   public var style: Style = .swift
-  #endif  // canImport(os)
+#endif  // canImport(os)
 
   private static var swiftLoggers: [Log: Logging.Logger] = [:]
 
-  #if canImport(os)
+#if canImport(os)
   private static var osLoggers: [Log: OSLog] = [:]
 
   public init(system: String, category: String, style: Style = .os) {
@@ -44,13 +45,13 @@ public struct Log: Hashable {
     self.category = category
     self.style = style
   }
-  #else  // canImport(os)
+#else  // canImport(os)
   public init(system: String, category: String, style: Style = .swift) {
     self.system = system
     self.category = category
     self.style = style
   }
-  #endif  // canImport(os)
+#endif  // canImport(os)
 
   public var maxFunctionLength: Int?
 
@@ -67,8 +68,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
-  ) {
+    dso: UnsafeRawPointer = #dsohandle)
+  {
     log(
       .info, emoji: "ℹ️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -80,8 +81,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
-  ) {
+    dso: UnsafeRawPointer = #dsohandle)
+  {
     log(
       .error, emoji: "⚠️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -93,8 +94,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
-  ) -> Never {
+    dso: UnsafeRawPointer = #dsohandle) -> Never
+  {
     log(
       .critical, emoji: "❌", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -110,8 +111,8 @@ public struct Log: Hashable {
     function: String,
     line: UInt,
     column: UInt,
-    dso: UnsafeRawPointer
-  ) {
+    dso: UnsafeRawPointer)
+  {
     Log.shared.log(
       level, emoji: emoji, string: string, file: file, function: function, line: line,
       column: column, dso: dso)
@@ -123,8 +124,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
-  ) {
+    dso: UnsafeRawPointer = #dsohandle)
+  {
     log(
       .info, emoji: "ℹ️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -136,8 +137,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
-  ) {
+    dso: UnsafeRawPointer = #dsohandle)
+  {
     log(
       .error, emoji: "⚠️", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -149,8 +150,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
-  ) -> Never {
+    dso: UnsafeRawPointer = #dsohandle) -> Never
+  {
     log(
       .critical, emoji: "❌", string: string,
       file: file, function: function, line: line, column: column, dso: dso)
@@ -166,11 +167,11 @@ public struct Log: Hashable {
     function: String,
     line: UInt,
     column _: UInt,
-    dso: UnsafeRawPointer
-  ) {
+    dso: UnsafeRawPointer)
+  {
     let url: URL = .init(
       string:
-        file
+      file
         // swiftlint:disable:next force_unwrapping
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
@@ -179,22 +180,22 @@ public struct Log: Hashable {
       case .print:
         Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
 
-      #if canImport(os)
+#if canImport(os)
 
-        case .os:
-          let logger = Self.osLoggers[
-            self, default: OSLog(subsystem: system, category: category)
-          ]
-          os_log(
-            level.toOSType,
-            dso: dso,
-            log: logger,
-            "%s-%i|%s| %s",
-            url.lastPathComponent,
-            line,
-            functionString,
-            string)
-      #endif  // canImport(os)
+      case .os:
+        let logger = Self.osLoggers[
+          self, default: OSLog(subsystem: system, category: category)
+        ]
+        os_log(
+          level.toOSType,
+          dso: dso,
+          log: logger,
+          "%s-%i|%s| %s",
+          url.lastPathComponent,
+          line,
+          functionString,
+          string)
+#endif  // canImport(os)
 
       case .swift:
         let logger = Self.swiftLoggers[
