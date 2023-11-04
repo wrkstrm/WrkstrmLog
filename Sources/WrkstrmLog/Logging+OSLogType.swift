@@ -3,7 +3,12 @@ import Logging
 import os
 
 extension Logging.Logger.Level {
-  /// Converts an OSLogType to a Swift Log Logger Level.
+  /// Converts a `Logging.Logger.Level` to an `OSLogType`.
+  ///
+  /// This extension allows for mapping Swift Log levels to their equivalent OSLog types, which is
+  /// useful for compatibility when using both logging frameworks.
+  ///
+  /// - Returns: An `OSLogType` equivalent to the Swift Log level.
   public var toOSType: OSLogType {
     switch self {
       case .trace:
