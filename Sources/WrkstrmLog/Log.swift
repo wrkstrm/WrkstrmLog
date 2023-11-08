@@ -1,12 +1,6 @@
 import Logging
-
-#if os(Linux)
-// Needed because DispatchQueue isn't Sendable on Linux
-@preconcurrency import Foundation
-#else  // os(Linux)
 import Foundation
 import os
-#endif  // os(Linux)
 
 /// A flexible and extensible logging utility that supports multiple styles and destinations for
 /// logging messages.
