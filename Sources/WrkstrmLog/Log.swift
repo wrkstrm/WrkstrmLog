@@ -1,6 +1,8 @@
 import Logging
 import Foundation
+#if canImport(os)
 import os
+#endif
 
 /// A flexible and extensible logging utility that supports multiple styles and destinations for
 /// logging messages.
