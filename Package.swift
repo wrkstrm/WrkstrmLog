@@ -1,6 +1,13 @@
 // swift-tools-version:5.9
 import PackageDescription
 
+extension SwiftSetting {
+  static let profile: SwiftSetting = .unsafeFlags([
+    "-Xfrontend",
+    "-warn-long-expression-type-checking=25",
+  ])
+}
+
 let package = Package(
   name: "WrkstrmLog",
   platforms: [
@@ -22,10 +29,7 @@ let package = Package(
         .product(name: "Logging", package: "swift-log"),
       ],
       swiftSettings: [
-        .unsafeFlags([
-          "-Xfrontend",
-          "-warn-long-expression-type-checking=50",
-        ]),
+        .profile
       ]),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ])
