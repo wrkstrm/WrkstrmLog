@@ -1,13 +1,13 @@
 name: "\U0001F3CE️ Swift Build| WrkstrmLog"
 on:
+  pull_request:
+    branches:
+    - main
   push:
     branches:
     - main
     paths:
     - '**'
-  pull_request:
-    branches:
-    - main
 jobs:
   swift-build:
     strategy:
@@ -22,12 +22,12 @@ jobs:
         submodules: recursive
     - name: Cache Swift PM dependencies
       id: cache-spm
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
-        restore-keys: ${{ runner.os }}-spm-WrkstrmLog-
-        path: apple/WrkstrmLog/.build
         key: ${{ runner.os }}-spm-WrkstrmLog-${{ hashFiles('**/Package.resolved')
           }}
+        restore-keys: ${{ runner.os }}-spm-WrkstrmLog-
+        path: apple/WrkstrmLog/.build
     - name: Check cache
       run: 'echo ''Cache hit: ${{ steps.cache-spm.outputs.cache-hit }}'''
     - name: Setup Xcode
