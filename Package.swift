@@ -4,7 +4,7 @@ import PackageDescription
 extension SwiftSetting {
   static let profile: SwiftSetting = .unsafeFlags([
     "-Xfrontend",
-    "-warn-long-expression-type-checking=5",
+    "-warn-long-expression-type-checking=6",
   ])
 }
 
@@ -20,16 +20,12 @@ let package = Package(
     .library(name: "WrkstrmLog", targets: ["WrkstrmLog"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
+    .package(url: "https://github.com/apple/swift-log.git", from: "1.5.0"),
   ],
   targets: [
     .target(
       name: "WrkstrmLog",
-      dependencies: [
-        .product(name: "Logging", package: "swift-log"),
-      ],
-      swiftSettings: [
-        .profile
-      ]),
+      dependencies: [.product(name: "Logging", package: "swift-log")],
+      swiftSettings: [.profile]),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ])
