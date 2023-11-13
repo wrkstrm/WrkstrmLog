@@ -6,7 +6,21 @@ import os
 
 extension ProcessInfo {
   public static var isRunningInXcode: Bool {
-    ProcessInfo.processInfo.environment["Xcode"] != nil
+    // Check for the Bundle Identifier
+    if ProcessInfo.processInfo.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
+      return true
+    }
+
+    // Check for specific paths in DYLD_LIBRARY_PATH or DYLD_FRAMEWORK_PATH
+    if let dyldLibraryPath = ProcessInfo.processInfo.environment["DYLD_LIBRARY_PATH"],
+       dyldLibraryPath.contains("/Xcode.app/") {
+      return true
+    }
+    if let dyldFrameworkPath = ProcessInfo.processInfo.environment["DYLD_FRAMEWORK_PATH"],
+       dyldFrameworkPath.contains("/Xcode.app/") {
+      return true
+    }
+    return false
   }
 }
 
