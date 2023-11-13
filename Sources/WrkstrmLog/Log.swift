@@ -4,6 +4,12 @@ import Logging
 import os
 #endif
 
+extension ProcessInfo {
+  public static var isRunningInXcode: Bool {
+    ProcessInfo.processInfo.environment["Xcode"] != nil
+  }
+}
+
 /// A flexible and extensible logging utility that supports multiple styles and destinations for
 /// logging messages.
 public struct Log: Hashable {
@@ -51,7 +57,9 @@ public struct Log: Hashable {
   ///   - system: The system name for the logger.
   ///   - category: The category name for the logger.
   ///   - style: The logging style used by the logger.
-  public init(system: String, category: String, style: Style = .os) {
+  public init(system: String, 
+              category: String,
+              style: Style = ProcessInfo.isRunningInXcode ? .os : .print) {
     self.system = system
     self.category = category
     self.style = style
