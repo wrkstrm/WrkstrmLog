@@ -4,11 +4,13 @@ To install `WrkstrmLog`, simply add it to your project using SPM.
 
 ## Status
 
-### Platforms 
+### Platforms
+
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
 
 ### Actions
+
 [![Build Status][build-badge]](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-swift.yml)
 [![Test Status][test-badge]](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-tests-swift.yml)
 
@@ -23,8 +25,6 @@ To use `WrkstrmLog` in your project, simply import the library and start logging
 ## Documentation
 
 For more information about using and customizing `WrkstrmLog`, please refer to the project's wiki on GitHub.
-
-
 
 ### Introduction
 
@@ -59,7 +59,6 @@ targets: [
         dependencies: ["WrkstrmLog"])
 ]
 ```
-
 
 #### Installation
 
