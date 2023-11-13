@@ -2,6 +2,11 @@
 
 To install `WrkstrmLog`, simply add it to your project using SPM.
 
+## Status
+
+[![Build Status][build-badge]](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-swift.yml)
+[![Test Status][test-badge]](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-tests-swift.yml)
+
 ## Usage
 
 To use `WrkstrmLog` in your project, simply import the library and start logging. The library includes four different types of logging systems, each with its own set of features and benefits.
@@ -14,16 +19,11 @@ To use `WrkstrmLog` in your project, simply import the library and start logging
 
 For more information about using and customizing `WrkstrmLog`, please refer to the project's wiki on GitHub.
 
-[build-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-build.yml/badge.svg
-[test-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-test.yml/badge.svg
 
 
 ### Introduction
 
 # `WrkstrmLog`
-
-[![Build Status][build-badge]](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-build.yml)
-[![Test Status][test-badge]](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-test.yml)
 
 - **Multiple Logging Systems**: Includes print, OSLog, Swift, and another system, each with unique features.
 - **User-Friendly**: Easily integrates with projects using Swift Package Manager (SPM).
@@ -92,8 +92,7 @@ To integrate `WrkstrmLog` into your project, simply add it via SPM.
 
 Visit our [GitHub Wiki](https://github.com/wrkstrm/WrkstrmLog/wiki) for comprehensive information on using and customizing `WrkstrmLog`.
 
---- 
-
+---
 
 [build-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-swift.yml/badge.svg
-[test-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-test.yml/badge.svg
+[test-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
