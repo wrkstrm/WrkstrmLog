@@ -1,5 +1,6 @@
 import Foundation
 import Logging
+
 #if canImport(os)
 import os
 #endif
@@ -13,11 +14,13 @@ extension ProcessInfo {
 
     // Check for specific paths in DYLD_LIBRARY_PATH or DYLD_FRAMEWORK_PATH
     if let dyldLibraryPath = ProcessInfo.processInfo.environment["DYLD_LIBRARY_PATH"],
-       dyldLibraryPath.contains("/Xcode.app/") {
+       dyldLibraryPath.contains("/Xcode.app/")
+    {
       return true
     }
     if let dyldFrameworkPath = ProcessInfo.processInfo.environment["DYLD_FRAMEWORK_PATH"],
-       dyldFrameworkPath.contains("/Xcode.app/") {
+       dyldFrameworkPath.contains("/Xcode.app/")
+    {
       return true
     }
     return false
@@ -71,9 +74,11 @@ public struct Log: Hashable {
   ///   - system: The system name for the logger.
   ///   - category: The category name for the logger.
   ///   - style: The logging style used by the logger.
-  public init(system: String, 
-              category: String,
-              style: Style = ProcessInfo.isRunningInXcode ? .os : .print) {
+  public init(
+    system: String,
+    category: String,
+    style: Style = ProcessInfo.isRunningInXcode ? .os : .print)
+  {
     self.system = system
     self.category = category
     self.style = style
