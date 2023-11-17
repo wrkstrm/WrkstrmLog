@@ -6,19 +6,20 @@ import os
 #endif
 
 extension ProcessInfo {
-  public static var isRunningInXcode: Bool {
+  public static var inXcodeEnvironment: Bool {
+    let info = Self.processInfo
     // Check for the Bundle Identifier
-    if ProcessInfo.processInfo.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
+    if info.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
       return true
     }
-
-    // Check for specific paths in DYLD_LIBRARY_PATH or DYLD_FRAMEWORK_PATH
-    if let dyldLibraryPath = ProcessInfo.processInfo.environment["DYLD_LIBRARY_PATH"],
+    // Check for specific paths in DYLD_LIBRARY_PATH
+    if let dyldLibraryPath = info.environment["DYLD_LIBRARY_PATH"],
        dyldLibraryPath.contains("/Xcode.app/")
     {
       return true
     }
-    if let dyldFrameworkPath = ProcessInfo.processInfo.environment["DYLD_FRAMEWORK_PATH"],
+    // Check for specific paths in DYLD_FRAMEWORK_PATH
+    if let dyldFrameworkPath = info.environment["DYLD_FRAMEWORK_PATH"],
        dyldFrameworkPath.contains("/Xcode.app/")
     {
       return true
@@ -77,7 +78,7 @@ public struct Log: Hashable {
   public init(
     system: String,
     category: String,
-    style: Style = ProcessInfo.isRunningInXcode ? .os : .print)
+    style: Style = ProcessInfo.inXcodeEnvironment ? .os : .print)
   {
     self.system = system
     self.category = category
@@ -277,8 +278,8 @@ public struct Log: Hashable {
   {
     let url: URL = .init(
       string:
-      file
-        // swiftlint:disable:next force_unwrapping
+        file
+      // swiftlint:disable:next force_unwrapping
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
