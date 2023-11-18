@@ -4,7 +4,6 @@ builder:
   - documentation_targets: [WrkstrmLog]
     custom_documentation_parameters: [--include-extended-types]
   - platform: watchos
-    scheme: ComposableArchitecture_watchOS
     swift_version: '5.9'
   - platform: ios
     swift_version: '5.9'
