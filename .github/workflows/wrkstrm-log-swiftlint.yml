@@ -1,13 +1,13 @@
 name: "\U0001F9F9 Swift Lint| WrkstrmLog"
 on:
+  pull_request:
+    branches:
+    - main
   push:
     branches:
     - main
     paths:
     - '**'
-  pull_request:
-    branches:
-    - main
 jobs:
   swift-build:
     strategy:
@@ -23,7 +23,7 @@ jobs:
       id: cache-brew
       uses: actions/cache@v3
       with:
-        key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }
+        key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
         path: /usr/local/Homebrew ~/Library/Caches/Homebrew
     - name: Check Cache
       run: 'echo ''Cache hit: ${{ steps.cache-brew.outputs.cache-hit }}'''
