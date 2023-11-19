@@ -7,19 +7,18 @@ import os
 
 extension ProcessInfo {
   public static var inXcodeEnvironment: Bool {
-    let info = Self.processInfo
     // Check for the Bundle Identifier
-    if info.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
+    if Self.processInfo.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
       return true
     }
     // Check for specific paths in DYLD_LIBRARY_PATH
-    if let dyldLibraryPath = info.environment["DYLD_LIBRARY_PATH"],
+    if let dyldLibraryPath = Self.processInfo.environment["DYLD_LIBRARY_PATH"],
        dyldLibraryPath.contains("/Xcode.app/")
     {
       return true
     }
     // Check for specific paths in DYLD_FRAMEWORK_PATH
-    if let dyldFrameworkPath = info.environment["DYLD_FRAMEWORK_PATH"],
+    if let dyldFrameworkPath = Self.processInfo.environment["DYLD_FRAMEWORK_PATH"],
        dyldFrameworkPath.contains("/Xcode.app/")
     {
       return true
@@ -123,7 +122,7 @@ public struct Log: Hashable {
   ///   - column: The column number in the source file where the log message is generated.
   ///   - dso: The address of the shared object where the log message is generated.
   public static func verbose(
-    _ string: String,
+    _ describable: Any,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
@@ -131,7 +130,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle)
   {
     log(
-      .info, emoji: "ℹ️", string: string,
+      .info, emoji: "ℹ️", describable: describable,
       file: file, function: function, line: line, column: column, dso: dso)
   }
 
@@ -145,7 +144,7 @@ public struct Log: Hashable {
   ///   - column: The column number in the source file where the log message is generated.
   ///   - dso: The address of the shared object where the log message is generated.
   public static func error(
-    _ string: String,
+    _ describable: Any,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
@@ -153,7 +152,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle)
   {
     log(
-      .error, emoji: "⚠️", string: string,
+      .error, emoji: "⚠️", describable: describable,
       file: file, function: function, line: line, column: column, dso: dso)
   }
 
@@ -168,7 +167,7 @@ public struct Log: Hashable {
   ///   - dso: The address of the shared object where the log message is generated.
   /// - Returns: Never, indicating a fatal error.
   public static func `guard`(
-    _ string: String = "",
+    _ describable: Any,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
@@ -176,7 +175,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle) -> Never
   {
     log(
-      .critical, emoji: "❌", string: string,
+      .critical, emoji: "❌", describable: describable,
       file: file, function: function, line: line, column: column, dso: dso)
     fatalError()
   }
@@ -185,7 +184,7 @@ public struct Log: Hashable {
   private static func log(
     _ level: Logging.Logger.Level,
     emoji: String,
-    string: String,
+    describable: Any,
     file: String,
     function: String,
     line: UInt,
@@ -193,7 +192,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer)
   {
     Log.shared.log(
-      level, emoji: emoji, string: string, file: file, function: function, line: line,
+      level, emoji: emoji, describable: describable, file: file, function: function, line: line,
       column: column, dso: dso)
   }
 
@@ -207,7 +206,7 @@ public struct Log: Hashable {
   ///   - column: The column number in the source file where the log message is generated.
   ///   - dso: The address of the shared object where the log message is generated.
   public func verbose(
-    _ string: String,
+    _ describable: Any,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
@@ -215,7 +214,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle)
   {
     log(
-      .info, emoji: "ℹ️", string: string,
+      .info, emoji: "ℹ️", describable: describable,
       file: file, function: function, line: line, column: column, dso: dso)
   }
 
@@ -229,7 +228,7 @@ public struct Log: Hashable {
   ///   - column: The column number in the source file where the log message is generated.
   ///   - dso: The address of the shared object where the log message is generated.
   public func error(
-    _ string: String,
+    _ describable: Any,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
@@ -237,7 +236,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle)
   {
     log(
-      .error, emoji: "⚠️", string: string,
+      .error, emoji: "⚠️", describable: describable,
       file: file, function: function, line: line, column: column, dso: dso)
   }
 
@@ -252,7 +251,7 @@ public struct Log: Hashable {
   ///   - dso: The address of the shared object where the log message is generated.
   /// - Returns: Never, indicating a fatal error.
   public func `guard`(
-    _ string: String = "",
+    _ describable: Any,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
@@ -260,7 +259,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle) -> Never
   {
     log(
-      .critical, emoji: "❌", string: string,
+      .critical, emoji: "❌", describable: describable,
       file: file, function: function, line: line, column: column, dso: dso)
     fatalError()
   }
@@ -269,7 +268,7 @@ public struct Log: Hashable {
   private func log(
     _ level: Logging.Logger.Level,
     emoji: String,
-    string: String,
+    describable: Any,
     file: String,
     function: String,
     line: UInt,
@@ -285,7 +284,7 @@ public struct Log: Hashable {
     let functionString = formattedFunction(function)
     switch style {
       case .print:
-        Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + string)
+        Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + String(describing: describable))
 
 #if canImport(os)
 
@@ -301,7 +300,7 @@ public struct Log: Hashable {
           url.lastPathComponent,
           line,
           functionString,
-          string)
+          String(describing: describable))
 #endif  // canImport(os)
 
       case .swift:
@@ -315,7 +314,7 @@ public struct Log: Hashable {
         ]
         logger.log(
           level: level,
-          "\(line)|\(functionString)| \(string)",
+          "\(line)|\(functionString)| \(String(describing: describable))",
           source: url.lastPathComponent,
           file: file,
           function: functionString,
