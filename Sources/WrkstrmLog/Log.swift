@@ -251,7 +251,7 @@ public struct Log: Hashable {
   ///   - dso: The address of the shared object where the log message is generated.
   /// - Returns: Never, indicating a fatal error.
   public func `guard`(
-    _ describable: Any,
+    _ describable: Any? = nil,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
@@ -259,7 +259,7 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle) -> Never
   {
     log(
-      .critical, emoji: "❌", describable: describable,
+      .critical, emoji: "❌", describable: describable ?? "",
       file: file, function: function, line: line, column: column, dso: dso)
     fatalError()
   }
