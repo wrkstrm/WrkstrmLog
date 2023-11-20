@@ -95,6 +95,4 @@ Import `WrkstrmLog` and start logging with ease:
 
 - Developed by github.com/@rismay
 
----
-
 [test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
