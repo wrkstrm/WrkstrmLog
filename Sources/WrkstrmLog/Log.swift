@@ -6,60 +6,81 @@ import os
 #endif
 
 extension ProcessInfo {
+  /// Determines if the current process is running within the Xcode environment.
+  ///
+  /// This property is useful for configuring logging behavior differently when running
+  /// in Xcode versus standalone execution.
+  ///
+  /// - Returns: `true` if running in Xcode, `false` otherwise.
   public static var inXcodeEnvironment: Bool {
-    // Check for the Bundle Identifier
+    // Check for the Bundle Identifier of Xcode
     if processInfo.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
       return true
     }
-    // Check for specific paths in DYLD_LIBRARY_PATH
+    // Check for specific paths in DYLD_LIBRARY_PATH that indicate Xcode environment
     if let dyldLibraryPath = processInfo.environment["DYLD_LIBRARY_PATH"],
-       dyldLibraryPath.contains("/Xcode.app/")
-    {
+       dyldLibraryPath.contains("/Xcode.app/") {
       return true
     }
     // Check for specific paths in DYLD_FRAMEWORK_PATH
     if let dyldFrameworkPath = Self.processInfo.environment["DYLD_FRAMEWORK_PATH"],
-       dyldFrameworkPath.contains("/Xcode.app/")
-    {
+       dyldFrameworkPath.contains("/Xcode.app/") {
       return true
     }
     return false
   }
 }
 
-/// A flexible and extensible logging utility that supports multiple styles and destinations for
-/// logging messages.
+/// A flexible and extensible logging utility supporting multiple styles and destinations for logging messages.
+///
+/// `Log` provides a unified interface for logging across various platforms and environments. It supports standard output logging,
+/// OSLog (on Apple platforms), and Swift's logging framework, allowing for easy configuration and usage.
+///
+/// Example usage:
+/// ```
+/// let logger = Log(system: "MyApp", category: "Networking")
+/// logger.info("Network request started")
+/// ```
 public struct Log: Hashable {
   /// Enum defining different logging styles.
   public enum Style {
     /// Print style, logs messages to standard output.
+    /// Typically used for debugging in local or development environments.
     case print
 #if canImport(os)
     /// OSLog style, logs messages using Apple's Unified Logging System (OSLog).
+    /// Recommended for production use on Apple platforms for detailed and performant logging.
     case os
 #endif  // canImport(os)
     /// Swift style, logs messages using Swift's built-in logging framework (SwiftLog).
+    /// Ideal for server-side Swift applications or when consistent logging behavior across platforms is desired.
     case swift
   }
 
   /// The shared logger instance, often used for default logging.
+  /// This shared instance can be conveniently used throughout your application.
+  ///
+  /// Example usage:
+  /// ```
+  /// Log.shared.info("Application started")
+  /// ```
   public static var shared = Log(system: "wrkstrm", category: "shared") {
     didSet {
       shared.verbose("New Logger: \(shared)")
     }
   }
 
-  /// The system name for the logger.
+  /// The system name for the logger. Typically represents the application or module name.
   public var system: String
 
-  /// The category name for the logger.
+  /// The category name for the logger. Used to categorize and filter log messages.
   public var category: String
 
 #if canImport(os)
-  /// The logging style used by the logger.
+  /// The logging style used by the logger. Defaults to `.os` on Apple platforms.
   public var style: Style = .os
 #else  // canImport(os)
-  /// The logging style used by the logger.
+  /// The logging style used by the logger. Defaults to `.swift` on non-Apple platforms.
   public var style: Style = .swift
 #endif  // canImport(os)
 
@@ -73,7 +94,12 @@ public struct Log: Hashable {
   /// - Parameters:
   ///   - system: The system name for the logger.
   ///   - category: The category name for the logger.
-  ///   - style: The logging style used by the logger.
+  ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`).
+  ///
+  /// Example:
+  /// ```
+  /// let networkLogger = Log(system: "MyApp", category: "Networking", style: .os)
+  /// ```
   public init(
     system: String,
     category: String,
@@ -90,7 +116,12 @@ public struct Log: Hashable {
   /// - Parameters:
   ///   - system: The system name for the logger.
   ///   - category: The category name for the logger.
-  ///   - style: The logging style used by the logger.
+  ///   - style: The logging style used by the logger (`.print`, `.swift`).
+  ///
+  /// Example:
+  /// ```
+  /// let networkLogger = Log(system: "MyApp", category: "Networking", style: .swift)
+  /// ```
   public init(system: String, category: String, style: Style = .swift) {
     self.system = system
     self.category = category
