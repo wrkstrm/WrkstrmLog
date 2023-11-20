@@ -72,7 +72,7 @@ Import `WrkstrmLog` and start logging with ease:
 
 For detailed usage and customization instructions, visit the [GitHub Wiki](https://github.com/wrkstrm/WrkstrmLog/wiki).
 
-[test-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
+[test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
 
 ---
 
