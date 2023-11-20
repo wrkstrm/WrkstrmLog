@@ -15,9 +15,14 @@
 - **🔧 Flexible and Customizable**: Extend the framework to fit specific logging requirements.
 - **🚀 Easy Integration**: Quick setup with Swift Package Manager.
 
+## Compatibility
+
+- macOS
+- Linux
+
 ## 📦 Installation
 
-To integrate `WrkstrmLog` into your project, simply add it via Swift Package Manager (SPM).
+To integrate `WrkstrmLog` into your project, follow these steps:
 
 ### 🛠 Swift Package Manager
 
@@ -68,12 +73,28 @@ Import `WrkstrmLog` and start logging with ease:
 
 `WrkstrmLog` offers high customization capabilities. Extend or modify it to suit your project's needs, and utilize the sample formatters as a foundation for custom implementations.
 
-## 📖 Documentation
+## 🤝 Contributing
 
-For detailed usage and customization instructions, visit the [GitHub Wiki](https://github.com/wrkstrm/WrkstrmLog/wiki).
+🌟 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-[test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📜 License
+
+📄 Distributed under the MIT License. See `LICENSE` for more information.
+
+## 📬 Contact
+
+🔗 Project Link: [https://github.com/wrkstrm/WrkstrmLog](https://github.com/wrkstrm/WrkstrmLog)
+
+## 💖 Acknowledgments
+
+- Developed by github.com/@rismay
 
 ---
 
-The emojis add a visual touch and help in categorizing different sections of the README for easier readability.
+[test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
