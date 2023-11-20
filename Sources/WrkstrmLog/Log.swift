@@ -269,6 +269,33 @@ public struct Log: Hashable {
       dso: dso)
   }
 
+  /// Logs a informational message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The object or string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public func info(
+    _ describable: Any,
+    file: String = #file,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle)
+  {
+    log(
+      .info,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
+  }
+
   /// Logs an error message with the specified parameters.
   ///
   /// - Parameters:
