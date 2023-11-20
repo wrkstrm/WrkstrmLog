@@ -1,97 +1,76 @@
-## Installation
+## `WrkstrmLog`
 
-To install `WrkstrmLog`, simply add it to your project using SPM.
+`WrkstrmLog` is a versatile and flexible logging framework designed for consistent logging across different environments including Linux, Xcode, and macOS terminal. It adapts to various contexts, ensuring that log messages are displayed with consistent formatting regardless of the platform.
 
-## Status
+## Key Features
 
-### Platforms
+- **Adaptive Logging**: Seamless logging across Linux, Xcode, and macOS terminal environments.
+- **Multiple Logging Styles**: Choose from print, OSLog, and SwiftLog styles.
+- **Flexible and Customizable**: Extend the framework to fit specific logging requirements.
+- **Easy Integration**: Quick setup with Swift Package Manager.
 
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
+### Installation
 
-## Usage
+To integrate `WrkstrmLog` into your project, simply add it via Swift Package Manager (SPM).
 
-To use `WrkstrmLog` in your project, simply import the library and start logging. The library includes four different types of logging systems, each with its own set of features and benefits.
+#### Swift Package Manager
 
-## Customization
-
-`WrkstrmLog` is highly customizable and can be extended or modified to fit your specific needs. The library includes a number of sample formatters that can be used as a starting point for creating custom formatters.
-
-## Documentation
-
-For more information about using and customizing `WrkstrmLog`, please refer to the project's wiki on GitHub.
-
-### Introduction
-
-# `WrkstrmLog`
-
-- **Multiple Logging Systems**: Includes print, OSLog, Swift, and another system, each with unique features.
-- **User-Friendly**: Easily integrates with projects using Swift Package Manager (SPM).
-
-### Features
-
-- **Three Logging Systems**: Choose from print, OSLog, and SwiftLog to best fit your project needs.
-- **Ease of Use**: Simple integration into your project using Swift Package Manager (SPM).
-
-#### Installation
-
-##### Swift Package Manager
-
-To integrate `WrkstrmLog` into your iOS or macOS project using SPM, add the following as a dependency in your `Package.swift` file:
+Add `WrkstrmLog` as a dependency in your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wrkstrm/Wrkstrm-Log.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.0.0"))
 ]
 ```
 
-And then add `WrkstrmLog` to your target dependencies:
+Include `WrkstrmLog` in your target dependencies:
 
 ```swift
 targets: [
-    .target( 
+    .target(
         name: "YourTarget",
         dependencies: ["WrkstrmLog"])
 ]
 ```
 
-#### Installation
+### Status
 
-To integrate `WrkstrmLog` into your project, simply add it via SPM.
+#### Platforms
 
-#### Usage
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
 
-1. **Importing the Library**:
-   Begin by importing `WrkstrmLog` in the Swift file where you want to use the logging functionality.
+### Usage
+
+Import `WrkstrmLog` and start logging with ease:
+
+1. **Import the Library**:
 
    ```swift
    import WrkstrmLog
    ```
 
-2. **Initialization**:
-   Initialize the logger with your desired system and category:
+2. **Initialize Logger**:
+   Create a logger instance with your system and category:
 
    ```swift
    let logger = Log(system: "YourSystem", category: "YourCategory")
    ```
 
-3. **Logging**:
-   Utilize the various logging methods like `verbose`, `error`, etc., based on your requirements.
+3. **Log Messages**:
+   Use various logging methods like `verbose`, `info`, `error`, and `guard`:
 
    ```swift
-   logger.verbose("This is a verbose log message")
-   logger.error("This is an error log message")
+   logger.verbose("Verbose message")
+   logger.info("Info message")
+   logger.error("Error message")
+   Log.guard("Critical error")
    ```
 
-#### Customization
+### Customization
 
-`WrkstrmLog` is built with flexibility in mind. Utilize the provided sample formatters to create custom formatters that perfectly align with your project's requirements.
+`WrkstrmLog` offers high customization capabilities. Extend or modify it to suit your project's needs, and utilize the sample formatters as a foundation for custom implementations.
 
 ### Documentation
 
-Visit our [GitHub Wiki](https://github.com/wrkstrm/WrkstrmLog/wiki) for comprehensive information on using and customizing `WrkstrmLog`.
-
----
-
-[build-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-swift.yml/badge.svg
-[test-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
+For detailed usage and customization instructions, visit the [GitHub Wiki](https://github.com/wrkstrm/WrkstrmLog/wiki).
