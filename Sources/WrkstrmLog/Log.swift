@@ -8,11 +8,11 @@ import os
 extension ProcessInfo {
   public static var inXcodeEnvironment: Bool {
     // Check for the Bundle Identifier
-    if Self.processInfo.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
+    if processInfo.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode" {
       return true
     }
     // Check for specific paths in DYLD_LIBRARY_PATH
-    if let dyldLibraryPath = Self.processInfo.environment["DYLD_LIBRARY_PATH"],
+    if let dyldLibraryPath = processInfo.environment["DYLD_LIBRARY_PATH"],
        dyldLibraryPath.contains("/Xcode.app/")
     {
       return true
@@ -129,9 +129,41 @@ public struct Log: Hashable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle)
   {
-    log(
-      .info, emoji: "ℹ️", describable: describable,
-      file: file, function: function, line: line, column: column, dso: dso)
+    Log.shared.log(
+      .info,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
+  }
+
+  /// Logs a info message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - string: The message string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public static func info(
+    _ describable: Any,
+    file: String = #file,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle)
+  {
+    Log.shared.log(
+      .info,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
   }
 
   /// Logs an error message with the specified parameters.
@@ -151,9 +183,14 @@ public struct Log: Hashable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle)
   {
-    log(
-      .error, emoji: "⚠️", describable: describable,
-      file: file, function: function, line: line, column: column, dso: dso)
+    Log.shared.log(
+      .error,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
   }
 
   /// Logs a critical message and triggers a fatal error.
@@ -167,23 +204,27 @@ public struct Log: Hashable {
   ///   - dso: The address of the shared object where the log message is generated.
   /// - Returns: Never, indicating a fatal error.
   public static func `guard`(
-    _ describable: Any,
+    _ describable: Any? = nil,
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle) -> Never
   {
-    log(
-      .critical, emoji: "❌", describable: describable,
-      file: file, function: function, line: line, column: column, dso: dso)
+    Log.shared.log(
+      .critical,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
     fatalError()
   }
 
   // swiftlint:disable:next function_parameter_count
   private static func log(
     _ level: Logging.Logger.Level,
-    emoji: String,
     describable: Any,
     file: String,
     function: String,
@@ -192,8 +233,13 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer)
   {
     Log.shared.log(
-      level, emoji: emoji, describable: describable, file: file, function: function, line: line,
-      column: column, dso: dso)
+      level,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
   }
 
   /// Logs a verbose message with the specified parameters.
@@ -214,8 +260,13 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle)
   {
     log(
-      .info, emoji: "ℹ️", describable: describable,
-      file: file, function: function, line: line, column: column, dso: dso)
+      .info,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
   }
 
   /// Logs an error message with the specified parameters.
@@ -236,8 +287,13 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle)
   {
     log(
-      .error, emoji: "⚠️", describable: describable,
-      file: file, function: function, line: line, column: column, dso: dso)
+      .error,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
   }
 
   /// Logs a critical message and triggers a fatal error.
@@ -259,15 +315,19 @@ public struct Log: Hashable {
     dso: UnsafeRawPointer = #dsohandle) -> Never
   {
     log(
-      .critical, emoji: "❌", describable: describable ?? "",
-      file: file, function: function, line: line, column: column, dso: dso)
+      .critical,
+      describable: describable ?? "",
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso)
     fatalError()
   }
 
   // swiftlint:disable:next function_parameter_count
   private func log(
     _ level: Logging.Logger.Level,
-    emoji: String,
     describable: Any,
     file: String,
     function: String,
@@ -277,14 +337,17 @@ public struct Log: Hashable {
   {
     let url: URL = .init(
       string:
-        file
-      // swiftlint:disable:next force_unwrapping
+      file
+        // swiftlint:disable:next force_unwrapping
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
     switch style {
       case .print:
-        Swift.print("\(system)::\(emoji) \(fileName):\(String(line))|\(functionString)| " + String(describing: describable))
+        Swift
+          .print(
+            "\(system)::\(level.emoji) \(fileName):\(String(line))|\(functionString)| " +
+              String(describing: describable))
 
 #if canImport(os)
 
