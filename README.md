@@ -1,4 +1,10 @@
-## `WrkstrmLog`
+# `WrkstrmLog`
+
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
+[![Test Status][test-badge]](https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-tests-swift.yml)
+
+---
 
 `WrkstrmLog` is a versatile and flexible logging framework designed for consistent logging across different environments including Linux, Xcode, and macOS terminal. It adapts to various contexts, ensuring that log messages are displayed with consistent formatting regardless of the platform.
 
@@ -9,11 +15,11 @@
 - **Flexible and Customizable**: Extend the framework to fit specific logging requirements.
 - **Easy Integration**: Quick setup with Swift Package Manager.
 
-### Installation
+## Installation
 
 To integrate `WrkstrmLog` into your project, simply add it via Swift Package Manager (SPM).
 
-#### Swift Package Manager
+### Swift Package Manager
 
 Add `WrkstrmLog` as a dependency in your `Package.swift` file:
 
@@ -27,20 +33,11 @@ Include `WrkstrmLog` in your target dependencies:
 
 ```swift
 targets: [
-    .target(
-        name: "YourTarget",
-        dependencies: ["WrkstrmLog"])
+    .target(name: "YourTarget", dependencies: ["WrkstrmLog"]),
 ]
 ```
 
-### Status
-
-#### Platforms
-
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
-
-### Usage
+## Usage
 
 Import `WrkstrmLog` and start logging with ease:
 
@@ -67,10 +64,12 @@ Import `WrkstrmLog` and start logging with ease:
    Log.guard("Critical error")
    ```
 
-### Customization
+## Customization
 
 `WrkstrmLog` offers high customization capabilities. Extend or modify it to suit your project's needs, and utilize the sample formatters as a foundation for custom implementations.
 
-### Documentation
+## Documentation
 
 For detailed usage and customization instructions, visit the [GitHub Wiki](https://github.com/wrkstrm/WrkstrmLog/wiki).
+
+[test-badge]: https://github.com/wrkstrm/laussat/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
