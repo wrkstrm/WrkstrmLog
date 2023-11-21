@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Cristian Adalberto Monterroza Calderon on 11/19/23.
-//
-
 import Foundation
 
 extension Log {
@@ -38,7 +31,8 @@ extension Log {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle)
   {
-    Log.shared.verbose(describable,
+    Log.shared.verbose(
+      describable,
       file: file,
       function: function,
       line: line,
@@ -116,7 +110,7 @@ extension Log {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle) -> Never
   {
-    Log.shared.`guard`(
+    Log.shared.guard(
       describable,
       file: file,
       function: function,

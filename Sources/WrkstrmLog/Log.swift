@@ -5,10 +5,13 @@ import Logging
 import os
 #endif
 
-/// A flexible and extensible logging utility supporting multiple styles and destinations for logging messages.
+/// A flexible and extensible logging utility supporting multiple styles and destinations for
+/// logging messages.
 ///
-/// `Log` provides a unified interface for logging across various platforms and environments. It supports standard output logging,
-/// OSLog (on Apple platforms), and Swift's logging framework, allowing for easy configuration and usage.
+/// `Log` provides a unified interface for logging across various platforms and environments. It
+/// supports standard output logging,
+/// OSLog (on Apple platforms), and Swift's logging framework, allowing for easy configuration and
+/// usage.
 ///
 /// Example usage:
 /// ```
@@ -27,7 +30,8 @@ public struct Log: Hashable {
     case os
 #endif  // canImport(os)
     /// Swift style, logs messages using Swift's built-in logging framework (SwiftLog).
-    /// Ideal for server-side Swift applications or when consistent logging behavior across platforms is desired.
+    /// Ideal for server-side Swift applications or when consistent logging behavior across
+    /// platforms is desired.
     case swift
   }
 
