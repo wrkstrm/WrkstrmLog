@@ -19,16 +19,26 @@ extension SwiftSetting {
   ])
 }
 
-// MARK: - Package Service
+// MARK: - Configuration Service
 
-struct PackageService {
-  static let shared = PackageService()
+struct ConfigurationService {
 
-  var swiftSettings: [SwiftSetting]
+  let swiftSettings: [SwiftSetting]
 
-  init() {
-    swiftSettings = ProcessInfo.useLocalDeps ? [SwiftSetting.profile] : []
-  }
+  private static let local: ConfigurationService = {
+    ConfigurationService(swiftSettings: [.unsafeFlags([
+      "-Xfrontend",
+      "-warn-long-expression-type-checking=10",
+    ]),])
+  }()
+
+  private static let remote: ConfigurationService = {
+    ConfigurationService(swiftSettings: [])
+  }()
+
+  static let shared: ConfigurationService = {
+    ProcessInfo.useLocalDeps ? .local : .remote
+  }()
 }
 
 
@@ -54,6 +64,6 @@ let package = Package(
     .target(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
-      swiftSettings: PackageService.shared.swiftSettings),
+      swiftSettings: ConfigurationService.shared.swiftSettings),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ])
