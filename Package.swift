@@ -19,6 +19,19 @@ extension SwiftSetting {
   ])
 }
 
+// MARK: - Package Service
+
+struct PackageService {
+  static let shared = PackageService()
+
+  var swiftSettings: [SwiftSetting]
+
+  init() {
+    swiftSettings = ProcessInfo.useLocalDeps ? [SwiftSetting.profile] : []
+  }
+}
+
+
 // MARK: - Package Declaration
 
 let package = Package(
@@ -41,6 +54,6 @@ let package = Package(
     .target(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
-      swiftSettings: ProcessInfo.useLocalDeps ? [.profile] : []),
+      swiftSettings: PackageService.shared.swiftSettings),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ])
