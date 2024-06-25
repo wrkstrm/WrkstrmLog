@@ -13,7 +13,7 @@ extension ProcessInfo {
 // MARK: - PackageDescription extensions
 
 extension SwiftSetting {
-  static let profile: SwiftSetting = .unsafeFlags([
+  static let localSwiftSettings: SwiftSetting = .unsafeFlags([
     "-Xfrontend",
     "-warn-long-expression-type-checking=10",
   ])
@@ -26,10 +26,7 @@ struct ConfigurationService {
   let swiftSettings: [SwiftSetting]
 
   private static let local: ConfigurationService = {
-    ConfigurationService(swiftSettings: [.unsafeFlags([
-      "-Xfrontend",
-      "-warn-long-expression-type-checking=10",
-    ]),])
+    ConfigurationService(swiftSettings: [.localSwiftSettings])
   }()
 
   private static let remote: ConfigurationService = {
