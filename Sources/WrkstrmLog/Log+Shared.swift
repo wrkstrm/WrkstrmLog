@@ -29,8 +29,8 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     Log.shared.verbose(
       describable,
       file: file,
@@ -55,8 +55,8 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     Log.shared.info(
       describable,
       file: file,
@@ -81,8 +81,8 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     Log.shared.error(
       describable,
       file: file,
@@ -108,8 +108,8 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle) -> Never
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) -> Never {
     Log.shared.guard(
       describable,
       file: file,

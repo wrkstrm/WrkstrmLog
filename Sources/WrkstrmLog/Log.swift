@@ -24,11 +24,11 @@ public struct Log: Hashable {
     /// Print style, logs messages to standard output.
     /// Typically used for debugging in local or development environments.
     case print
-#if canImport(os)
+    #if canImport(os)
     /// OSLog style, logs messages using Apple's Unified Logging System (OSLog).
     /// Recommended for production use on Apple platforms for detailed and performant logging.
     case os
-#endif  // canImport(os)
+    #endif  // canImport(os)
     /// Swift style, logs messages using Swift's built-in logging framework (SwiftLog).
     /// Ideal for server-side Swift applications or when consistent logging behavior across
     /// platforms is desired.
@@ -41,17 +41,17 @@ public struct Log: Hashable {
   /// The category name for the logger. Used to categorize and filter log messages.
   public var category: String
 
-#if canImport(os)
+  #if canImport(os)
   /// The logging style used by the logger. Defaults to `.os` on Apple platforms.
   public var style: Style = .os
-#else  // canImport(os)
+  #else  // canImport(os)
   /// The logging style used by the logger. Defaults to `.swift` on non-Apple platforms.
   public var style: Style = .swift
-#endif  // canImport(os)
+  #endif  // canImport(os)
 
   private static var swiftLoggers: [Log: Logging.Logger] = [:]
 
-#if canImport(os)
+  #if canImport(os)
   private static var osLoggers: [Log: OSLog] = [:]
 
   /// Initializes a new Log instance with the specified system, category, and style.
@@ -68,14 +68,14 @@ public struct Log: Hashable {
   public init(
     system: String,
     category: String,
-    style: Style = ProcessInfo.inXcodeEnvironment ? .os : .print)
-  {
+    style: Style = ProcessInfo.inXcodeEnvironment ? .os : .print
+  ) {
     self.system = system
     self.category = category
     self.style = style
   }
 
-#else  // canImport(os)
+  #else  // canImport(os)
   /// Initializes a new Log instance with the specified system, category, and style.
   ///
   /// - Parameters:
@@ -92,7 +92,7 @@ public struct Log: Hashable {
     self.category = category
     self.style = style
   }
-#endif  // canImport(os)
+  #endif  // canImport(os)
 
   /// Maximum length for the function name in log messages.
   public var maxFunctionLength: Int?
@@ -123,8 +123,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     log(
       .info,
       describable: describable,
@@ -150,8 +150,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     log(
       .info,
       describable: describable,
@@ -177,8 +177,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle)
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) {
     log(
       .error,
       describable: describable,
@@ -205,8 +205,8 @@ public struct Log: Hashable {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle) -> Never
-  {
+    dso: UnsafeRawPointer = #dsohandle
+  ) -> Never {
     log(
       .critical,
       describable: describable ?? "",
@@ -226,11 +226,11 @@ public struct Log: Hashable {
     function: String,
     line: UInt,
     column _: UInt,
-    dso: UnsafeRawPointer)
-  {
+    dso: UnsafeRawPointer
+  ) {
     let url: URL = .init(
       string:
-      file
+        file
         // swiftlint:disable:next force_unwrapping
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
@@ -239,25 +239,25 @@ public struct Log: Hashable {
       case .print:
         Swift
           .print(
-            "\(system)::\(level.emoji) \(fileName):\(String(line))|\(functionString)| " +
-              String(describing: describable))
+            "\(system)::\(level.emoji) \(fileName):\(String(line))|\(functionString)| "
+              + String(describing: describable))
 
-#if canImport(os)
+      #if canImport(os)
 
-      case .os:
-        let logger = Self.osLoggers[
-          self, default: OSLog(subsystem: system, category: category)
-        ]
-        os_log(
-          level.toOSType,
-          dso: dso,
-          log: logger,
-          "%s-%i|%s| %s",
-          url.lastPathComponent,
-          line,
-          functionString,
-          String(describing: describable))
-#endif  // canImport(os)
+        case .os:
+          let logger = Self.osLoggers[
+            self, default: OSLog(subsystem: system, category: category)
+          ]
+          os_log(
+            level.toOSType,
+            dso: dso,
+            log: logger,
+            "%s-%i|%s| %s",
+            url.lastPathComponent,
+            line,
+            functionString,
+            String(describing: describable))
+      #endif  // canImport(os)
 
       case .swift:
         let logger = Self.swiftLoggers[

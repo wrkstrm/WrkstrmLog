@@ -14,13 +14,13 @@ extension ProcessInfo {
     }
     // Check for specific paths in DYLD_LIBRARY_PATH that indicate Xcode environment
     if let dyldLibraryPath = processInfo.environment["DYLD_LIBRARY_PATH"],
-       dyldLibraryPath.contains("/Xcode.app/")
+      dyldLibraryPath.contains("/Xcode.app/")
     {
       return true
     }
     // Check for specific paths in DYLD_FRAMEWORK_PATH
     if let dyldFrameworkPath = Self.processInfo.environment["DYLD_FRAMEWORK_PATH"],
-       dyldFrameworkPath.contains("/Xcode.app/")
+      dyldFrameworkPath.contains("/Xcode.app/")
     {
       return true
     }
