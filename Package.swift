@@ -22,22 +22,14 @@ extension SwiftSetting {
 // MARK: - Configuration Service
 
 struct ConfigurationService {
-
   let swiftSettings: [SwiftSetting]
 
-  private static let local: ConfigurationService = {
-    ConfigurationService(swiftSettings: [.localSwiftSettings])
-  }()
+  private static let local: ConfigurationService = .init(swiftSettings: [.localSwiftSettings])
 
-  private static let remote: ConfigurationService = {
-    ConfigurationService(swiftSettings: [])
-  }()
+  private static let remote: ConfigurationService = .init(swiftSettings: [])
 
-  static let shared: ConfigurationService = {
-    ProcessInfo.useLocalDeps ? .local : .remote
-  }()
+  static let shared: ConfigurationService = ProcessInfo.useLocalDeps ? .local : .remote
 }
-
 
 // MARK: - Package Declaration
 
