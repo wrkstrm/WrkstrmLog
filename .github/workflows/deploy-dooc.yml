@@ -22,9 +22,7 @@ jobs:
           xcode-version: '16.0.0-beta'
       - name: Build Documentation
         run: |
-          swift package --allow-writing-to-directory ./docs \
-            generate-documentation --target SPMConfigSteward \
-            --output-path ./docs
+          swift package --allow-writing-to-directory ./docs generate-documentation --target SPMConfigSteward --output-path ./docs
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
