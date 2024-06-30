@@ -30,6 +30,10 @@ jobs:
         if: matrix.os == 'macos-latest' || matrix.os == 'macos-14' || matrix.os == 'self-hosted'
         with:
           xcode-version: '16.0.0-beta'
+      - name: Set up Swift
+        uses: fwal/setup-swift@v1
+        with:
+          swift-version: '5.10'
       - name: Generate Docs
         uses: fwcd/swift-docc-action@v1
         with:
