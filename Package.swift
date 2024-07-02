@@ -24,25 +24,27 @@ let package = Package(
     .target(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
-      swiftSettings: ConfigurationService.inject.swiftSettings),
+      swiftSettings: Package.Service.inject.swiftSettings),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ])
 
-// CONFIG_SERVICE_START_V1_HASH:{{CONFIG_HASH}}
+// PACKAGE_SERVICE_START_V1_HASH:{{CONFIG_HASH}}
 import Foundation
 
-// MARK: - Configuration Service
+// MARK: - Package Service
 
-public struct ConfigurationService {
-  public static let version = "0.0.0"
+extension Package {
+  public struct Service {
+    public static let version = "0.0.1"
 
-  public var swiftSettings: [SwiftSetting] = []
-  var dependencies: [PackageDescription.Package.Dependency] = []
+    public var swiftSettings: [SwiftSetting] = []
+    var dependencies: [PackageDescription.Package.Dependency] = []
 
-  public static let inject: ConfigurationService = ProcessInfo.useLocalDeps ? .local : .remote
+    public static let inject: Package.Service = ProcessInfo.useLocalDeps ? .local : .remote
 
-  static var local: ConfigurationService = .init(swiftSettings: [.localSwiftSettings])
-  static var remote: ConfigurationService = .init()
+    static var local: Package.Service = .init(swiftSettings: [.localSwiftSettings])
+    static var remote: Package.Service = .init()
+  }
 }
 
 // MARK: - PackageDescription extensions
@@ -62,4 +64,4 @@ extension ProcessInfo {
   }
 }
 
-// CONFIG_SERVICE_END_V1_HASH:{{CONFIG_HASH}}
+// PACKAGE_SERVICE_END_V1_HASH:{{CONFIG_HASH}}
