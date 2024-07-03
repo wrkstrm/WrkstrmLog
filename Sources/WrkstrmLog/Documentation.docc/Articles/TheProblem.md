@@ -2,9 +2,10 @@
 
 In the world of Swift development, logging is a crucial aspect of debugging and monitoring applications. However, managing logs across different environments and configurations can quickly become complex. Enter WrkstrmLog, a flexible and extensible logging utility designed to streamline this process.
 
-## The Problem: Logging Inconsistencies
+## The Problem: Logging Inconsistencies and Default Behaviors
 
-Let's consider a typical logging scenario in a Swift project:
+Let's delve deeper into the inconsistencies of default logging behaviors across different environments:
+
 
 ```swift
 import Foundation
@@ -89,6 +90,32 @@ With WrkstrmLog, the logging experience remains consistent whether you're runnin
 4. **Multiple Output Styles**: Supports console output, Apple's Unified Logging System, and Swift's logging framework.
 5. **Cross-Environment Consistency**: Provides the same logging experience across Xcode, command line, and Linux environments.
 6. **Extensibility**: Can be easily extended to support additional logging destinations.
+
+### Default Behavior of WrkstrmLog's Shared Logger
+
+WrkstrmLog provides a shared logger instance (`Log.shared`) that's preconfigured for immediate use. By default:
+
+1. It uses the system name "wrkstrm" and category "shared".
+2. The logging style is automatically selected based on the environment:
+
+| Environment | WrkstrmLog Behavior | Default Swift Logging Behavior |
+|-------------|---------------------|--------------------------------|
+| Xcode | Uses `.os` style, leveraging `os.Logger`. Logs appear in the debug console, allowing you to use all of Xcode's advanced filtering features. | `print()` and `os.Logger` messages appear in the debug console. |
+| macOS Terminal | Uses `.print` style. Logs are output to `stdout` using `print()`, ensuring immediate visibility. | `print()` outputs to stdout. `os.Logger` messages are not visible in the terminal by default. They can be viewed using the Console app or the `log` command-line tool. |
+| Linux | Uses `.swift` style, based on Swift's `Logging` framework. Logs are consistently output, bridging the gap left by the absence of `os.Logger`. | `print()` works as expected, outputting to stdout. While `os.Logger` is not available, the Swift `Logging` framework can be used for more advanced logging capabilities. |
+
+This smart defaulting ensures that logs are visible and consistent across all platforms without any additional configuration.
+
+```swift
+// This will work consistently across Xcode, Terminal, and Linux
+Log.shared.info("Application started")
+```
+
+The key advantage of WrkstrmLog is that it provides a unified interface that adapts to each environment, ensuring that your logging code remains consistent and functional regardless of where it's running. This is particularly valuable for cross-platform Swift development, where maintaining consistent behavior across different environments can be challenging.
+
+It's worth noting that on macOS, while `os.Logger` messages are not immediately visible in the terminal, they are captured by the system. These logs can be accessed and filtered using the Console app, which provides a powerful interface for viewing and analyzing system logs. Additionally, the `log` command-line tool can be used to access these logs from the terminal, offering flexibility for developers who prefer command-line tools.
+
+On Linux, while `os.Logger` is not available as it's part of Apple's ecosystem, the Swift `Logging` framework provides a robust alternative. WrkstrmLog leverages this framework on Linux, ensuring that you have access to advanced logging capabilities even in non-Apple environments.
 
 ## Challenges We Overcame
 
