@@ -24,26 +24,26 @@ let package = Package(
     .target(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
-      swiftSettings: Package.Service.inject.swiftSettings),
+      swiftSettings: Package.Inject.shared.swiftSettings),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ])
 
-// PACKAGE_SERVICE_START_V1_HASH:{{CONFIG_HASH}}
+// PACKAGE_SERVICE_START_V0_0_1_HASH:f2c9eab644cc6416b9f6608bf581ad8c0b4c606c2c2dac5e62505e70cc7bfc53
 import Foundation
 
 // MARK: - Package Service
 
 extension Package {
-  public struct Service {
+  public struct Inject {
     public static let version = "0.0.1"
 
     public var swiftSettings: [SwiftSetting] = []
     var dependencies: [PackageDescription.Package.Dependency] = []
 
-    public static let inject: Package.Service = ProcessInfo.useLocalDeps ? .local : .remote
+    public static let shared: Inject = ProcessInfo.useLocalDeps ? .local : .remote
 
-    static var local: Package.Service = .init(swiftSettings: [.localSwiftSettings])
-    static var remote: Package.Service = .init()
+    static var local: Inject = .init(swiftSettings: [.localSwiftSettings])
+    static var remote: Inject = .init()
   }
 }
 
@@ -64,4 +64,4 @@ extension ProcessInfo {
   }
 }
 
-// PACKAGE_SERVICE_END_V1_HASH:{{CONFIG_HASH}}
+// PACKAGE_SERVICE_END_V0_0_1
