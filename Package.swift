@@ -1,4 +1,5 @@
 // swift-tools-version:5.10
+import Foundation
 import PackageDescription
 
 // MARK: - Package Declaration
@@ -14,7 +15,7 @@ let package = Package(
     .watchOS(.v9),
   ],
   products: [
-    .library(name: "WrkstrmLog", targets: ["WrkstrmLog"]),
+    .library(name: "WrkstrmLog", targets: ["WrkstrmLog"])
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.1.0"),
@@ -24,12 +25,11 @@ let package = Package(
     .target(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
-      swiftSettings: Package.Inject.shared.swiftSettings),
+      swiftSettings: Package.Inject.shared.swiftSettings
+    ),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
-  ])
-
-// PACKAGE_SERVICE_START_V0_0_1_HASH:f2c9eab644cc6416b9f6608bf581ad8c0b4c606c2c2dac5e62505e70cc7bfc53
-import Foundation
+  ]
+)
 
 // MARK: - Package Service
 

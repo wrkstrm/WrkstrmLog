@@ -132,7 +132,8 @@ public struct Log: Hashable {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
   }
 
   /// Logs a informational message with the specified parameters.
@@ -159,7 +160,8 @@ public struct Log: Hashable {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
   }
 
   /// Logs an error message with the specified parameters.
@@ -186,7 +188,8 @@ public struct Log: Hashable {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
   }
 
   /// Logs a critical message and triggers a fatal error.
@@ -214,7 +217,8 @@ public struct Log: Hashable {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
     fatalError()
   }
 
@@ -232,7 +236,8 @@ public struct Log: Hashable {
       string:
         file
         // swiftlint:disable:next force_unwrapping
-        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+    )!
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
     switch style {
@@ -256,7 +261,8 @@ public struct Log: Hashable {
             url.lastPathComponent,
             line,
             functionString,
-            String(describing: describable))
+            String(describing: describable)
+          )
       #endif  // canImport(os)
 
       case .swift:
@@ -274,7 +280,8 @@ public struct Log: Hashable {
           source: url.lastPathComponent,
           file: file,
           function: functionString,
-          line: line)
+          line: line
+        )
     }
   }
 }

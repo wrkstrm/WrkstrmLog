@@ -37,7 +37,8 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
   }
 
   /// Logs a info message with the specified parameters.
@@ -63,7 +64,8 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
   }
 
   /// Logs an error message with the specified parameters.
@@ -89,7 +91,8 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
   }
 
   /// Logs a critical message and triggers a fatal error.
@@ -116,6 +119,7 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso)
+      dso: dso
+    )
   }
 }
