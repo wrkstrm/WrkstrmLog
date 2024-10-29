@@ -49,10 +49,10 @@ public struct Log: Hashable {
   public var style: Style = .swift
   #endif  // canImport(os)
 
-  private static var swiftLoggers: [Log: Logging.Logger] = [:]
+  private static var swiftLoggers: [Self: Logging.Logger] = [:]
 
   #if canImport(os)
-  private static var osLoggers: [Log: OSLog] = [:]
+  private static var osLoggers: [Self: OSLog] = [:]
 
   /// Initializes a new Log instance with the specified system, category, and style.
   ///
