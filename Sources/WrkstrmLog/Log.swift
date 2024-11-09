@@ -219,7 +219,7 @@ public struct Log: Hashable {
       column: column,
       dso: dso
     )
-    fatalError()
+    fatalError("Guard failed: \(String(describing: describable))")
   }
 
   // swiftlint:disable:next function_parameter_count
