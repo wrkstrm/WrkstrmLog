@@ -8,7 +8,7 @@ extension Log {
   /// ```
   /// Log.shared.info("Application started")
   /// ```
-  public static var shared = Log(system: "wrkstrm", category: "shared") {
+  nonisolated(unsafe) public static var shared = Log(system: "wrkstrm", category: "shared") {
     didSet {
       shared.verbose("New Logger: \(shared)")
     }
