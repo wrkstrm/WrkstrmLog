@@ -18,8 +18,8 @@ let package = Package(
     .library(name: "WrkstrmLog", targets: ["WrkstrmLog"])
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.1.0"),
-    .package(url: "https://github.com/apple/swift-log.git", from: "1.5.0"),
+    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.0"),
+    .package(url: "https://github.com/apple/swift-log.git", from: "1.6.0"),
   ],
   targets: [
     .target(
