@@ -18,9 +18,10 @@ import os
 /// let logger = Log(system: "MyApp", category: "Networking")
 /// logger.info("Network request started")
 /// ```
-public struct Log: Hashable {
+@preconcurrency
+public struct Log: Hashable, @unchecked Sendable {
   /// Enum defining different logging styles.
-  public enum Style {
+  public enum Style: Sendable {
     /// Print style, logs messages to standard output.
     /// Typically used for debugging in local or development environments.
     case print
@@ -49,10 +50,10 @@ public struct Log: Hashable {
   public var style: Style = .swift
   #endif  // canImport(os)
 
-  private static var swiftLoggers: [Self: Logging.Logger] = [:]
+  private static let swiftLoggers: [Self: Logging.Logger] = [:]
 
   #if canImport(os)
-  private static var osLoggers: [Self: OSLog] = [:]
+  private static let osLoggers: [Self: OSLog] = [:]
 
   /// Initializes a new Log instance with the specified system, category, and style.
   ///
