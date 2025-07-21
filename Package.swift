@@ -34,6 +34,7 @@ let package = Package(
 // MARK: - Package Service
 
 extension Package {
+  @MainActor
   public struct Inject {
     public static let version = "0.0.1"
 
@@ -63,5 +64,4 @@ extension ProcessInfo {
     ProcessInfo.processInfo.environment["SPM_USE_LOCAL_DEPS"] == "true"
   }
 }
-
 // PACKAGE_SERVICE_END_V0_0_1
