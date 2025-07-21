@@ -1,13 +1,13 @@
-import XCTest
+import Testing
 
 @testable import WrkstrmLog
 
-final class WrkstrmLogTests: XCTestCase {
-  static var allTests = [("testExample", testExample)]
-
+@Suite("WrkstrmLog")
+struct WrkstrmLogTests {
+  @Test
   func testExample() {
     Log.error("This is interesting.")
     Log.verbose("This is a log.")
-    XCTAssert(true)
+    #expect(true)
   }
 }
