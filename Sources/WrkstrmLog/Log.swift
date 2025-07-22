@@ -34,6 +34,8 @@ public struct Log: Hashable, @unchecked Sendable {
     /// Ideal for server-side Swift applications or when consistent logging behavior across
     /// platforms is desired.
     case swift
+    
+    case disabled
   }
 
   /// The system name for the logger. Typically represents the application or module name.
@@ -75,6 +77,8 @@ public struct Log: Hashable, @unchecked Sendable {
     self.category = category
     self.style = style
   }
+  
+  static public let disabled = Log(system: "", category: "", style: .disabled)
 
   #else  // canImport(os)
   /// Initializes a new Log instance with the specified system, category, and style.
@@ -126,6 +130,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle
   ) {
+    guard style != .disabled else { return }
     log(
       .info,
       describable: describable,
@@ -154,6 +159,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle
   ) {
+    guard style != .disabled else { return }
     log(
       .info,
       describable: describable,
@@ -182,6 +188,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle
   ) {
+    guard style != .disabled else { return }
     log(
       .error,
       describable: describable,
@@ -211,6 +218,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle
   ) -> Never {
+    guard style != .disabled else { fatalError() }
     log(
       .critical,
       describable: describable ?? "",
@@ -233,6 +241,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column _: UInt,
     dso: UnsafeRawPointer
   ) {
+    guard style != .disabled else { return }
     let url: URL = .init(
       string:
         file
@@ -283,6 +292,7 @@ public struct Log: Hashable, @unchecked Sendable {
           function: functionString,
           line: line
         )
+      case .disabled: break
     }
   }
 }
