@@ -1,16 +1,16 @@
 #if canImport(os)
-import Logging
-import os
+  import Logging
+  import os
 
-extension Logging.Logger.Level {
-  /// Converts a `Logging.Logger.Level` to an `OSLogType`.
-  ///
-  /// This extension allows for mapping Swift Log levels to their equivalent OSLog types, which is
-  /// useful for compatibility when using both logging frameworks.
-  ///
-  /// - Returns: An `OSLogType` equivalent to the Swift Log level.
-  public var toOSType: OSLogType {
-    switch self {
+  extension Logging.Logger.Level {
+    /// Converts a `Logging.Logger.Level` to an `OSLogType`.
+    ///
+    /// This extension allows for mapping Swift Log levels to their equivalent OSLog types, which is
+    /// useful for compatibility when using both logging frameworks.
+    ///
+    /// - Returns: An `OSLogType` equivalent to the Swift Log level.
+    public var toOSType: OSLogType {
+      switch self {
       case .trace:
         .debug
 
@@ -31,7 +31,7 @@ extension Logging.Logger.Level {
 
       case .critical:
         .fault
+      }
     }
   }
-}
 #endif  // canImport(os)

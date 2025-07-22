@@ -5,7 +5,7 @@ import Testing
 @Suite("WrkstrmLog")
 struct WrkstrmLogTests {
   @Test
-  func testExample() {
+  func example() {
     Log.error("This is interesting.")
     Log.verbose("This is a log.")
     #expect(true)

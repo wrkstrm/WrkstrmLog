@@ -25,10 +25,10 @@ let package = Package(
     .target(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
-      swiftSettings: Package.Inject.shared.swiftSettings
+      swiftSettings: Package.Inject.shared.swiftSettings,
     ),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
-  ]
+  ],
 )
 
 // MARK: - Package Service
@@ -64,4 +64,5 @@ extension ProcessInfo {
     ProcessInfo.processInfo.environment["SPM_USE_LOCAL_DEPS"] == "true"
   }
 }
+
 // PACKAGE_SERVICE_END_V0_0_1

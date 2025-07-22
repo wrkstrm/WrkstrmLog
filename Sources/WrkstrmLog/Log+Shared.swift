@@ -29,7 +29,7 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
+    dso: UnsafeRawPointer = #dsohandle,
   ) {
     Log.shared.verbose(
       describable,
@@ -37,7 +37,7 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso
+      dso: dso,
     )
   }
 
@@ -56,7 +56,7 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
+    dso: UnsafeRawPointer = #dsohandle,
   ) {
     Log.shared.info(
       describable,
@@ -64,7 +64,7 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso
+      dso: dso,
     )
   }
 
@@ -83,7 +83,7 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
+    dso: UnsafeRawPointer = #dsohandle,
   ) {
     Log.shared.error(
       describable,
@@ -91,7 +91,7 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso
+      dso: dso,
     )
   }
 
@@ -111,7 +111,7 @@ extension Log {
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
-    dso: UnsafeRawPointer = #dsohandle
+    dso: UnsafeRawPointer = #dsohandle,
   ) -> Never {
     Log.shared.guard(
       describable,
@@ -119,7 +119,7 @@ extension Log {
       function: function,
       line: line,
       column: column,
-      dso: dso
+      dso: dso,
     )
   }
 }
