@@ -289,11 +289,11 @@ public struct Log: Hashable, @unchecked Sendable {
     #endif  // canImport(os)
 
       case .swift:
-        let logger: Logger = Self.loggerQueue.sync {
+        let logger: Logging.Logger = Self.loggerQueue.sync {
           if let existing = Self.swiftLoggers[self] {
             return existing
           }
-          var newLogger = Logger(label: system)
+          var newLogger = Logging.Logger(label: system)
           newLogger.logLevel = .debug
           Self.swiftLoggers[self] = newLogger
           return newLogger
