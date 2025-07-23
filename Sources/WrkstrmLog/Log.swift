@@ -1,5 +1,6 @@
 import Foundation
 import Logging
+import Dispatch
 
 #if canImport(os)
   import os
@@ -52,10 +53,17 @@ public struct Log: Hashable, @unchecked Sendable {
     public var style: Style = .swift
   #endif  // canImport(os)
 
-  private static let swiftLoggers: [Self: Logging.Logger] = [:]
+  /// Storage for SwiftLog loggers, keyed by `Log` instance.
+  /// Access is synchronized using ``loggerQueue``.
+  private nonisolated(unsafe) static var swiftLoggers: [Self: Logging.Logger] = [:]
+
+  /// Serial queue used to synchronize access to static logger storage.
+  private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
 
   #if canImport(os)
-    private static let osLoggers: [Self: OSLog] = [:]
+    /// Storage for OSLog loggers, keyed by `Log` instance.
+    /// Access is synchronized using ``loggerQueue``.
+    private nonisolated(unsafe) static var osLoggers: [Self: OSLog] = [:]
 
     /// Initializes a new Log instance with the specified system, category, and style.
     ///
@@ -260,9 +268,14 @@ public struct Log: Hashable, @unchecked Sendable {
     #if canImport(os)
 
       case .os:
-        let logger = Self.osLoggers[
-          self, default: OSLog(subsystem: system, category: category),
-        ]
+        let logger: OSLog = Self.loggerQueue.sync {
+          if let existing = Self.osLoggers[self] {
+            return existing
+          }
+          let created = OSLog(subsystem: system, category: category)
+          Self.osLoggers[self] = created
+          return created
+        }
         os_log(
           level.toOSType,
           dso: dso,
@@ -275,16 +288,17 @@ public struct Log: Hashable, @unchecked Sendable {
         )
     #endif  // canImport(os)
 
-    case .swift:
-      let logger = Self.swiftLoggers[
-        self,
-        default: {
-          var logger = Logger(label: system)
-          logger.logLevel = .debug
-          return logger
-        }(),
-      ]
-      logger.log(
+      case .swift:
+        let logger: Logger = Self.loggerQueue.sync {
+          if let existing = Self.swiftLoggers[self] {
+            return existing
+          }
+          var newLogger = Logger(label: system)
+          newLogger.logLevel = .debug
+          Self.swiftLoggers[self] = newLogger
+          return newLogger
+        }
+        logger.log(
         level: level,
         "\(line)|\(functionString)| \(String(describing: describable))",
         source: url.lastPathComponent,
