@@ -30,7 +30,7 @@ Add `WrkstrmLog` as a dependency in your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "0.0.0"))
+    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.1.0"))
 ]
 ```
 
@@ -155,7 +155,7 @@ func someFunction() {
 Add this line to your `Package.swift` and let the magic begin:
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.1.0"))
 ]
 ```
 

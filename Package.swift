@@ -36,7 +36,7 @@ let package = Package(
 extension Package {
   @MainActor
   public struct Inject {
-    public static let version = "0.0.1"
+    public static let version = "1.1.0"
 
     public var swiftSettings: [SwiftSetting] = []
     var dependencies: [PackageDescription.Package.Dependency] = []
@@ -65,4 +65,4 @@ extension ProcessInfo {
   }
 }
 
-// PACKAGE_SERVICE_END_V0_0_1
+// PACKAGE_SERVICE_END_V1_1_0

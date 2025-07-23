@@ -98,7 +98,7 @@ With WrkstrmLog, the logging experience remains consistent whether you're runnin
 Add the following to your `Package.swift` file:
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.1.0"))
 ]
 ```
 
