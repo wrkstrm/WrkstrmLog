@@ -262,7 +262,7 @@ public struct Log: Hashable, @unchecked Sendable {
     case .print:
       Swift
         .print(
-          "\(system)::\(level.emoji) \(fileName):\(String(line))|\(functionString)| "
+          "\(system):\(category):\(level.emoji) \(fileName):\(String(line))|\(functionString)| "
             + String(describing: describable))
 
     #if canImport(os)
