@@ -160,7 +160,7 @@ public struct Log: Hashable, @unchecked Sendable {
   ///   - column: The column number in the source file where the log message is generated.
   ///   - dso: The address of the shared object where the log message is generated.
   public func info(
-    _ describable: Any,
+    _ describable: Any = "",
     file: String = #file,
     function: String = #function,
     line: UInt = #line,
