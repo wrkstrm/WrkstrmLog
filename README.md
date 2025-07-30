@@ -14,6 +14,7 @@
 - **💼 Multiple Logging Styles**: Choose from print, OSLog, and SwiftLog styles.
 - **🔧 Flexible and Customizable**: Extend the framework to fit specific logging requirements.
 - **🚀 Easy Integration**: Quick setup with Swift Package Manager.
+- **🆕 Swift 6 File IDs**: Cleaner log output using `#fileID`.
 
 ## Compatibility
 

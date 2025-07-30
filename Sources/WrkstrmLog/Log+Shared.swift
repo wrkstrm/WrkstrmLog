@@ -25,7 +25,7 @@ extension Log {
   ///   - dso: The address of the shared object where the log message is generated.
   public static func verbose(
     _ describable: Any,
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
@@ -52,7 +52,7 @@ extension Log {
   ///   - dso: The address of the shared object where the log message is generated.
   public static func info(
     _ describable: Any,
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
@@ -79,7 +79,7 @@ extension Log {
   ///   - dso: The address of the shared object where the log message is generated.
   public static func error(
     _ describable: Any,
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
@@ -107,7 +107,7 @@ extension Log {
   /// - Returns: Never, indicating a fatal error.
   public static func `guard`(
     _ describable: Any? = nil,
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,

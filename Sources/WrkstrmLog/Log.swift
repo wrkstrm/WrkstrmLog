@@ -132,7 +132,7 @@ public struct Log: Hashable, @unchecked Sendable {
   ///   - dso: The address of the shared object where the log message is generated.
   public func verbose(
     _ describable: Any,
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
@@ -161,7 +161,7 @@ public struct Log: Hashable, @unchecked Sendable {
   ///   - dso: The address of the shared object where the log message is generated.
   public func info(
     _ describable: Any = "",
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
@@ -190,7 +190,7 @@ public struct Log: Hashable, @unchecked Sendable {
   ///   - dso: The address of the shared object where the log message is generated.
   public func error(
     _ describable: Any,
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
@@ -220,7 +220,7 @@ public struct Log: Hashable, @unchecked Sendable {
   /// - Returns: Never, indicating a fatal error.
   public func `guard`(
     _ describable: Any? = nil,
-    file: String = #file,
+    file: String = #fileID,
     function: String = #function,
     line: UInt = #line,
     column: UInt = #column,
