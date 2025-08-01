@@ -61,7 +61,9 @@ Import `WrkstrmLog` and start logging with ease:
    ```
 
 3. **📝 Log Messages**:
-   Use various logging methods like `verbose`, `info`, `error`, and `guard`:
+   Use various logging methods like `verbose`, `info`, `error`, and `guard`.
+   `verbose` logs are emitted at the debug level, making them lower
+   priority than informational messages:
 
    ```swift
    logger.verbose("Verbose message")

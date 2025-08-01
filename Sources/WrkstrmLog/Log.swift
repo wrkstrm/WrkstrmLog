@@ -123,6 +123,9 @@ public struct Log: Hashable, @unchecked Sendable {
 
   /// Logs a verbose message with the specified parameters.
   ///
+  /// Verbose output is mapped to the `.debug` log level so it can be
+  /// easily filtered separately from informational logs.
+  ///
   /// - Parameters:
   ///   - string: The message string to log.
   ///   - file: The source file where the log message is generated.
@@ -139,8 +142,10 @@ public struct Log: Hashable, @unchecked Sendable {
     dso: UnsafeRawPointer = #dsohandle,
   ) {
     guard style != .disabled else { return }
+    // Verbose messages are lower priority than standard informational logs.
+    // Map them to the debug log level so they can be filtered separately.
     log(
-      .info,
+      .debug,
       describable: describable,
       file: file,
       function: function,
