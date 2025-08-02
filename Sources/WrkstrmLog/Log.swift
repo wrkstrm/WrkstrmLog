@@ -40,67 +40,99 @@ public struct Log: Hashable, @unchecked Sendable {
   }
 
   /// The system name for the logger. Typically represents the application or module name.
-  public var system: String
+  public let system: String
 
   /// The category name for the logger. Used to categorize and filter log messages.
-  public var category: String
+  public let category: String
 
   #if canImport(os)
     /// The logging style used by the logger. Defaults to `.os` on Apple platforms.
-    public var style: Style = .os
+    public let style: Style
   #else  // canImport(os)
     /// The logging style used by the logger. Defaults to `.swift` on non-Apple platforms.
-    public var style: Style = .swift
+    public let style: Style
   #endif  // canImport(os)
 
-  /// Storage for SwiftLog loggers, keyed by `Log` instance.
+  /// Storage for SwiftLog loggers, keyed by ``Log`` instance.
   /// Access is synchronized using ``loggerQueue``.
   private nonisolated(unsafe) static var swiftLoggers: [Self: Logging.Logger] = [:]
 
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
 
+  /// Current number of cached SwiftLog loggers. Used in tests.
+  static var _swiftLoggerCount: Int {
+    loggerQueue.sync { swiftLoggers.count }
+  }
+
+  /// Removes all cached loggers. Intended for tests.
+  static func _reset() {
+    loggerQueue.sync {
+      swiftLoggers.removeAll()
+      #if canImport(os)
+        osLoggers.removeAll()
+      #endif
+    }
+  }
+
+  /// Indicates whether a Swift logger exists for the given instance. Used in tests.
+  func _hasSwiftLogger() -> Bool {
+    Self.loggerQueue.sync { Self.swiftLoggers[self] != nil }
+  }
+
+#if canImport(os)
+  /// Indicates whether an OS logger exists for the given instance. Used in tests.
+  func _hasOSLogger() -> Bool {
+    Self.loggerQueue.sync { Self.osLoggers[self] != nil }
+  }
+#endif
+
   #if canImport(os)
-    /// Storage for OSLog loggers, keyed by `Log` instance.
+    /// Storage for OSLog loggers, keyed by ``Log`` instance.
     /// Access is synchronized using ``loggerQueue``.
     private nonisolated(unsafe) static var osLoggers: [Self: OSLog] = [:]
 
-    /// Initializes a new Log instance with the specified system, category, and style.
+    /// Current number of cached OSLog loggers. Used in tests.
+    static var _osLoggerCount: Int {
+      loggerQueue.sync { osLoggers.count }
+    }
+
+    /// Initializes a new ``Log`` instance.
     ///
     /// - Parameters:
-    ///   - system: The system name for the logger.
-    ///   - category: The category name for the logger.
-    ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`).
+    ///   - system: The system name for the logger. Defaults to an empty string.
+    ///   - category: The category name for the logger. Defaults to an empty string.
+    ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`). Defaults to `.os`.
     ///
     /// Example:
     /// ```
-    /// let networkLogger = Log(system: "MyApp", category: "Networking", style: .os)
+    /// let networkLogger = Log(system: "MyApp", category: "Networking")
     /// ```
     public init(
-      system: String,
-      category: String,
-      style: Style = ProcessInfo.inXcodeEnvironment ? .os : .print,
+      system: String = "",
+      category: String = "",
+      style: Style = .os
     ) {
       self.system = system
       self.category = category
       self.style = style
     }
 
-    public static let disabled = Log(system: "", category: "", style: .disabled)
+    public static let disabled = Log(style: .disabled)
 
   #else  // canImport(os)
-    /// Initializes a new Log instance with the specified system, category, and style.
+    /// Initializes a new ``Log`` instance.
     ///
     /// - Parameters:
-    ///   - system: The system name for the logger.
-    ///   - category: The category name for the logger.
-    ///   - style: The logging style used by the logger (`.print`, `.swift`).
+    ///   - system: The system name for the logger. Defaults to an empty string.
+    ///   - category: The category name for the logger. Defaults to an empty string.
+    ///   - style: The logging style used by the logger (`.print`, `.swift`). Defaults to `.swift`.
     ///
     /// Example:
     /// ```
-    /// let networkLogger = Log(system: "MyApp", category: "Networking", style: .swift)
+    /// let networkLogger = Log(system: "MyApp", category: "Networking")
     /// ```
-    public init(system: String, category: String, style: Style = .swift) {
+    public init(system: String = "", category: String = "", style: Style = .swift) {
       self.system = system
       self.category = category
       self.style = style
@@ -109,6 +141,16 @@ public struct Log: Hashable, @unchecked Sendable {
 
   /// Maximum length for the function name in log messages.
   public var maxFunctionLength: Int?
+
+  public static func == (lhs: Log, rhs: Log) -> Bool {
+    lhs.system == rhs.system && lhs.category == rhs.category && lhs.style == rhs.style
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(system)
+    hasher.combine(category)
+    hasher.combine(style)
+  }
 
   /// Formats the function name to fit within the specified maximum length.
   ///
