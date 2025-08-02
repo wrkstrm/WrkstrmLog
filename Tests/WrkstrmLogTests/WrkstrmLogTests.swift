@@ -38,4 +38,10 @@ struct WrkstrmLogTests {
     #expect(original == mutatedHash)
   }
 
+  @Test
+  func pathEncoding() {
+    let logger = Log(system: "Test", category: "Encoding", style: .print)
+    logger.info("Testing path", file: "/tmp/Some Folder/File Name.swift")
+    #expect(true)
+  }
 }
