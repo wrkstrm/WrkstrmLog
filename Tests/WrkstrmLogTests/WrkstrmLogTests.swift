@@ -21,5 +21,4 @@ struct WrkstrmLogTests {
     log.info("second")
     #expect(log._hasSwiftLogger())
   }
-
 }
