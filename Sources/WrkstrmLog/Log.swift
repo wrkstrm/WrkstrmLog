@@ -88,8 +88,8 @@ public struct Log: Hashable, @unchecked Sendable {
 #endif
 
   #if canImport(os)
-    /// Storage for OSLog loggers, keyed by ``Log`` instance.
-    /// Access is synchronized using ``loggerQueue``.
+    /// Storage for OSLog loggers, keyed by `Log` instance.
+    /// Access is synchronized using `loggerQueue`.
     private nonisolated(unsafe) static var osLoggers: [Self: OSLog] = [:]
 
     /// Current number of cached OSLog loggers. Used in tests.
@@ -97,7 +97,7 @@ public struct Log: Hashable, @unchecked Sendable {
       loggerQueue.sync { osLoggers.count }
     }
 
-    /// Initializes a new ``Log`` instance.
+    /// Initializes a new `Log` instance.
     ///
     /// - Parameters:
     ///   - system: The system name for the logger. Defaults to an empty string.
@@ -121,7 +121,7 @@ public struct Log: Hashable, @unchecked Sendable {
     public static let disabled = Log(style: .disabled)
 
   #else  // canImport(os)
-    /// Initializes a new ``Log`` instance.
+    /// Initializes a new `Log` instance.
     ///
     /// - Parameters:
     ///   - system: The system name for the logger. Defaults to an empty string.
