@@ -6,9 +6,36 @@ import Testing
 struct WrkstrmLogTests {
   @Test
   func example() {
-    Log.error("This is interesting.")
-    Log.verbose("This is a log.")
     #expect(true)
+  }
+
+  @Test
+  func swiftLoggerReuse() {
+    Log._reset()
+    var log = Log()
+    log.info("first")
+    #expect(Log._swiftLoggerCount == 1)
+
+    var mutated = log
+    mutated.maxFunctionLength = 10
+    mutated.info("second")
+    #expect(Log._swiftLoggerCount == 1)
+  }
+
+  @Test
+  func hashingIgnoresMutableProperties() {
+    let log = Log(system: "sys", category: "cat")
+    var hasher1 = Hasher()
+    log.hash(into: &hasher1)
+    let original = hasher1.finalize()
+
+    var mutated = log
+    mutated.maxFunctionLength = 12
+    var hasher2 = Hasher()
+    mutated.hash(into: &hasher2)
+    let mutatedHash = hasher2.finalize()
+
+    #expect(original == mutatedHash)
   }
 
   @Test
