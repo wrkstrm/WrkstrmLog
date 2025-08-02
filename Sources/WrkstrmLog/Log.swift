@@ -255,12 +255,7 @@ public struct Log: Hashable, @unchecked Sendable {
     dso: UnsafeRawPointer,
   ) {
     guard style != .disabled else { return }
-    let url: URL = .init(
-      string:
-        file
-        // swiftlint:disable:next force_unwrapping
-        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!,
-    )!
+    let url = URL(fileURLWithPath: file)
     let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
     let functionString = formattedFunction(function)
     switch style {
