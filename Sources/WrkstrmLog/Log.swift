@@ -53,8 +53,8 @@ public struct Log: Hashable, @unchecked Sendable {
     public let style: Style
   #endif  // canImport(os)
 
-  /// Storage for SwiftLog loggers, keyed by ``Log`` instance.
-  /// Access is synchronized using ``loggerQueue``.
+  /// Storage for SwiftLog loggers, keyed by `Log` instance.
+  /// Access is synchronized using `loggerQueue`.
   private nonisolated(unsafe) static var swiftLoggers: [Self: Logging.Logger] = [:]
 
   /// Serial queue used to synchronize access to static logger storage.
