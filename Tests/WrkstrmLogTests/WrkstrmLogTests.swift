@@ -12,7 +12,7 @@ struct WrkstrmLogTests {
   @Test
   func swiftLoggerReuse() {
     Log._reset()
-    var log = Log(style: .swift)
+    let log = Log(style: .swift, options: [.prod])
     log.info("first")
     #expect(Log._swiftLoggerCount == 1)
 
@@ -66,6 +66,15 @@ struct WrkstrmLogTests {
       log.info("silence")
       #expect(log.style == .disabled)
       #expect(Log._swiftLoggerCount == 0)
+    }
+
+    @Test
+    func loggerWithProdOptionEnabledInRelease() {
+      Log._reset()
+      let log = Log(style: .swift, options: [.prod])
+      log.info("hello")
+      #expect(log.style == .swift)
+      #expect(Log._swiftLoggerCount == 1)
     }
   #endif
 }

@@ -40,6 +40,19 @@ public struct Log: Hashable, @unchecked Sendable {
     case disabled
   }
 
+  /// Configuration options for a logger instance.
+  public struct Options: OptionSet, Hashable, Sendable {
+    /// The raw bit mask representing the option set.
+    public let rawValue: Int
+
+    /// Creates a new set from the given raw value.
+    /// - Parameter rawValue: The raw bit mask value.
+    public init(rawValue: Int) { self.rawValue = rawValue }
+
+    /// Indicates the logger should remain active in production builds.
+    public static let prod = Options(rawValue: 1 << 0)
+  }
+
   /// The system name for the logger. Typically represents the application or module name.
   public let system: String
 
@@ -47,27 +60,22 @@ public struct Log: Hashable, @unchecked Sendable {
   public let category: String
 
   #if canImport(os)
-    /// The logging style used by the logger. Defaults to `.os` in debug builds and
-    /// `.disabled` otherwise.
+    /// The logging style used by the logger. Defaults to `.os` but is disabled in
+    /// production unless the `.prod` option is specified.
     public let style: Style
   #else  // canImport(os)
-    /// The logging style used by the logger. Defaults to `.swift` in debug builds and
-    /// `.disabled` otherwise.
+    /// The logging style used by the logger. Defaults to `.swift` but is disabled in
+    /// production unless the `.prod` option is specified.
     public let style: Style
   #endif  // canImport(os)
 
+  /// Options describing when the logger should be active.
+  public let options: Options
+
   #if canImport(os)
-    #if DEBUG
-      @usableFromInline static let defaultStyle: Style = .os
-    #else
-      @usableFromInline static let defaultStyle: Style = .disabled
-    #endif
+    @usableFromInline static let defaultStyle: Style = .os
   #else  // canImport(os)
-    #if DEBUG
-      @usableFromInline static let defaultStyle: Style = .swift
-    #else
-      @usableFromInline static let defaultStyle: Style = .disabled
-    #endif
+    @usableFromInline static let defaultStyle: Style = .swift
   #endif  // canImport(os)
 
   /// Storage for SwiftLog loggers, keyed by `Log` instance.
@@ -120,7 +128,9 @@ public struct Log: Hashable, @unchecked Sendable {
     ///   - system: The system name for the logger. Defaults to an empty string.
     ///   - category: The category name for the logger. Defaults to an empty string.
     ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`,
-    ///     `.disabled`). Defaults to `.os` in debug builds and `.disabled` otherwise.
+    ///     `.disabled`). Defaults to `.os`.
+    ///   - options: Configuration options for the logger. Use `.prod` to keep the
+    ///     logger active in production. Defaults to an empty set.
     ///
     /// Example:
     /// ```
@@ -129,11 +139,17 @@ public struct Log: Hashable, @unchecked Sendable {
     public init(
       system: String = "",
       category: String = "",
-      style: Style = defaultStyle
+      style: Style = defaultStyle,
+      options: Options = []
     ) {
       self.system = system
       self.category = category
-      self.style = style
+      self.options = options
+      #if DEBUG
+        self.style = style
+      #else
+        self.style = options.contains(.prod) ? style : .disabled
+      #endif
     }
 
     public static let disabled = Log(style: .disabled)
@@ -145,16 +161,28 @@ public struct Log: Hashable, @unchecked Sendable {
     ///   - system: The system name for the logger. Defaults to an empty string.
     ///   - category: The category name for the logger. Defaults to an empty string.
     ///   - style: The logging style used by the logger (`.print`, `.swift`, `.disabled`).
-    ///     Defaults to `.swift` in debug builds and `.disabled` otherwise.
+    ///     Defaults to `.swift`.
+    ///   - options: Configuration options for the logger. Use `.prod` to keep the
+    ///     logger active in production. Defaults to an empty set.
     ///
     /// Example:
     /// ```
     /// let networkLogger = Log(system: "MyApp", category: "Networking")
     /// ```
-    public init(system: String = "", category: String = "", style: Style = defaultStyle) {
+    public init(
+      system: String = "",
+      category: String = "",
+      style: Style = defaultStyle,
+      options: Options = []
+    ) {
       self.system = system
       self.category = category
-      self.style = style
+      self.options = options
+      #if DEBUG
+        self.style = style
+      #else
+        self.style = options.contains(.prod) ? style : .disabled
+      #endif
     }
 
     public static let disabled = Log(style: .disabled)
@@ -165,12 +193,14 @@ public struct Log: Hashable, @unchecked Sendable {
 
   public static func == (lhs: Log, rhs: Log) -> Bool {
     lhs.system == rhs.system && lhs.category == rhs.category && lhs.style == rhs.style
+      && lhs.options == rhs.options
   }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(system)
     hasher.combine(category)
     hasher.combine(style)
+    hasher.combine(options)
   }
 
   /// Formats the function name to fit within the specified maximum length.
