@@ -1,6 +1,6 @@
+import Dispatch
 import Foundation
 import Logging
-import Dispatch
 
 #if canImport(os)
   import os
@@ -29,7 +29,7 @@ public struct Log: Hashable, @unchecked Sendable {
     #if canImport(os)
       /// OSLog style, logs messages using Apple's Unified Logging System (OSLog).
       /// Recommended for production use on Apple platforms for detailed and performant logging.
-      case os
+      case os  // swiftlint:disable:this identifier_name
     #endif  // canImport(os)
     /// Swift style, logs messages using Swift's built-in logging framework (SwiftLog).
     /// Ideal for server-side Swift applications or when consistent logging behavior across
@@ -61,12 +61,12 @@ public struct Log: Hashable, @unchecked Sendable {
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
 
   /// Current number of cached SwiftLog loggers. Used in tests.
-  static var _swiftLoggerCount: Int {
+  static var _swiftLoggerCount: Int {  // swiftlint:disable:this identifier_name
     loggerQueue.sync { swiftLoggers.count }
   }
 
   /// Removes all cached loggers. Intended for tests.
-  static func _reset() {
+  static func _reset() {  // swiftlint:disable:this identifier_name
     loggerQueue.sync {
       swiftLoggers.removeAll()
       #if canImport(os)
@@ -76,16 +76,16 @@ public struct Log: Hashable, @unchecked Sendable {
   }
 
   /// Indicates whether a Swift logger exists for the given instance. Used in tests.
-  func _hasSwiftLogger() -> Bool {
+  func _hasSwiftLogger() -> Bool {  // swiftlint:disable:this identifier_name
     Self.loggerQueue.sync { Self.swiftLoggers[self] != nil }
   }
 
-#if canImport(os)
-  /// Indicates whether an OS logger exists for the given instance. Used in tests.
-  func _hasOSLogger() -> Bool {
-    Self.loggerQueue.sync { Self.osLoggers[self] != nil }
-  }
-#endif
+  #if canImport(os)
+    /// Indicates whether an OS logger exists for the given instance. Used in tests.
+    func _hasOSLogger() -> Bool {  // swiftlint:disable:this identifier_name
+      Self.loggerQueue.sync { Self.osLoggers[self] != nil }
+    }
+  #endif
 
   #if canImport(os)
     /// Storage for OSLog loggers, keyed by `Log` instance.
@@ -93,7 +93,7 @@ public struct Log: Hashable, @unchecked Sendable {
     private nonisolated(unsafe) static var osLoggers: [Self: OSLog] = [:]
 
     /// Current number of cached OSLog loggers. Used in tests.
-    static var _osLoggerCount: Int {
+    static var _osLoggerCount: Int {  // swiftlint:disable:this identifier_name
       loggerQueue.sync { osLoggers.count }
     }
 
@@ -102,7 +102,8 @@ public struct Log: Hashable, @unchecked Sendable {
     /// - Parameters:
     ///   - system: The system name for the logger. Defaults to an empty string.
     ///   - category: The category name for the logger. Defaults to an empty string.
-    ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`). Defaults to `.os`.
+    ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`).
+    ///     Defaults to `.os`.
     ///
     /// Example:
     /// ```
@@ -286,7 +287,7 @@ public struct Log: Hashable, @unchecked Sendable {
     fatalError("Guard failed: \(String(describing: describable))")
   }
 
-  // swiftlint:disable:next function_parameter_count
+  // swiftlint:disable:next function_parameter_count function_body_length
   private func log(
     _ level: Logging.Logger.Level,
     describable: Any,
@@ -330,17 +331,17 @@ public struct Log: Hashable, @unchecked Sendable {
         )
     #endif  // canImport(os)
 
-      case .swift:
-        let logger: Logging.Logger = Self.loggerQueue.sync {
-          if let existing = Self.swiftLoggers[self] {
-            return existing
-          }
-          var newLogger = Logging.Logger(label: system)
-          newLogger.logLevel = .debug
-          Self.swiftLoggers[self] = newLogger
-          return newLogger
+    case .swift:
+      let logger: Logging.Logger = Self.loggerQueue.sync {
+        if let existing = Self.swiftLoggers[self] {
+          return existing
         }
-        logger.log(
+        var newLogger = Logging.Logger(label: system)
+        newLogger.logLevel = .debug
+        Self.swiftLoggers[self] = newLogger
+        return newLogger
+      }
+      logger.log(
         level: level,
         "\(line)|\(functionString)| \(String(describing: describable))",
         source: url.lastPathComponent,
@@ -349,7 +350,8 @@ public struct Log: Hashable, @unchecked Sendable {
         line: line,
       )
 
-    case .disabled: break
+    case .disabled:
+      break
     }
   }
 }
