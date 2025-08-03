@@ -14,6 +14,7 @@
 - **💼 Multiple Logging Styles**: Choose from print, OSLog, and SwiftLog styles.
 - **🔧 Flexible and Customizable**: Extend the framework to fit specific logging requirements.
 - **🚀 Easy Integration**: Quick setup with Swift Package Manager.
+- **🚫 Optional Disabled Mode**: Silence logs entirely using the `.disabled` style or the convenience `Log.disabled`—perfect for production builds.
 - **🆕 Swift 6 File IDs**: Cleaner log output using `#fileID`.
 
 ## Compatibility
@@ -70,6 +71,15 @@ Import `WrkstrmLog` and start logging with ease:
    logger.info("Info message")
    logger.error("Error message")
    Log.guard("Critical error")
+   ```
+
+4. **🚫 Disable or Enable in Production**:
+   Loggers default to `.disabled` in release builds. Use the `.prod` option to keep them
+   active or the `.disabled` style for a silent logger.
+
+   ```swift
+   let silent = Log.disabled
+   let active = Log(style: .swift, options: [.prod])
    ```
 
 ## 🎨 Customization
@@ -151,6 +161,7 @@ func someFunction() {
 - 🔀 **Multi-Style Output**: Console, Apple's Unified Logging, Swift Logging - we speak them all!
 - 🌍 **Cross-Platform Consistency**: From Xcode to Linux, we've got you covered.
 - 🧩 **Extensibility**: Build your own log empire!
+- 🚫 **Built-in Disabled Mode**: Silence logs completely when you need total quiet.
 
 ## 4. 🏁 Getting Started
 
