@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0] - 2024-08-29
+## [1.1.2] - 2024-08-29
 ### Added
 - Adopt Swift 6 `#fileID` identifiers for cleaner, more consistent log output across platforms.
 - Lower verbose log level and update documentation to reflect the new severity.
