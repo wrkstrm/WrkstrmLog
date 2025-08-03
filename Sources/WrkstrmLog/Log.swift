@@ -27,11 +27,9 @@ public struct Log: Hashable, @unchecked Sendable {
     /// Typically used for debugging in local or development environments.
     case print
     #if canImport(os)
-      // swiftlint:disable identifier_name
       /// OSLog style, logs messages using Apple's Unified Logging System (OSLog).
       /// Recommended for production use on Apple platforms for detailed and performant logging.
-      case os
-    // swiftlint:enable identifier_name
+      case os  // swiftlint:disable:this identifier_name
     #endif  // canImport(os)
     /// Swift style, logs messages using Swift's built-in logging framework (SwiftLog).
     /// Ideal for server-side Swift applications or when consistent logging behavior across
@@ -62,16 +60,13 @@ public struct Log: Hashable, @unchecked Sendable {
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
 
-  // swiftlint:disable identifier_name
   /// Current number of cached SwiftLog loggers. Used in tests.
-  static var _swiftLoggerCount: Int {
+  static var _swiftLoggerCount: Int {  // swiftlint:disable:this identifier_name
     loggerQueue.sync { swiftLoggers.count }
   }
-  // swiftlint:enable identifier_name
 
-  // swiftlint:disable identifier_name
   /// Removes all cached loggers. Intended for tests.
-  static func _reset() {
+  static func _reset() {  // swiftlint:disable:this identifier_name
     loggerQueue.sync {
       swiftLoggers.removeAll()
       #if canImport(os)
@@ -79,22 +74,17 @@ public struct Log: Hashable, @unchecked Sendable {
       #endif
     }
   }
-  // swiftlint:enable identifier_name
 
-  // swiftlint:disable identifier_name
   /// Indicates whether a Swift logger exists for the given instance. Used in tests.
-  func _hasSwiftLogger() -> Bool {
+  func _hasSwiftLogger() -> Bool {  // swiftlint:disable:this identifier_name
     Self.loggerQueue.sync { Self.swiftLoggers[self] != nil }
   }
-  // swiftlint:enable identifier_name
 
   #if canImport(os)
-    // swiftlint:disable identifier_name
     /// Indicates whether an OS logger exists for the given instance. Used in tests.
-    func _hasOSLogger() -> Bool {
+    func _hasOSLogger() -> Bool {  // swiftlint:disable:this identifier_name
       Self.loggerQueue.sync { Self.osLoggers[self] != nil }
     }
-  // swiftlint:enable identifier_name
   #endif
 
   #if canImport(os)
@@ -102,12 +92,10 @@ public struct Log: Hashable, @unchecked Sendable {
     /// Access is synchronized using `loggerQueue`.
     private nonisolated(unsafe) static var osLoggers: [Self: OSLog] = [:]
 
-    // swiftlint:disable identifier_name
     /// Current number of cached OSLog loggers. Used in tests.
-    static var _osLoggerCount: Int {
+    static var _osLoggerCount: Int {  // swiftlint:disable:this identifier_name
       loggerQueue.sync { osLoggers.count }
     }
-    // swiftlint:enable identifier_name
 
     /// Initializes a new `Log` instance.
     ///
