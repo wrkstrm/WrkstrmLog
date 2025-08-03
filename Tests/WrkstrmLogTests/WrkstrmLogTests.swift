@@ -12,7 +12,7 @@ struct WrkstrmLogTests {
   @Test
   func swiftLoggerReuse() {
     Log._reset()
-    var log = Log()
+    var log = Log(style: .swift)
     log.info("first")
     #expect(Log._swiftLoggerCount == 1)
 
@@ -44,4 +44,28 @@ struct WrkstrmLogTests {
     logger.info("Testing path", file: "/tmp/Some Folder/File Name.swift")
     #expect(true)
   }
+
+  @Test
+  func disabledProducesNoLoggers() {
+    Log._reset()
+    Log.disabled.info("silence")
+    #expect(Log._swiftLoggerCount == 0)
+  }
+
+  #if DEBUG
+    @Test
+    func defaultLoggerNotDisabledInDebug() {
+      let log = Log()
+      #expect(log.style != .disabled)
+    }
+  #else
+    @Test
+    func defaultLoggerDisabledInRelease() {
+      Log._reset()
+      let log = Log()
+      log.info("silence")
+      #expect(log.style == .disabled)
+      #expect(Log._swiftLoggerCount == 0)
+    }
+  #endif
 }

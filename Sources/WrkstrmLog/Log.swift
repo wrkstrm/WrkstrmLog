@@ -35,7 +35,8 @@ public struct Log: Hashable, @unchecked Sendable {
     /// Ideal for server-side Swift applications or when consistent logging behavior across
     /// platforms is desired.
     case swift
-
+    /// Disabled style that suppresses all logging. Recommended for release builds when
+    /// log output is not desired.
     case disabled
   }
 
@@ -46,11 +47,27 @@ public struct Log: Hashable, @unchecked Sendable {
   public let category: String
 
   #if canImport(os)
-    /// The logging style used by the logger. Defaults to `.os` on Apple platforms.
+    /// The logging style used by the logger. Defaults to `.os` in debug builds and
+    /// `.disabled` otherwise.
     public let style: Style
   #else  // canImport(os)
-    /// The logging style used by the logger. Defaults to `.swift` on non-Apple platforms.
+    /// The logging style used by the logger. Defaults to `.swift` in debug builds and
+    /// `.disabled` otherwise.
     public let style: Style
+  #endif  // canImport(os)
+
+  #if canImport(os)
+    #if DEBUG
+      @usableFromInline static let defaultStyle: Style = .os
+    #else
+      @usableFromInline static let defaultStyle: Style = .disabled
+    #endif
+  #else  // canImport(os)
+    #if DEBUG
+      @usableFromInline static let defaultStyle: Style = .swift
+    #else
+      @usableFromInline static let defaultStyle: Style = .disabled
+    #endif
   #endif  // canImport(os)
 
   /// Storage for SwiftLog loggers, keyed by `Log` instance.
@@ -102,8 +119,8 @@ public struct Log: Hashable, @unchecked Sendable {
     /// - Parameters:
     ///   - system: The system name for the logger. Defaults to an empty string.
     ///   - category: The category name for the logger. Defaults to an empty string.
-    ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`).
-    ///     Defaults to `.os`.
+    ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`,
+    ///     `.disabled`). Defaults to `.os` in debug builds and `.disabled` otherwise.
     ///
     /// Example:
     /// ```
@@ -112,7 +129,7 @@ public struct Log: Hashable, @unchecked Sendable {
     public init(
       system: String = "",
       category: String = "",
-      style: Style = .os
+      style: Style = defaultStyle
     ) {
       self.system = system
       self.category = category
@@ -127,17 +144,20 @@ public struct Log: Hashable, @unchecked Sendable {
     /// - Parameters:
     ///   - system: The system name for the logger. Defaults to an empty string.
     ///   - category: The category name for the logger. Defaults to an empty string.
-    ///   - style: The logging style used by the logger (`.print`, `.swift`). Defaults to `.swift`.
+    ///   - style: The logging style used by the logger (`.print`, `.swift`, `.disabled`).
+    ///     Defaults to `.swift` in debug builds and `.disabled` otherwise.
     ///
     /// Example:
     /// ```
     /// let networkLogger = Log(system: "MyApp", category: "Networking")
     /// ```
-    public init(system: String = "", category: String = "", style: Style = .swift) {
+    public init(system: String = "", category: String = "", style: Style = defaultStyle) {
       self.system = system
       self.category = category
       self.style = style
     }
+
+    public static let disabled = Log(style: .disabled)
   #endif  // canImport(os)
 
   /// Maximum length for the function name in log messages.
