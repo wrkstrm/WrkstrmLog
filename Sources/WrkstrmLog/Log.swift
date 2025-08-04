@@ -80,7 +80,8 @@ public struct Log: Hashable, @unchecked Sendable {
 
   /// Storage for SwiftLog loggers, keyed by `Log` instance.
   /// Access is synchronized using `loggerQueue`.
-  private nonisolated(unsafe) static var swiftLoggers: [Self: Logging.Logger] = [:]
+  private nonisolated(unsafe) static var swiftLoggers: [Self: Logging.Logger] =
+    [:]
 
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
@@ -152,6 +153,8 @@ public struct Log: Hashable, @unchecked Sendable {
       #endif
     }
 
+    /// A convenience logger instance with logging disabled.
+    /// Useful for cases where a logger must be provided but logging should be suppressed.
     public static let disabled = Log(style: .disabled)
 
   #else  // canImport(os)
@@ -192,7 +195,8 @@ public struct Log: Hashable, @unchecked Sendable {
   public var maxFunctionLength: Int?
 
   public static func == (lhs: Log, rhs: Log) -> Bool {
-    lhs.system == rhs.system && lhs.category == rhs.category && lhs.style == rhs.style
+    lhs.system == rhs.system && lhs.category == rhs.category
+      && lhs.style == rhs.style
       && lhs.options == rhs.options
   }
 
@@ -248,7 +252,7 @@ public struct Log: Hashable, @unchecked Sendable {
     )
   }
 
-  /// Logs a informational message with the specified parameters.
+  /// Logs an informational message with the specified parameters.
   ///
   /// - Parameters:
   ///   - describable: The object or string to log.
@@ -349,14 +353,18 @@ public struct Log: Hashable, @unchecked Sendable {
   ) {
     guard style != .disabled else { return }
     let url = URL(fileURLWithPath: file)
-    let fileName = url.lastPathComponent.replacingOccurrences(of: ".swift", with: "")
+    let fileName = url.lastPathComponent.replacingOccurrences(
+      of: ".swift",
+      with: ""
+    )
     let functionString = formattedFunction(function)
     switch style {
     case .print:
       Swift
         .print(
           "\(system):\(category):\(level.emoji) \(fileName):\(String(line))|\(functionString)| "
-            + String(describing: describable))
+            + String(describing: describable)
+        )
 
     #if canImport(os)
 
