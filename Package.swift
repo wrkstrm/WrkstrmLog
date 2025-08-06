@@ -16,7 +16,6 @@ let package = Package(
   ],
   products: [
     .library(name: "WrkstrmLog", targets: ["WrkstrmLog"]),
-    .executable(name: "WrkstrmPerformance", targets: ["WrkstrmPerformance"])
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.0"),
