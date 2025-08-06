@@ -6,7 +6,7 @@ struct WrkstrmPerformanceCLI {
   static func main() throws {
     let arguments = CommandLine.arguments
     guard arguments.count > 1 else {
-      print("Usage: wrkstrmperformance <command> [arguments...]")
+      print("Usage: WrkstrmPerformance <command> [arguments...]")
       return
     }
     let command = arguments[1]
