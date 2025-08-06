@@ -27,11 +27,6 @@ let package = Package(
       dependencies: [.product(name: "Logging", package: "swift-log")],
       swiftSettings: Package.Inject.shared.swiftSettings,
     ),
-    .executableTarget(
-      name: "WrkstrmPerformance",
-      dependencies: ["WrkstrmLog"],
-      swiftSettings: Package.Inject.shared.swiftSettings
-    ),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ],
 )
