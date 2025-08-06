@@ -487,17 +487,22 @@ public struct Log: Hashable, @unchecked Sendable {
         mask = LevelMask.threshold(self.level)
       }
       // Clamp the global exposure to the logger's maximum before evaluating.
-      // This is the minimum of the global exposure or the 
-      // logger's exposure limit.
-      let clampedExposure = min(globalExposure, self.exposureLimit)
+      // Choose the more restrictive (higher-severity) level between the global
+      // exposure setting and the logger's own limit.
+      let clampedExposure =
+        globalExposure.naturalIntegralValue <= self.exposureLimit.naturalIntegralValue
+          ? globalExposure : self.exposureLimit
       mask.formIntersection(LevelMask.threshold(clampedExposure))
       guard mask.contains(.single(level)) else { return }
       let effectiveLevel = mask.minimumLevel
     #else
       let configuredLevel = self.level
       // Clamp the global exposure to the logger's maximum before evaluating.
-      // This is the minimum of the global exposure or the logger's exposure limit.
-      let clampedExposure = min(globalExposure, self.exposureLimit)
+      // Choose the more restrictive (higher-severity) level between the global
+      // exposure setting and the logger's own limit.
+      let clampedExposure =
+        globalExposure.naturalIntegralValue <= self.exposureLimit.naturalIntegralValue
+          ? globalExposure : self.exposureLimit
       let effectiveLevel: Logging.Logger.Level
       if clampedExposure > configuredLevel {
         effectiveLevel = clampedExposure
@@ -566,6 +571,29 @@ public struct Log: Hashable, @unchecked Sendable {
 
     case .disabled:
       break
+    }
+  }
+}
+
+extension Logging.Logger.Level {
+  /// A numeric representation of the log level where lower values
+  /// indicate more severe messages.
+  internal var naturalIntegralValue: Int {
+    switch self {
+    case .critical:
+      return 0
+    case .error:
+      return 1
+    case .warning:
+      return 2
+    case .notice:
+      return 3
+    case .info:
+      return 4
+    case .debug:
+      return 5
+    case .trace:
+      return 6
     }
   }
 }
