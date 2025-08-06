@@ -53,6 +53,66 @@ public struct Log: Hashable, @unchecked Sendable {
     public static let prod = Options(rawValue: 1 << 0)
   }
 
+  #if DEBUG
+    /// Bit mask describing which log levels are enabled.
+    struct LevelMask: OptionSet, Sendable {
+      /// The raw bit mask value.
+      let rawValue: UInt8
+
+      /// Creates a new mask from the given raw value.
+      /// - Parameter rawValue: The raw bit mask value.
+      init(rawValue: UInt8) { self.rawValue = rawValue }
+
+      /// Individual log level bits.
+      static let trace = LevelMask(rawValue: 1 << 0)
+      static let debug = LevelMask(rawValue: 1 << 1)
+      static let info = LevelMask(rawValue: 1 << 2)
+      static let notice = LevelMask(rawValue: 1 << 3)
+      static let warning = LevelMask(rawValue: 1 << 4)
+      static let error = LevelMask(rawValue: 1 << 5)
+      static let critical = LevelMask(rawValue: 1 << 6)
+
+      /// A mask containing all levels from the specified minimum level upward.
+      /// - Parameter level: The minimum included level.
+      static func threshold(_ level: Logging.Logger.Level) -> LevelMask {
+        switch level {
+        case .trace: return [.trace, .debug, .info, .notice, .warning, .error, .critical]
+        case .debug: return [.debug, .info, .notice, .warning, .error, .critical]
+        case .info: return [.info, .notice, .warning, .error, .critical]
+        case .notice: return [.notice, .warning, .error, .critical]
+        case .warning: return [.warning, .error, .critical]
+        case .error: return [.error, .critical]
+        case .critical: return [.critical]
+        }
+      }
+
+      /// A mask representing only the specified level.
+      /// - Parameter level: The level to include.
+      static func single(_ level: Logging.Logger.Level) -> LevelMask {
+        switch level {
+        case .trace: return .trace
+        case .debug: return .debug
+        case .info: return .info
+        case .notice: return .notice
+        case .warning: return .warning
+        case .error: return .error
+        case .critical: return .critical
+        }
+      }
+
+      /// The lowest level contained in the mask.
+      var minimumLevel: Logging.Logger.Level {
+        if contains(.trace) { return .trace }
+        if contains(.debug) { return .debug }
+        if contains(.info) { return .info }
+        if contains(.notice) { return .notice }
+        if contains(.warning) { return .warning }
+        if contains(.error) { return .error }
+        return .critical
+      }
+    }
+  #endif
+
   /// The system name for the logger. Typically represents the application or module name.
   public let system: String
 
@@ -69,6 +129,10 @@ public struct Log: Hashable, @unchecked Sendable {
     public let style: Style
   #endif  // canImport(os)
 
+  /// The minimum log level that will be logged.
+  /// Messages below this level are ignored.
+  public let level: Logging.Logger.Level
+
   /// Options describing when the logger should be active.
   public let options: Options
 
@@ -83,6 +147,12 @@ public struct Log: Hashable, @unchecked Sendable {
   private nonisolated(unsafe) static var swiftLoggers: [Self: Logging.Logger] =
     [:]
 
+  #if DEBUG
+    /// Override level masks used during debugging.
+    /// Access is synchronized using `loggerQueue`.
+    nonisolated(unsafe) static var overrideLevelMasks: [Self: LevelMask] = [:]
+  #endif
+
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
 
@@ -95,10 +165,26 @@ public struct Log: Hashable, @unchecked Sendable {
   static func _reset() {  // swiftlint:disable:this identifier_name
     loggerQueue.sync {
       swiftLoggers.removeAll()
+      #if DEBUG
+        overrideLevelMasks.removeAll()
+      #endif
       #if canImport(os)
         osLoggers.removeAll()
       #endif
     }
+  }
+
+  /// Overrides the minimum logging level for a specific logger. Only
+  /// available in debug builds.
+  /// - Parameters:
+  ///   - logger: The logger to override.
+  ///   - level: The new minimum logging level.
+  public static func overrideLevel(for logger: Log, to level: Logging.Logger.Level) {
+    #if DEBUG
+      loggerQueue.sync {
+        overrideLevelMasks[logger] = LevelMask.threshold(level)
+      }
+    #endif
   }
 
   /// Indicates whether a Swift logger exists for the given instance. Used in tests.
@@ -130,6 +216,7 @@ public struct Log: Hashable, @unchecked Sendable {
     ///   - category: The category name for the logger. Defaults to an empty string.
     ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`,
     ///     `.disabled`). Defaults to `.os`.
+    ///   - level: The minimum log level that will be logged. Defaults to `.info`.
     ///   - options: Configuration options for the logger. Use `.prod` to keep the
     ///     logger active in production. Defaults to an empty set.
     ///
@@ -141,10 +228,12 @@ public struct Log: Hashable, @unchecked Sendable {
       system: String = "",
       category: String = "",
       style: Style = defaultStyle,
+      level: Logging.Logger.Level = .info,
       options: Options = []
     ) {
       self.system = system
       self.category = category
+      self.level = level
       self.options = options
       #if DEBUG
         self.style = style
@@ -165,6 +254,7 @@ public struct Log: Hashable, @unchecked Sendable {
     ///   - category: The category name for the logger. Defaults to an empty string.
     ///   - style: The logging style used by the logger (`.print`, `.swift`, `.disabled`).
     ///     Defaults to `.swift`.
+    ///   - level: The minimum log level that will be logged. Defaults to `.info`.
     ///   - options: Configuration options for the logger. Use `.prod` to keep the
     ///     logger active in production. Defaults to an empty set.
     ///
@@ -176,10 +266,12 @@ public struct Log: Hashable, @unchecked Sendable {
       system: String = "",
       category: String = "",
       style: Style = defaultStyle,
+      level: Logging.Logger.Level = .info,
       options: Options = []
     ) {
       self.system = system
       self.category = category
+      self.level = level
       self.options = options
       #if DEBUG
         self.style = style
@@ -197,6 +289,7 @@ public struct Log: Hashable, @unchecked Sendable {
   public static func == (lhs: Log, rhs: Log) -> Bool {
     lhs.system == rhs.system && lhs.category == rhs.category
       && lhs.style == rhs.style
+      && lhs.level == rhs.level
       && lhs.options == rhs.options
   }
 
@@ -204,6 +297,7 @@ public struct Log: Hashable, @unchecked Sendable {
     hasher.combine(system)
     hasher.combine(category)
     hasher.combine(style)
+    hasher.combine(level)
     hasher.combine(options)
   }
 
@@ -352,6 +446,21 @@ public struct Log: Hashable, @unchecked Sendable {
     dso: UnsafeRawPointer,
   ) {
     guard style != .disabled else { return }
+    #if DEBUG
+      let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
+      let mask: LevelMask
+      if let overrideMask {
+        mask = overrideMask
+        guard mask.contains(.single(level)) else { return }
+      } else {
+        mask = LevelMask.threshold(self.level)
+        guard mask.contains(.single(level)) else { return }
+      }
+      let effectiveLevel = mask.minimumLevel
+    #else
+      let effectiveLevel = self.level
+      guard level >= effectiveLevel else { return }
+    #endif
     let url = URL(fileURLWithPath: file)
     let fileName = url.lastPathComponent.replacingOccurrences(
       of: ".swift",
@@ -391,11 +500,13 @@ public struct Log: Hashable, @unchecked Sendable {
 
     case .swift:
       let logger: Logging.Logger = Self.loggerQueue.sync {
-        if let existing = Self.swiftLoggers[self] {
+        if var existing = Self.swiftLoggers[self] {
+          existing.logLevel = effectiveLevel
+          Self.swiftLoggers[self] = existing
           return existing
         }
         var newLogger = Logging.Logger(label: system)
-        newLogger.logLevel = .debug
+        newLogger.logLevel = effectiveLevel
         Self.swiftLoggers[self] = newLogger
         return newLogger
       }

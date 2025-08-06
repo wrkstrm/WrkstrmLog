@@ -2,7 +2,7 @@ import Testing
 
 @testable import WrkstrmLog
 
-@Suite("WrkstrmLog")
+@Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
   @Test
   func example() {
@@ -51,6 +51,38 @@ struct WrkstrmLogTests {
     Log.disabled.info("silence")
     #expect(Log._swiftLoggerCount == 0)
   }
+
+  @Test
+  func logLevelFiltersMessages() {
+    Log._reset()
+    let log = Log(style: .swift, level: .error, options: [.prod])
+    log.info("ignored")
+    #expect(Log._swiftLoggerCount == 0)
+  }
+
+  #if DEBUG
+    @Test
+    func overrideLevelAdjustsLoggingInDebug() {
+      Log._reset()
+      let log = Log(style: .swift, level: .error, options: [.prod])
+      log.info("suppressed")
+      #expect(Log._swiftLoggerCount == 0)
+      Log.overrideLevel(for: log, to: .debug)
+      log.info("logged")
+      #expect(Log._swiftLoggerCount == 1)
+    }
+  #else
+    @Test
+    func overrideLevelNoEffectInRelease() {
+      Log._reset()
+      let log = Log(style: .swift, level: .error, options: [.prod])
+      log.info("suppressed")
+      #expect(Log._swiftLoggerCount == 0)
+      Log.overrideLevel(for: log, to: .debug)
+      log.info("still suppressed")
+      #expect(Log._swiftLoggerCount == 0)
+    }
+  #endif
 
   #if DEBUG
     @Test

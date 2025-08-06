@@ -132,6 +132,21 @@ On macOS, while `os.Logger` messages are not immediately visible in the terminal
 
 On Linux, while `os.Logger` is not available as it's part of Apple's ecosystem, the Swift `Logging` framework provides a robust alternative. WrkstrmLog leverages this framework on Linux, ensuring that you have access to advanced logging capabilities even in non-Apple environments. 🐧💪
 
+### Controlling Log Levels
+
+Set a minimum level when creating a logger to filter out lower-priority messages:
+
+```swift
+let log = Log(system: "com.myapp", category: "network", level: .error)
+log.info("Ignored")
+
+Log.overrideLevel(for: log, to: .debug)
+log.info("Now logged")
+```
+
+`overrideLevel` is available only in `DEBUG` builds and lets you adjust a logger's level at runtime.
+
+
 
 ## ⚡ Performance Considerations
 Developing WrkstrmLog presented its own set of challenges, particularly in terms of performance:

@@ -82,6 +82,18 @@ Import `WrkstrmLog` and start logging with ease:
    let active = Log(style: .swift, options: [.prod])
    ```
 
+5. **🎚 Control Log Level**:
+   Set a minimum log level when creating a logger. Messages below this level are ignored. In
+   `DEBUG` builds, you can temporarily override a logger's level:
+
+   ```swift
+   var logger = Log(system: "YourSystem", category: "Networking", level: .error)
+   logger.info("Ignored")
+
+   Log.overrideLevel(for: logger, to: .debug)
+   logger.info("Logged")
+   ```
+
 ## 🎨 Customization
 
 `WrkstrmLog` offers high customization capabilities. Extend or modify it to suit your project's needs, and utilize the sample formatters as a foundation for custom implementations.

@@ -8,8 +8,16 @@ extension Log {
   /// ```
   /// Log.shared.info("Application started")
   /// ```
-  public nonisolated(unsafe) static var shared = Log(system: "wrkstrm", category: "shared") {
+  public nonisolated(unsafe) static var shared =
+    Log(system: "wrkstrm", category: "shared", level: .info)
+  {
     didSet {
+      #if DEBUG
+        let override = overrideLevelMasks.removeValue(forKey: oldValue)
+        if let mask = override {
+          overrideLevelMasks[shared] = mask
+        }
+      #endif
       shared.verbose("New Logger: \(shared)")
     }
   }
