@@ -1,34 +1,31 @@
-# 🗂️ `WrkstrmLog`
+# WrkstrmLog 🗂️
 
 | CI System | Status |
 |-----------|--------|
 | Swift Package Index | [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog) |
 | GitHub Action Status | [![Lint Status][lint-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swiftlint.yml) [![Test Status][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) |
 
----
-`WrkstrmLog` is a versatile and flexible logging framework designed for consistent logging across different environments including Linux, Xcode, and macOS terminal. It adapts to various contexts, ensuring that log messages are displayed with consistent formatting regardless of the platform.
+WrkstrmLog is a logging framework for Swift that provides consistent, configurable log output across Linux, macOS, and Xcode. It offers multiple logging styles and can be completely disabled for production builds. 🔧
 
-## 🔑 Key Features
+## ✨ Key Features
 
-- **🌐 Adaptive Logging**: Seamless logging across Linux, Xcode, and macOS terminal environments.
-- **💼 Multiple Logging Styles**: Choose from print, OSLog, and SwiftLog styles.
-- **🔧 Flexible and Customizable**: Extend the framework to fit specific logging requirements.
-- **🚀 Easy Integration**: Quick setup with Swift Package Manager.
-- **🚫 Optional Disabled Mode**: Silence logs entirely using the `.disabled` style or the convenience `Log.disabled`—perfect for production builds.
-- **🆕 Swift 6 File IDs**: Cleaner log output using `#fileID`.
+- 🌐 Adaptive logging across Linux, Xcode, and the macOS terminal
+- 💼 Support for print, OSLog, and SwiftLog styles
+- 🔧 Customizable to fit specific logging requirements
+- 🚀 Simple integration with Swift Package Manager
+- 🔕 Optional disabled mode to silence logs
+- 🆕 Swift 6 `#fileID` support for concise output
 
-## Compatibility
+## 🖥️ Compatibility
 
-- macOS
-- Linux
+- 🍎 macOS
+- 🐧 Linux
 
 ## 📦 Installation
 
-To integrate `WrkstrmLog` into your project, follow these steps:
+### 🛠️ Swift Package Manager
 
-### 🛠 Swift Package Manager
-
-Add `WrkstrmLog` as a dependency in your `Package.swift` file:
+Add WrkstrmLog as a dependency in your `Package.swift` file:
 
 ```swift
 dependencies: [
@@ -36,7 +33,7 @@ dependencies: [
 ]
 ```
 
-Include `WrkstrmLog` in your target dependencies:
+Include WrkstrmLog in your target dependencies:
 
 ```swift
 targets: [
@@ -44,29 +41,25 @@ targets: [
 ]
 ```
 
-## 📚 Usage
+## 🚀 Usage
 
-Import `WrkstrmLog` and start logging with ease:
-
-1. **📥 Import the Library**:
+1. **Import the library** 📥
 
    ```swift
    import WrkstrmLog
    ```
 
-2. **🔨 Initialize Logger**:
-   Create a logger instance with your system and category. By default, each logger
-   suppresses logs below the `.critical` level. Provide an `exposure` limit to
-   allow additional levels:
+2. **Initialize a logger** ⚙️
+
+   Create a logger with your system and category. By default, each logger suppresses messages below the `.critical` level. Set an `exposure` limit to allow additional levels:
 
    ```swift
    let logger = Log(system: "YourSystem", category: "YourCategory", exposure: .info)
    ```
 
-3. **📝 Log Messages**:
-   Use various logging methods like `verbose`, `info`, `error`, and `guard`.
-   `verbose` logs are emitted at the debug level, making them lower
-   priority than informational messages:
+3. **Log messages** 📝
+
+   Use the provided methods such as `verbose`, `info`, `error`, and `guard`. `verbose` logs are emitted at the debug level.
 
    ```swift
    logger.verbose("Verbose message")
@@ -75,18 +68,18 @@ Import `WrkstrmLog` and start logging with ease:
    Log.guard("Critical error")
    ```
 
-4. **🚫 Disable or Enable in Production**:
-   Loggers default to `.disabled` in release builds. Use the `.prod` option to keep them
-   active or the `.disabled` style for a silent logger.
+4. **Disable or enable logging in production** 🔇
+
+   Loggers default to `.disabled` in release builds. Use the `.prod` option to keep them active or the `.disabled` style for a silent logger.
 
    ```swift
    let silent = Log.disabled
    let active = Log(style: .swift, options: [.prod])
    ```
 
-5. **🎚 Control Log Level**:
-   Set a minimum log level when creating a logger. Messages below this level are ignored. In
-   `DEBUG` builds, you can temporarily override a logger's level:
+5. **Control log level** 🎚️
+
+   Set a minimum log level when creating a logger. Messages below this level are ignored. In `DEBUG` builds, you can temporarily override a logger's level:
 
    ```swift
    var logger = Log(system: "YourSystem", category: "Networking", level: .error)
@@ -96,135 +89,42 @@ Import `WrkstrmLog` and start logging with ease:
    logger.info("Logged")
    ```
 
-6. **🔒 Limit Log Exposure**:
-   Logging is suppressed to `.critical` messages by default. Set a global
-   minimum level during application startup to expose additional logs. The
-   global setting is clamped by each logger's `maxExposureLevel`, requiring
-   libraries to opt in before emitting more verbose messages:
+6. **Limit log exposure** 🚦
+
+   Logging is suppressed to `.critical` messages by default. Set a global minimum level during application startup to expose additional logs. The global setting is clamped by each logger's `maxExposureLevel`, requiring libraries to opt in before emitting more verbose messages:
 
    ```swift
    Log.limitExposure(to: .warning)
    print(logger.maxExposureLevel) // .info
    ```
 
-## 🎨 Customization
+## 🧩 Customization
 
-`WrkstrmLog` offers high customization capabilities. Extend or modify it to suit your project's needs, and utilize the sample formatters as a foundation for custom implementations.
+WrkstrmLog can be extended or modified to suit project-specific needs. Use the sample formatters as a foundation for custom implementations.
 
 ## 🤝 Contributing
 
-🌟 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are welcome.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Fork the project 🍴
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request 🚀
 
-## 📜 License
+## 📄 License
 
-📄 Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for details.
 
 ## 📬 Contact
 
-🔗 Project Link: [https://github.com/wrkstrm/WrkstrmLog](https://github.com/wrkstrm/WrkstrmLog)
+Project link: [https://github.com/wrkstrm/WrkstrmLog](https://github.com/wrkstrm/WrkstrmLog)
 
-## 💖 Acknowledgments
+## 🙏 Acknowledgments
 
-- Developed by github.com/@rismay
+Developed by github.com/@rismay
+
+For a narrative overview of the project's goals 🎶, see [docs/Symphony.md](docs/Symphony.md).
 
 [lint-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swiftlint.yml/badge.svg
 [test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
-
---- 
-
-# 📝 WrkstrmLog: Unifying the Symphony of Swift Logging 🎼
-
-## 1. 🎭 The Challenge: Taming the Wild Logs
-Ever felt like your logs are speaking different languages across platforms? You're not alone! 😅
-
-Swift developers face a common nemesis:
-```swift
-#if DEBUG
-print("Debug: Entering function") // 👀 Only in debug? What about production?
-#endif
-
-// ... 🏗️ Your awesome code here ...
-
-if let error = performOperation() {
-  print("Error occurred: \(error)") // 😱 Errors in production, but where?
-}
-```
-
-This approach is like trying to conduct an orchestra with musicians playing from different sheets! 🎻🎺🥁
-
-## 2. 🚀 Enter WrkstrmLog: The Maestro of Swift Logging
-WrkstrmLog steps in as the conductor, bringing harmony to your logging chaos. It's like having a universal translator for your logs! 🌐🗣️
-
-```swift
-import WrkstrmLog
-
-let log = Log(system: "com.myapp", category: "networking")
-
-func someFunction() {
-  log.debug("🎬 Action! Entering someFunction")
-  
-  // 🏗️ Your symphony of code here
-  
-  if let error = performOperation() {
-    log.error("🚨 Plot twist! Operation failed: \(error)")
-  }
-  
-  log.debug("🎭 Scene end. Exiting someFunction")
-}
-```
-
-## 3. 💎 Core Features and Benefits
-- 🎯 **Unified Interface**: One log to rule them all!
-- 🌈 **Flexible Configuration**: Dress your logs for any occasion.
-- 🏷️ **Smart Categorization**: Find that needle in the haystack.
-- 🔀 **Multi-Style Output**: Console, Apple's Unified Logging, Swift Logging - we speak them all!
-- 🌍 **Cross-Platform Consistency**: From Xcode to Linux, we've got you covered.
-- 🧩 **Extensibility**: Build your own log empire!
-- 🚫 **Built-in Disabled Mode**: Silence logs completely when you need total quiet.
-
-## 4. 🏁 Getting Started
-
-### 📦 Installation
-Add this line to your `Package.swift` and let the magic begin:
-```swift
-dependencies: [
-    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.1.2"))
-]
-```
-
-### 🔰 Basic Usage
-```swift
-import WrkstrmLog
-
-let log = Log.shared
-log.info("🎉 App launched! Time to rock and roll!")
-```
-
-## 5. 🎓 Advanced Usage and Best Practices
-WrkstrmLog is like a Swiss Army knife for logging. Here's a taste of its power:
-
-| Environment | WrkstrmLog Magic | Default Swift (Boring) Logging |
-|-------------|------------------|--------------------------------|
-| Xcode | 🔍 Uses `.os` style. Debug console becomes your crystal ball. | Basic `print()` and `os.Logger` in console. |
-| macOS Terminal | 🖨️ `.print` style. Logs pop right into stdout. | `print()` works, `os.Logger` plays hide and seek. |
-| Linux | 🐧 `.swift` style. Bridging the gap like a boss. | `print()` only. `os.Logger` goes MIA. |
-
-## 6. ⚡ Performance Considerations
-We've turbocharged WrkstrmLog:
-- 🧠 Lazy evaluation: Logs think before they speak.
-- 🚦 Efficient filtering: Only the VIP logs get through.
-
-## 7. 🔮 Conclusion and Next Steps
-WrkstrmLog isn't just a logger; it's your ticket to logging nirvana. 🧘‍♂️ Say goodbye to platform-specific headaches and hello to logging bliss!
-
-Stay tuned for our next episode: "WrkstrmLog Advanced: Turning Your Logs into Superheroes!" 🦸‍♂️📚
-
----
-
-For more mind-blowing details, swing by our [GitHub repo](https://github.com/wrkstrm/WrkstrmLog) or dive deep into our [docs](https://docs.wrkstrm.com/WrkstrmLog). Happy logging! 🎉🔧
