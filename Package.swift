@@ -16,7 +16,6 @@ let package = Package(
   ],
   products: [
     .library(name: "WrkstrmLog", targets: ["WrkstrmLog"]),
-    .executable(name: "WrkstrmPerformance", targets: ["WrkstrmPerformance"])
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.0"),
@@ -27,11 +26,6 @@ let package = Package(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
       swiftSettings: Package.Inject.shared.swiftSettings,
-    ),
-    .executableTarget(
-      name: "WrkstrmPerformance",
-      dependencies: ["WrkstrmLog"],
-      swiftSettings: Package.Inject.shared.swiftSettings
     ),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
   ],
