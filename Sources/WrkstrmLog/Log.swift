@@ -488,7 +488,7 @@ public struct Log: Hashable, @unchecked Sendable {
       }
       // Clamp the global exposure to the logger's maximum before evaluating.
       // This is the minimum of the global exposure or the 
-      // loggers exposure limit.
+      // logger's exposure limit.
       let clampedExposure = min(globalExposure, self.exposureLimit)
       mask.formIntersection(LevelMask.threshold(clampedExposure))
       guard mask.contains(.single(level)) else { return }
