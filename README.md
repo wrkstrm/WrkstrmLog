@@ -122,7 +122,7 @@ Project link: [https://github.com/wrkstrm/WrkstrmLog](https://github.com/wrkstrm
 
 ## 🙏 Acknowledgments
 
-Developed by github.com/@rismay
+Developed by [rismay](https://github.com/rismay)
 
 For a narrative overview of the project's goals 🎶, see [Sources/WrkstrmLog/Documentation.docc/Articles/WrkstrmLogUnifyingTheSymphony.md](Sources/WrkstrmLog/Documentation.docc/Articles/WrkstrmLogUnifyingTheSymphony.md).
 
