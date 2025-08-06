@@ -96,12 +96,19 @@ targets: [
 
    ```swift
    Log.limitExposure(to: .warning)
+   
+   // Inspect how far this logger is willing to expose messages
    print(logger.maxExposureLevel) // .info
+   if logger.maxExposureLevel >= .debug {
+       print("Debug logs may be exposed")
+   }
    ```
 
    The global limit is configured via `Log.limitExposure`. Each logger exposes its
    opt-in ceiling through `maxExposureLevel`, ensuring verbose logs are only emitted
-   when both the global and per-logger limits allow.
+   when both the global and per-logger limits allow. When raising the global limit,
+   compare it with each logger's `maxExposureLevel` to avoid surfacing unintended
+   verbosity from loggers that opt in to higher levels.
 
 ## 🧩 Customization
 
