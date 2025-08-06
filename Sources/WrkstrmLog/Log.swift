@@ -136,6 +136,12 @@ public struct Log: Hashable, @unchecked Sendable {
   /// Options describing when the logger should be active.
   public let options: Options
 
+  /// Internal maximum log level this logger is permitted to expose.
+  private let exposureLimit: Logging.Logger.Level
+
+  /// The maximum log level this logger can emit.
+  public var maxExposureLevel: Logging.Logger.Level { exposureLimit }
+
   #if canImport(os)
     @usableFromInline static let defaultStyle: Style = .os
   #else  // canImport(os)
@@ -152,6 +158,10 @@ public struct Log: Hashable, @unchecked Sendable {
     /// Access is synchronized using `loggerQueue`.
     nonisolated(unsafe) static var overrideLevelMasks: [Self: LevelMask] = [:]
   #endif
+
+  /// Global minimum log level applied to all loggers to limit message exposure.
+  /// Defaults to `.critical` and must be configured explicitly to expose additional levels.
+  private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level = .critical
 
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
@@ -171,6 +181,7 @@ public struct Log: Hashable, @unchecked Sendable {
       #if canImport(os)
         osLoggers.removeAll()
       #endif
+      exposureLevel = .critical
     }
   }
 
@@ -185,6 +196,14 @@ public struct Log: Hashable, @unchecked Sendable {
         overrideLevelMasks[logger] = LevelMask.threshold(level)
       }
     #endif
+  }
+
+  /// Sets a global minimum log level applied across all loggers.
+  /// Must be invoked during application initialization to enable logging
+  /// above the default `.critical` level.
+  /// - Parameter level: The lowest level that will be emitted.
+  public static func limitExposure(to level: Logging.Logger.Level) {
+    loggerQueue.sync { exposureLevel = level }
   }
 
   /// Indicates whether a Swift logger exists for the given instance. Used in tests.
@@ -217,6 +236,7 @@ public struct Log: Hashable, @unchecked Sendable {
     ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`,
     ///     `.disabled`). Defaults to `.os`.
     ///   - level: The minimum log level that will be logged. Defaults to `.info`.
+    ///   - exposure: The maximum log level permitted for this logger. Defaults to `.critical`.
     ///   - options: Configuration options for the logger. Use `.prod` to keep the
     ///     logger active in production. Defaults to an empty set.
     ///
@@ -229,12 +249,14 @@ public struct Log: Hashable, @unchecked Sendable {
       category: String = "",
       style: Style = defaultStyle,
       level: Logging.Logger.Level = .info,
+      exposure: Logging.Logger.Level = .critical,
       options: Options = []
     ) {
       self.system = system
       self.category = category
       self.level = level
       self.options = options
+      self.exposureLimit = exposure
       #if DEBUG
         self.style = style
       #else
@@ -255,6 +277,7 @@ public struct Log: Hashable, @unchecked Sendable {
     ///   - style: The logging style used by the logger (`.print`, `.swift`, `.disabled`).
     ///     Defaults to `.swift`.
     ///   - level: The minimum log level that will be logged. Defaults to `.info`.
+    ///   - exposure: The maximum log level permitted for this logger. Defaults to `.critical`.
     ///   - options: Configuration options for the logger. Use `.prod` to keep the
     ///     logger active in production. Defaults to an empty set.
     ///
@@ -267,12 +290,14 @@ public struct Log: Hashable, @unchecked Sendable {
       category: String = "",
       style: Style = defaultStyle,
       level: Logging.Logger.Level = .info,
+      exposure: Logging.Logger.Level = .critical,
       options: Options = []
     ) {
       self.system = system
       self.category = category
       self.level = level
       self.options = options
+      self.exposureLimit = exposure
       #if DEBUG
         self.style = style
       #else
@@ -291,6 +316,7 @@ public struct Log: Hashable, @unchecked Sendable {
       && lhs.style == rhs.style
       && lhs.level == rhs.level
       && lhs.options == rhs.options
+      && lhs.exposureLimit == rhs.exposureLimit
   }
 
   public func hash(into hasher: inout Hasher) {
@@ -299,6 +325,7 @@ public struct Log: Hashable, @unchecked Sendable {
     hasher.combine(style)
     hasher.combine(level)
     hasher.combine(options)
+    hasher.combine(exposureLimit)
   }
 
   /// Formats the function name to fit within the specified maximum length.
@@ -446,19 +473,28 @@ public struct Log: Hashable, @unchecked Sendable {
     dso: UnsafeRawPointer,
   ) {
     guard style != .disabled else { return }
+    let globalExposure = Self.loggerQueue.sync { Self.exposureLevel }
     #if DEBUG
       let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
-      let mask: LevelMask
+      var mask: LevelMask
       if let overrideMask {
         mask = overrideMask
-        guard mask.contains(.single(level)) else { return }
       } else {
         mask = LevelMask.threshold(self.level)
-        guard mask.contains(.single(level)) else { return }
       }
+      let combinedExposure = max(globalExposure, self.exposureLimit)
+      mask.formIntersection(LevelMask.threshold(combinedExposure))
+      guard mask.contains(.single(level)) else { return }
       let effectiveLevel = mask.minimumLevel
     #else
-      let effectiveLevel = self.level
+      let configuredLevel = self.level
+      let combinedExposure = max(globalExposure, self.exposureLimit)
+      let effectiveLevel: Logging.Logger.Level
+      if combinedExposure > configuredLevel {
+        effectiveLevel = combinedExposure
+      } else {
+        effectiveLevel = configuredLevel
+      }
       guard level >= effectiveLevel else { return }
     #endif
     let url = URL(fileURLWithPath: file)

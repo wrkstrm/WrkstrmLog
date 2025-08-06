@@ -55,10 +55,12 @@ Import `WrkstrmLog` and start logging with ease:
    ```
 
 2. **🔨 Initialize Logger**:
-   Create a logger instance with your system and category:
+   Create a logger instance with your system and category. By default, each logger
+   suppresses logs below the `.critical` level. Provide an `exposure` limit to
+   allow additional levels:
 
    ```swift
-   let logger = Log(system: "YourSystem", category: "YourCategory")
+   let logger = Log(system: "YourSystem", category: "YourCategory", exposure: .info)
    ```
 
 3. **📝 Log Messages**:
@@ -92,6 +94,16 @@ Import `WrkstrmLog` and start logging with ease:
 
    Log.overrideLevel(for: logger, to: .debug)
    logger.info("Logged")
+   ```
+
+6. **🔒 Limit Log Exposure**:
+   Logging is suppressed to `.critical` messages by default. Set a global
+   minimum level during application startup to expose additional logs, and
+   inspect a logger's `maxExposureLevel` to see its highest permitted level:
+
+   ```swift
+   Log.limitExposure(to: .warning)
+   print(logger.maxExposureLevel) // .info
    ```
 
 ## 🎨 Customization

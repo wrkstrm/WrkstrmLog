@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+### Added
+- Introduce a global exposure limit to restrict logging output across libraries. The limit
+  defaults to `.critical` and must be configured at startup to enable more verbose logging.
+- Provide a per-logger exposure limit defaulting to `.critical`, exposing a public
+  `maxExposureLevel` for consumers to inspect.
+### Removed
+- Remove `Log.removeExposureLimit` in favor of requiring an explicit exposure limit.
+
 ## [1.1.2] - 2024-08-29
 ### Added
 - Adopt Swift 6 `#fileID` identifiers for cleaner, more consistent log output across platforms.
