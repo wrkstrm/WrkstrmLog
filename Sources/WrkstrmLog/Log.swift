@@ -496,8 +496,7 @@ public struct Log: Hashable, @unchecked Sendable {
     #else
       let configuredLevel = self.level
       // Clamp the global exposure to the logger's maximum before evaluating.
-      // This is the minimum of the global exposure or the 
-      // loggers exposure limit.
+      // This is the minimum of the global exposure or the logger's exposure limit.
       let clampedExposure = min(globalExposure, self.exposureLimit)
       let effectiveLevel: Logging.Logger.Level
       if clampedExposure > configuredLevel {
