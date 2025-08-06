@@ -98,8 +98,9 @@ Import `WrkstrmLog` and start logging with ease:
 
 6. **🔒 Limit Log Exposure**:
    Logging is suppressed to `.critical` messages by default. Set a global
-   minimum level during application startup to expose additional logs, and
-   inspect a logger's `maxExposureLevel` to see its highest permitted level:
+   minimum level during application startup to expose additional logs. The
+   global setting is clamped by each logger's `maxExposureLevel`, requiring
+   libraries to opt in before emitting more verbose messages:
 
    ```swift
    Log.limitExposure(to: .warning)

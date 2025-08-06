@@ -88,6 +88,18 @@ struct WrkstrmLogTests {
     #expect(Log._swiftLoggerCount == 1)
   }
 
+  @Test
+  func globalExposureIncreaseDoesNotOverrideLoggerLimit() {
+    Log._reset()
+    let log = Log(style: .swift, level: .trace, options: [.prod])
+    log.error("suppressed")
+    #expect(Log._swiftLoggerCount == 0)
+    Log.limitExposure(to: .trace)
+    #expect(log.maxExposureLevel == .critical)
+    log.error("still suppressed")
+    #expect(Log._swiftLoggerCount == 0)
+  }
+
   #if DEBUG
     @Test
     func overrideLevelAdjustsLoggingInDebug() {

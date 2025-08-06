@@ -199,9 +199,13 @@ public struct Log: Hashable, @unchecked Sendable {
   }
 
   /// Sets a global minimum log level applied across all loggers.
-  /// Must be invoked during application initialization to enable logging
-  /// above the default `.critical` level.
-  /// - Parameter level: The lowest level that will be emitted.
+  ///
+  /// The provided `level` is clamped by each logger's `maxExposureLevel`,
+  /// ensuring libraries must explicitly opt in before more verbose logging
+  /// is emitted. Invoke during application initialization to expose
+  /// additional logs beyond the default `.critical` level.
+  ///
+  /// - Parameter level: The lowest level that will be emitted globally.
   public static func limitExposure(to level: Logging.Logger.Level) {
     loggerQueue.sync { exposureLevel = level }
   }
@@ -482,16 +486,18 @@ public struct Log: Hashable, @unchecked Sendable {
       } else {
         mask = LevelMask.threshold(self.level)
       }
-      let combinedExposure = max(globalExposure, self.exposureLimit)
-      mask.formIntersection(LevelMask.threshold(combinedExposure))
+      // Clamp the global exposure to the logger's maximum before evaluating.
+      let clampedExposure = max(globalExposure, self.exposureLimit)
+      mask.formIntersection(LevelMask.threshold(clampedExposure))
       guard mask.contains(.single(level)) else { return }
       let effectiveLevel = mask.minimumLevel
     #else
       let configuredLevel = self.level
-      let combinedExposure = max(globalExposure, self.exposureLimit)
+      // Clamp the global exposure to the logger's maximum before evaluating.
+      let clampedExposure = max(globalExposure, self.exposureLimit)
       let effectiveLevel: Logging.Logger.Level
-      if combinedExposure > configuredLevel {
-        effectiveLevel = combinedExposure
+      if clampedExposure > configuredLevel {
+        effectiveLevel = clampedExposure
       } else {
         effectiveLevel = configuredLevel
       }
