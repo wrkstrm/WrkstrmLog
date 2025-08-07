@@ -297,13 +297,11 @@ public struct Log: Hashable, @unchecked Sendable {
       system: String = "",
       category: String = "",
       style: Style = defaultStyle,
-      level: Logging.Logger.Level = .info,
       exposure: Logging.Logger.Level = .critical,
       options: Options = []
     ) {
       self.system = system
       self.category = category
-      self.level = level
       self.options = options
       self.exposureLimit = exposure
       #if DEBUG
