@@ -131,10 +131,6 @@ public struct Log: Hashable, @unchecked Sendable {
     public let style: Style
   #endif  // canImport(os)
 
-  /// The minimum log level that will be logged.
-  /// Messages below this level are ignored.
-  public let level: Logging.Logger.Level
-
   /// Options describing when the logger should be active.
   public let options: Options
 
@@ -262,13 +258,11 @@ public struct Log: Hashable, @unchecked Sendable {
       system: String = "",
       category: String = "",
       style: Style = defaultStyle,
-      level: Logging.Logger.Level = .info,
       exposure: Logging.Logger.Level = .critical,
       options: Options = []
     ) {
       self.system = system
       self.category = category
-      self.level = level
       self.options = options
       self.exposureLimit = exposure
       #if DEBUG
@@ -328,7 +322,6 @@ public struct Log: Hashable, @unchecked Sendable {
   public static func == (lhs: Log, rhs: Log) -> Bool {
     lhs.system == rhs.system && lhs.category == rhs.category
       && lhs.style == rhs.style
-      && lhs.level == rhs.level
       && lhs.options == rhs.options
       && lhs.exposureLimit == rhs.exposureLimit
   }
@@ -337,7 +330,6 @@ public struct Log: Hashable, @unchecked Sendable {
     hasher.combine(system)
     hasher.combine(category)
     hasher.combine(style)
-    hasher.combine(level)
     hasher.combine(options)
     hasher.combine(exposureLimit)
   }
@@ -494,7 +486,7 @@ public struct Log: Hashable, @unchecked Sendable {
       if let overrideMask {
         mask = overrideMask
       } else {
-        mask = LevelMask.threshold(self.level)
+        mask = LevelMask.threshold(level)
       }
       // Clamp the global exposure to the logger's maximum before evaluating.
       // Choose the more restrictive (higher-severity) level between the global
@@ -600,7 +592,7 @@ extension Log {
     logLevel: Logging.Logger.Level,
     completion: ((Log) throws -> Void)?
   ) throws {
-    if level == logLevel
+    if logLevel <= self.exposureLimit
       && maxExposureLevel <= Log.globalLogExposureLevel
     {
       info("Log Level Enabled: \(logLevel)")
