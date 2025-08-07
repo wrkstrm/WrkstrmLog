@@ -106,8 +106,19 @@ public struct Log: Hashable, @unchecked Sendable {
       }
     }
 
-    /// The lowest level contained in the mask.
+    /// The most severe level contained in the mask.
     public var minimumLevel: Logging.Logger.Level {
+      if contains(.critical) { return .critical }
+      if contains(.error) { return .error }
+      if contains(.warning) { return .warning }
+      if contains(.notice) { return .notice }
+      if contains(.info) { return .info }
+      if contains(.debug) { return .debug }
+      return .trace
+    }
+
+    /// The least severe level contained in the mask.
+    public var maximumLevel: Logging.Logger.Level {
       if contains(.trace) { return .trace }
       if contains(.debug) { return .debug }
       if contains(.info) { return .info }
@@ -506,7 +517,7 @@ public struct Log: Hashable, @unchecked Sendable {
     mask.formIntersection(LevelMask.threshold(self.exposureLimit))
     mask.formIntersection(globalMask)
     guard mask.contains(LevelMask.single(level)) else { return }
-    let effectiveLevel = mask.minimumLevel
+    let effectiveLevel = mask.maximumLevel
     let url = URL(fileURLWithPath: file)
     let fileName = url.lastPathComponent.replacingOccurrences(
       of: ".swift",
