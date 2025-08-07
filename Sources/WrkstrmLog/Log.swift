@@ -63,6 +63,11 @@ public struct Log: Hashable, @unchecked Sendable {
     public init(rawValue: UInt8) { self.rawValue = rawValue }
 
     /// Individual log level bits in descending order of frequency.
+    ///
+    /// Note: The bit ordering here is intentionally reversed from the conventional approach.
+    /// The least severe level (`trace`) is assigned the highest bit (`1 << 6`), while the most severe
+    /// (`critical`) is assigned the lowest bit (`1 << 0`). This ordering is used throughout this implementation.
+    /// If you are familiar with other logging frameworks, be aware of this difference to avoid confusion.
     public static let trace = LevelMask(rawValue: 1 << 6)
     public static let debug = LevelMask(rawValue: 1 << 5)
     public static let info = LevelMask(rawValue: 1 << 4)
