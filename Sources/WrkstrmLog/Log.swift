@@ -209,6 +209,10 @@ public struct Log: Hashable, @unchecked Sendable {
   public static func limitExposure(to level: Logging.Logger.Level) {
     loggerQueue.sync { exposureLevel = level }
   }
+  
+  public static var globalLogExposureLevel: Logging.Logger.Level {
+    exposureLevel
+  }
 
   /// Indicates whether a Swift logger exists for the given instance. Used in tests.
   func _hasSwiftLogger() -> Bool {  // swiftlint:disable:this identifier_name
