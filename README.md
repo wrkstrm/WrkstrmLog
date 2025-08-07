@@ -95,7 +95,7 @@ targets: [
    Logging is suppressed to `.critical` messages by default. Set a global minimum level during application startup to expose additional logs. The global setting is clamped by each logger's `maxExposureLevel`, requiring libraries to opt in before emitting more verbose messages:
 
    ```swift
-   Log.limitExposure(to: .warning)
+   Log.enableLoggingLevels(levelMask: .threshold(.warning))
    
    // Inspect how far this logger is willing to expose messages
    print(logger.maxExposureLevel) // .info
@@ -104,7 +104,7 @@ targets: [
    }
    ```
 
-   The global limit is configured via `Log.limitExposure`. Each logger exposes its
+   The global limit is configured via `Log.enableLoggingLevels`. Each logger exposes its
    opt-in ceiling through `maxExposureLevel`, ensuring verbose logs are only emitted
    when both the global and per-logger limits allow. When raising the global limit,
    compare it with each logger's `maxExposureLevel` to avoid surfacing unintended

@@ -53,67 +53,70 @@ public struct Log: Hashable, @unchecked Sendable {
     public static let prod = Options(rawValue: 1 << 0)
   }
 
-  #if DEBUG
-    /// Bit mask describing which log levels are enabled.
-    struct LevelMask: OptionSet, Sendable {
-      /// The raw bit mask value.
-      let rawValue: UInt8
+  /// Bit mask describing which log levels are enabled.
+  public struct LevelMask: OptionSet, Sendable {
+    /// The raw bit mask value.
+    public let rawValue: UInt8
 
-      /// Creates a new mask from the given raw value.
-      /// - Parameter rawValue: The raw bit mask value.
-      init(rawValue: UInt8) { self.rawValue = rawValue }
+    /// Creates a new mask from the given raw value.
+    /// - Parameter rawValue: The raw bit mask value.
+    public init(rawValue: UInt8) { self.rawValue = rawValue }
 
-      /// Individual log level bits.
-      static let trace = LevelMask(rawValue: 1 << 0)
-      static let debug = LevelMask(rawValue: 1 << 1)
-      static let info = LevelMask(rawValue: 1 << 2)
-      static let notice = LevelMask(rawValue: 1 << 3)
-      static let warning = LevelMask(rawValue: 1 << 4)
-      static let error = LevelMask(rawValue: 1 << 5)
-      static let critical = LevelMask(rawValue: 1 << 6)
+    /// Individual log level bits in descending order of frequency.
+    public static let trace = LevelMask(rawValue: 1 << 6)
+    public static let debug = LevelMask(rawValue: 1 << 5)
+    public static let info = LevelMask(rawValue: 1 << 4)
+    public static let notice = LevelMask(rawValue: 1 << 3)
+    public static let warning = LevelMask(rawValue: 1 << 2)
+    public static let error = LevelMask(rawValue: 1 << 1)
+    public static let critical = LevelMask(rawValue: 1 << 0)
 
-      /// A mask containing all levels from the specified minimum level upward.
-      /// - Parameter level: The minimum included level.
-      static func threshold(_ level: Logging.Logger.Level) -> LevelMask {
-        switch level {
-        case .trace:
-          return [.trace, .debug, .info, .notice, .warning, .error, .critical]
-        case .debug:
-          return [.debug, .info, .notice, .warning, .error, .critical]
-        case .info: return [.info, .notice, .warning, .error, .critical]
-        case .notice: return [.notice, .warning, .error, .critical]
-        case .warning: return [.warning, .error, .critical]
-        case .error: return [.error, .critical]
-        case .critical: return [.critical]
-        }
-      }
-
-      /// A mask representing only the specified level.
-      /// - Parameter level: The level to include.
-      static func single(_ level: Logging.Logger.Level) -> LevelMask {
-        switch level {
-        case .trace: return .trace
-        case .debug: return .debug
-        case .info: return .info
-        case .notice: return .notice
-        case .warning: return .warning
-        case .error: return .error
-        case .critical: return .critical
-        }
-      }
-
-      /// The lowest level contained in the mask.
-      var minimumLevel: Logging.Logger.Level {
-        if contains(.trace) { return .trace }
-        if contains(.debug) { return .debug }
-        if contains(.info) { return .info }
-        if contains(.notice) { return .notice }
-        if contains(.warning) { return .warning }
-        if contains(.error) { return .error }
-        return .critical
+    /// A mask containing all levels from the specified minimum level upward.
+    /// - Parameter level: The minimum included level.
+    public static func threshold(_ level: Logging.Logger.Level) -> LevelMask {
+      switch level {
+      case .trace:
+        return [.trace, .debug, .info, .notice, .warning, .error, .critical]
+      case .debug:
+        return [.debug, .info, .notice, .warning, .error, .critical]
+      case .info:
+        return [.info, .notice, .warning, .error, .critical]
+      case .notice:
+        return [.notice, .warning, .error, .critical]
+      case .warning:
+        return [.warning, .error, .critical]
+      case .error:
+        return [.error, .critical]
+      case .critical:
+        return [.critical]
       }
     }
-  #endif
+
+    /// A mask representing only the specified level.
+    /// - Parameter level: The level to include.
+    public static func single(_ level: Logging.Logger.Level) -> LevelMask {
+      switch level {
+      case .trace: return .trace
+      case .debug: return .debug
+      case .info: return .info
+      case .notice: return .notice
+      case .warning: return .warning
+      case .error: return .error
+      case .critical: return .critical
+      }
+    }
+
+    /// The lowest level contained in the mask.
+    public var minimumLevel: Logging.Logger.Level {
+      if contains(.trace) { return .trace }
+      if contains(.debug) { return .debug }
+      if contains(.info) { return .info }
+      if contains(.notice) { return .notice }
+      if contains(.warning) { return .warning }
+      if contains(.error) { return .error }
+      return .critical
+    }
+  }
 
   /// The system name for the logger. Typically represents the application or module name.
   public let system: String
@@ -161,10 +164,9 @@ public struct Log: Hashable, @unchecked Sendable {
     nonisolated(unsafe) static var overrideLevelMasks: [Self: LevelMask] = [:]
   #endif
 
-  /// Global minimum log level applied to all loggers to limit message exposure.
+  /// Global logging levels applied to all loggers to limit message exposure.
   /// Defaults to `.critical` and must be configured explicitly to expose additional levels.
-  private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level =
-    .critical
+  private nonisolated(unsafe) static var loggingLevelMask: LevelMask = .critical
 
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
@@ -184,7 +186,7 @@ public struct Log: Hashable, @unchecked Sendable {
       #if canImport(os)
         osLoggers.removeAll()
       #endif
-      exposureLevel = .critical
+      loggingLevelMask = .critical
     }
   }
 
@@ -212,12 +214,12 @@ public struct Log: Hashable, @unchecked Sendable {
   /// additional logs beyond the default `.critical` level.
   ///
   /// - Parameter level: The lowest level that will be emitted globally.
-  public static func limitExposure(to level: Logging.Logger.Level) {
-    loggerQueue.sync { exposureLevel = level }
+  public static func enableLoggingLevels(levelMask: Log.LevelMask) {
+    loggerQueue.sync { loggingLevelMask = levelMask }
   }
 
-  public static var globalLogExposureLevel: Logging.Logger.Level {
-    exposureLevel
+  public static var globalLoggingLevelMask: LevelMask {
+    loggingLevelMask
   }
 
   /// Indicates whether a Swift logger exists for the given instance. Used in tests.
@@ -487,42 +489,24 @@ public struct Log: Hashable, @unchecked Sendable {
     dso: UnsafeRawPointer,
   ) {
     guard style != .disabled else { return }
-    let globalExposure = Self.loggerQueue.sync { Self.exposureLevel }
+    let globalMask = Self.loggerQueue.sync { Self.loggingLevelMask }
     #if DEBUG
       let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
-      var mask: LevelMask
+    #endif
+    var mask: LevelMask
+    #if DEBUG
       if let overrideMask {
         mask = overrideMask
       } else {
         mask = LevelMask.threshold(self.level)
       }
-      // Clamp the global exposure to the logger's maximum before evaluating.
-      // Choose the more restrictive (higher-severity) level between the global
-      // exposure setting and the logger's own limit.
-      let clampedExposure =
-        globalExposure.naturalIntegralValue
-          <= self.exposureLimit.naturalIntegralValue
-        ? globalExposure : self.exposureLimit
-      mask.formIntersection(LevelMask.threshold(clampedExposure))
-      guard mask.contains(.single(level)) else { return }
-      let effectiveLevel = mask.minimumLevel
     #else
-      let configuredLevel = self.level
-      // Clamp the global exposure to the logger's maximum before evaluating.
-      // Choose the more restrictive (higher-severity) level between the global
-      // exposure setting and the logger's own limit.
-      let clampedExposure =
-        globalExposure.naturalIntegralValue
-          <= self.exposureLimit.naturalIntegralValue
-        ? globalExposure : self.exposureLimit
-      let effectiveLevel: Logging.Logger.Level
-      if clampedExposure > configuredLevel {
-        effectiveLevel = clampedExposure
-      } else {
-        effectiveLevel = configuredLevel
-      }
-      guard level >= effectiveLevel else { return }
+      mask = LevelMask.threshold(self.level)
     #endif
+    mask.formIntersection(LevelMask.threshold(self.exposureLimit))
+    mask.formIntersection(globalMask)
+    guard mask.contains(LevelMask.single(level)) else { return }
+    let effectiveLevel = mask.minimumLevel
     let url = URL(fileURLWithPath: file)
     let fileName = url.lastPathComponent.replacingOccurrences(
       of: ".swift",
@@ -591,7 +575,7 @@ extension Log {
   /// Evaluates whether the logger should log a message at the specified log level and, if so, invokes the provided completion closure.
   ///
   /// The function checks if the logger's current level matches the specified log level and whether the logger's maximum exposure level
-  /// is less than or equal to the global log exposure level. If both conditions are met, it calls the completion closure with `self`.
+  /// is enabled by the global logging level mask. If both conditions are met, it calls the completion closure with `self`.
   ///
   /// - Parameters:
   ///   - logLevel: The log level to check against the logger's configured level.
@@ -601,7 +585,7 @@ extension Log {
     completion: ((Log) throws -> Void)?
   ) throws {
     if level == logLevel
-      && maxExposureLevel <= Log.globalLogExposureLevel
+      && Log.globalLoggingLevelMask.contains(LevelMask.single(maxExposureLevel))
     {
       info("Log Level Enabled: \(logLevel)")
       try completion?(self)
