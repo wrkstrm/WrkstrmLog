@@ -76,8 +76,10 @@ public struct Log: Hashable, @unchecked Sendable {
       /// - Parameter level: The minimum included level.
       static func threshold(_ level: Logging.Logger.Level) -> LevelMask {
         switch level {
-        case .trace: return [.trace, .debug, .info, .notice, .warning, .error, .critical]
-        case .debug: return [.debug, .info, .notice, .warning, .error, .critical]
+        case .trace:
+          return [.trace, .debug, .info, .notice, .warning, .error, .critical]
+        case .debug:
+          return [.debug, .info, .notice, .warning, .error, .critical]
         case .info: return [.info, .notice, .warning, .error, .critical]
         case .notice: return [.notice, .warning, .error, .critical]
         case .warning: return [.warning, .error, .critical]
@@ -161,7 +163,8 @@ public struct Log: Hashable, @unchecked Sendable {
 
   /// Global minimum log level applied to all loggers to limit message exposure.
   /// Defaults to `.critical` and must be configured explicitly to expose additional levels.
-  private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level = .critical
+  private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level =
+    .critical
 
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
@@ -190,7 +193,10 @@ public struct Log: Hashable, @unchecked Sendable {
   /// - Parameters:
   ///   - logger: The logger to override.
   ///   - level: The new minimum logging level.
-  public static func overrideLevel(for logger: Log, to level: Logging.Logger.Level) {
+  public static func overrideLevel(
+    for logger: Log,
+    to level: Logging.Logger.Level
+  ) {
     #if DEBUG
       loggerQueue.sync {
         overrideLevelMasks[logger] = LevelMask.threshold(level)
@@ -209,7 +215,7 @@ public struct Log: Hashable, @unchecked Sendable {
   public static func limitExposure(to level: Logging.Logger.Level) {
     loggerQueue.sync { exposureLevel = level }
   }
-  
+
   public static var globalLogExposureLevel: Logging.Logger.Level {
     exposureLevel
   }
@@ -494,8 +500,9 @@ public struct Log: Hashable, @unchecked Sendable {
       // Choose the more restrictive (higher-severity) level between the global
       // exposure setting and the logger's own limit.
       let clampedExposure =
-        globalExposure.naturalIntegralValue <= self.exposureLimit.naturalIntegralValue
-          ? globalExposure : self.exposureLimit
+        globalExposure.naturalIntegralValue
+          <= self.exposureLimit.naturalIntegralValue
+        ? globalExposure : self.exposureLimit
       mask.formIntersection(LevelMask.threshold(clampedExposure))
       guard mask.contains(.single(level)) else { return }
       let effectiveLevel = mask.minimumLevel
@@ -505,8 +512,9 @@ public struct Log: Hashable, @unchecked Sendable {
       // Choose the more restrictive (higher-severity) level between the global
       // exposure setting and the logger's own limit.
       let clampedExposure =
-        globalExposure.naturalIntegralValue <= self.exposureLimit.naturalIntegralValue
-          ? globalExposure : self.exposureLimit
+        globalExposure.naturalIntegralValue
+          <= self.exposureLimit.naturalIntegralValue
+        ? globalExposure : self.exposureLimit
       let effectiveLevel: Logging.Logger.Level
       if clampedExposure > configuredLevel {
         effectiveLevel = clampedExposure
@@ -575,6 +583,28 @@ public struct Log: Hashable, @unchecked Sendable {
 
     case .disabled:
       break
+    }
+  }
+}
+
+extension Log {
+  /// Evaluates whether the logger should log a message at the specified log level and, if so, invokes the provided completion closure.
+  ///
+  /// The function checks if the logger's current level matches the specified log level and whether the logger's maximum exposure level
+  /// is less than or equal to the global log exposure level. If both conditions are met, it calls the completion closure with `self`.
+  ///
+  /// - Parameters:
+  ///   - logLevel: The log level to check against the logger's configured level.
+  ///   - completion: A closure to invoke if the logger should log at the given level. Receives the logger instance as a parameter.
+  public func shouldLog(
+    logLevel: Logging.Logger.Level,
+    completion: ((Log) throws -> Void)?
+  ) throws {
+    if level == logLevel
+      && maxExposureLevel <= Log.globalLogExposureLevel
+    {
+      info("Log Level Enabled: \(logLevel)")
+      try completion?(self)
     }
   }
 }
