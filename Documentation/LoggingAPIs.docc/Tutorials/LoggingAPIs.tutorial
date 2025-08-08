@@ -21,7 +21,7 @@
 
     @ContentAndMedia {
     ```swift
-    Log.globalExposureLevel = .debug
+    Log.maxExposureLevel = .debug
     ```
     }
   }
