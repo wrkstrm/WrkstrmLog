@@ -20,6 +20,7 @@ jobs:
       with:
         submodules: recursive
     - name: Cache Homebrew dependencies
+      if: matrix.os == 'macos-latest' || matrix.os == 'macos-15' || matrix.os == 'self-hosted'
       id: cache-brew
       uses: actions/cache@v4
       with:
@@ -40,10 +41,15 @@ jobs:
       env:
         SPM_CI_USE_LOCAL_DEPS: ${{ env.SPM_CI_USE_LOCAL_DEPS }}
     - name: brew install swiftlint
-      if: steps.cache-brew.outputs.cache-hit != 'true'
+      if: (matrix.os == 'macos-latest' || matrix.os == 'macos-15' || matrix.os == 'self-hosted') && steps.cache-brew.outputs.cache-hit != 'true'
       run: brew install swiftlint
+    - name: Install SwiftLint (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux.zip -o swiftlint_linux.zip
+        unzip swiftlint_linux.zip -d swiftlint_tmp
+        sudo mv swiftlint_tmp/swiftlint /usr/local/bin/
     - name: Download SwiftLint Configuration
-      if: matrix.os == 'macos-latest' || matrix.os == 'macos-15'
       run: curl -O https://raw.githubusercontent.com/wrkstrm/configs/main/linting/.swiftlint.yml
     - name: SwiftLint
       run: swiftlint

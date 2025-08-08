@@ -8,6 +8,7 @@
   `maxExposureLevel` for consumers to inspect.
 - Clamp global exposure increases to each logger's `maxExposureLevel`, ensuring
   opt-in behavior for more verbose logging.
+- Install SwiftLint on Ubuntu runners in CI to enable linting across platforms.
 ### Removed
 - Remove `Log.removeExposureLimit` in favor of requiring an explicit exposure limit.
 
