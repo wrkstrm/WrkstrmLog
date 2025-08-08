@@ -313,8 +313,6 @@ public struct Log: Hashable, @unchecked Sendable {
         self.style = options.contains(.prod) ? style : .disabled
       #endif
     }
-
-    public static let disabled = Log(style: .disabled)
   #endif  // canImport(os)
 
   /// Maximum length for the function name in log messages.
