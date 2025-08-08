@@ -159,8 +159,13 @@ public struct Log: Hashable, @unchecked Sendable {
 
   /// Global minimum log level applied to all loggers to limit message exposure.
   /// Defaults to `.critical` and must be configured explicitly to expose additional levels.
-  private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level =
-    .critical
+  #if DEBUG
+    private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level =
+      .trace
+  #else
+    private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level =
+      .critical
+  #endif
 
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
