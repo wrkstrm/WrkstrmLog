@@ -86,6 +86,29 @@ struct WrkstrmLogTests {
     #expect(Log._swiftLoggerCount == 1)
   }
 
+  /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
+  @Test
+  func isEnabledRespectsExposureLimits() {
+    Log._reset()
+    Log.globalExposureLevel = .warning
+    let log = Log(style: .swift, exposure: .info, options: [.prod])
+    #expect(log.isEnabled(for: .info) == false)
+    #expect(log.isEnabled(for: .warning) == true)
+  }
+
+  /// Validates `ifEnabled(for:_:)` executes the closure only when enabled.
+  @Test
+  func ifEnabledExecutesConditionally() {
+    Log._reset()
+    Log.globalExposureLevel = .warning
+    let log = Log(style: .swift, exposure: .trace, options: [.prod])
+    var executed = false
+    log.ifEnabled(for: .debug) { _ in executed = true }
+    #expect(executed == false)
+    log.ifEnabled(for: .error) { _ in executed = true }
+    #expect(executed == true)
+  }
+
   /// Ensures raising the global exposure level does not override a logger's limit.
   @Test
   func globalExposureIncreaseDoesNotOverrideLoggerLimit() {
