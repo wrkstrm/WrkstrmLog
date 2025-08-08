@@ -589,7 +589,6 @@ extension Log {
   ///   - body: A closure executed when logging is enabled for `level`.
   public func ifEnabled(for level: Logging.Logger.Level, _ body: (Log) throws -> Void) rethrows {
     guard isEnabled(for: level) else { return }
-    info("Log Level Enabled: \(logLevel)")
     try body(self)
   }
 }
