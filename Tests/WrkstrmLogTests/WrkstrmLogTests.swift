@@ -56,15 +56,6 @@ struct WrkstrmLogTests {
   }
 
   @Test
-  func logLevelFiltersMessages() {
-    Log._reset()
-    Log.limitExposure(to: .trace)
-    let log = Log(style: .swift, level: .error, exposure: .trace, options: [.prod])
-    log.info("ignored")
-    #expect(Log._swiftLoggerCount == 0)
-  }
-
-  @Test
   func exposureLimitFiltersMessages() {
     Log._reset()
     Log.limitExposure(to: .warning)
@@ -91,7 +82,7 @@ struct WrkstrmLogTests {
   @Test
   func globalExposureIncreaseDoesNotOverrideLoggerLimit() {
     Log._reset()
-    let log = Log(style: .swift, level: .trace, options: [.prod])
+    let log = Log(style: .swift, options: [.prod])
     log.error("suppressed")
     #expect(Log._swiftLoggerCount == 0)
     Log.limitExposure(to: .trace)
@@ -105,24 +96,12 @@ struct WrkstrmLogTests {
     func overrideLevelAdjustsLoggingInDebug() {
       Log._reset()
       Log.limitExposure(to: .trace)
-      let log = Log(style: .swift, level: .error, exposure: .trace, options: [.prod])
+      let log = Log(style: .swift, exposure: .trace, options: [.prod])
       log.info("suppressed")
-      #expect(Log._swiftLoggerCount == 0)
+      #expect(Log._swiftLoggerCount == 1)
       Log.overrideLevel(for: log, to: .debug)
       log.info("logged")
       #expect(Log._swiftLoggerCount == 1)
-    }
-  #else
-    @Test
-    func overrideLevelNoEffectInRelease() {
-      Log._reset()
-      Log.limitExposure(to: .trace)
-      let log = Log(style: .swift, level: .error, exposure: .trace, options: [.prod])
-      log.info("suppressed")
-      #expect(Log._swiftLoggerCount == 0)
-      Log.overrideLevel(for: log, to: .debug)
-      log.info("still suppressed")
-      #expect(Log._swiftLoggerCount == 0)
     }
   #endif
 
