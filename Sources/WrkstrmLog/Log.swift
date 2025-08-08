@@ -573,24 +573,24 @@ public struct Log: Hashable, @unchecked Sendable {
 }
 
 extension Log {
-  /// Evaluates whether the logger should log a message at the specified log level and, if so, invokes the provided completion closure.
+  /// Determines whether logging is enabled for the provided level based on
+  /// both the logger's `maxExposureLevel` and the global exposure level.
   ///
-  /// The function checks if the logger's current level matches the specified log level and whether the logger's maximum exposure level
-  /// is less than or equal to the global log exposure level. If both conditions are met, it calls the completion closure with `self`.
+  /// - Parameter level: The level to evaluate.
+  /// - Returns: `true` if logging at the specified level is enabled.
+  public func isEnabled(for level: Logging.Logger.Level) -> Bool {
+    level >= self.maxExposureLevel && level >= Log.globalExposureLevel
+  }
+
+  /// Invokes `body` only when logging is enabled for the given level.
   ///
   /// - Parameters:
-  ///   - logLevel: The log level to check against the logger's configured level.
-  ///   - completion: A closure to invoke if the logger should log at the given level. Receives the logger instance as a parameter.
-  public func shouldLog(
-    logLevel: Logging.Logger.Level,
-    completion: ((Log) throws -> Void)?
-  ) throws {
-    if logLevel <= self.maxExposureLevelLimit
-      && maxExposureLevel <= Log.globalExposureLevel
-    {
-      info("Log Level Enabled: \(logLevel)")
-      try completion?(self)
-    }
+  ///   - level: The level to evaluate.
+  ///   - body: A closure executed when logging is enabled for `level`.
+  public func ifEnabled(for level: Logging.Logger.Level, _ body: (Log) throws -> Void) rethrows {
+    guard isEnabled(for: level) else { return }
+    info("Log Level Enabled: \(logLevel)")
+    try body(self)
   }
 }
 
