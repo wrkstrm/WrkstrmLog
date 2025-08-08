@@ -9,7 +9,7 @@ extension Log {
   /// Log.shared.info("Application started")
   /// ```
   public nonisolated(unsafe) static var shared =
-    Log(system: "wrkstrm", category: "shared", level: .info)
+    Log(system: "wrkstrm", category: "shared", exposure: .trace)
   {
     didSet {
       #if DEBUG

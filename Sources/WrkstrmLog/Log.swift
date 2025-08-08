@@ -57,11 +57,10 @@ public struct Log: Hashable, @unchecked Sendable {
   public struct LevelMask: OptionSet, Sendable {
     /// The raw bit mask value.
     public let rawValue: UInt8
-
     /// Creates a new mask from the given raw value.
     /// - Parameter rawValue: The raw bit mask value.
-    public init(rawValue: UInt8) { self.rawValue = rawValue }
-
+    init(rawValue: UInt8) { self.rawValue = rawValue }
+    
     /// Individual log level bits in descending order of frequency.
     ///
     /// Note: The bit ordering here is intentionally reversed from the conventional approach.
@@ -150,10 +149,6 @@ public struct Log: Hashable, @unchecked Sendable {
     public let style: Style
   #endif  // canImport(os)
 
-  /// The minimum log level that will be logged.
-  /// Messages below this level are ignored.
-  public let level: Logging.Logger.Level
-
   /// Options describing when the logger should be active.
   public let options: Options
 
@@ -171,18 +166,25 @@ public struct Log: Hashable, @unchecked Sendable {
 
   /// Storage for SwiftLog loggers, keyed by `Log` instance.
   /// Access is synchronized using `loggerQueue`.
-  private nonisolated(unsafe) static var swiftLoggers: [Self: Logging.Logger] =
+  private nonisolated(unsafe) static var swiftLoggers: [Log: Logging.Logger] =
     [:]
 
   #if DEBUG
     /// Override level masks used during debugging.
     /// Access is synchronized using `loggerQueue`.
-    nonisolated(unsafe) static var overrideLevelMasks: [Self: LevelMask] = [:]
+    nonisolated(unsafe) static var overrideLevelMasks: [Log: LevelMask] = [:]
   #endif
 
   /// Global logging levels applied to all loggers to limit message exposure.
-  /// Defaults to `.critical` and must be configured explicitly to expose additional levels.
-  private nonisolated(unsafe) static var loggingLevelMask: LevelMask = .critical
+  /// Defaults to `.critical` in prod and must be configured explicitly to expose additional levels.
+  /// Defaults to trace in DEBUG to **just work**.
+  #if DEBUG
+    private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level =
+      .trace
+  #else
+    private nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level =
+      .critical
+  #endif
 
   /// Serial queue used to synchronize access to static logger storage.
   private static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
@@ -243,17 +245,19 @@ public struct Log: Hashable, @unchecked Sendable {
     Self.loggerQueue.sync { Self.swiftLoggers[self] != nil }
   }
 
-  #if canImport(os)
-    /// Indicates whether an OS logger exists for the given instance. Used in tests.
-    func _hasOSLogger() -> Bool {  // swiftlint:disable:this identifier_name
-      Self.loggerQueue.sync { Self.osLoggers[self] != nil }
-    }
-  #endif
+  /// A convenience logger instance with logging disabled.
+  /// Useful for cases where a logger must be provided but logging should be suppressed.
+  public static let disabled = Log(style: .disabled)
 
   #if canImport(os)
     /// Storage for OSLog loggers, keyed by `Log` instance.
     /// Access is synchronized using `loggerQueue`.
-    private nonisolated(unsafe) static var osLoggers: [Self: OSLog] = [:]
+    private nonisolated(unsafe) static var osLoggers: [Log: OSLog] = [:]
+  
+    /// Indicates whether an OS logger exists for the given instance. Used in tests.
+    func _hasOSLogger() -> Bool {  // swiftlint:disable:this identifier_name
+      Self.loggerQueue.sync { Self.osLoggers[self] != nil }
+    }
 
     /// Current number of cached OSLog loggers. Used in tests.
     static var _osLoggerCount: Int {  // swiftlint:disable:this identifier_name
@@ -279,14 +283,12 @@ public struct Log: Hashable, @unchecked Sendable {
     public init(
       system: String = "",
       category: String = "",
-      style: Style = defaultStyle,
-      level: Logging.Logger.Level = .info,
+      style: Style = ProcessInfo.inXcodeEnvironment ? defaultStyle : .print,
       exposure: Logging.Logger.Level = .critical,
       options: Options = []
     ) {
       self.system = system
       self.category = category
-      self.level = level
       self.options = options
       self.exposureLimit = exposure
       #if DEBUG
@@ -295,10 +297,6 @@ public struct Log: Hashable, @unchecked Sendable {
         self.style = options.contains(.prod) ? style : .disabled
       #endif
     }
-
-    /// A convenience logger instance with logging disabled.
-    /// Useful for cases where a logger must be provided but logging should be suppressed.
-    public static let disabled = Log(style: .disabled)
 
   #else  // canImport(os)
     /// Initializes a new `Log` instance.
@@ -320,14 +318,12 @@ public struct Log: Hashable, @unchecked Sendable {
     public init(
       system: String = "",
       category: String = "",
-      style: Style = defaultStyle,
-      level: Logging.Logger.Level = .info,
+      style: Style = ProcessInfo.inXcodeEnvironment ? defaultStyle : .print,
       exposure: Logging.Logger.Level = .critical,
       options: Options = []
     ) {
       self.system = system
       self.category = category
-      self.level = level
       self.options = options
       self.exposureLimit = exposure
       #if DEBUG
@@ -336,8 +332,6 @@ public struct Log: Hashable, @unchecked Sendable {
         self.style = options.contains(.prod) ? style : .disabled
       #endif
     }
-
-    public static let disabled = Log(style: .disabled)
   #endif  // canImport(os)
 
   /// Maximum length for the function name in log messages.
@@ -346,7 +340,6 @@ public struct Log: Hashable, @unchecked Sendable {
   public static func == (lhs: Log, rhs: Log) -> Bool {
     lhs.system == rhs.system && lhs.category == rhs.category
       && lhs.style == rhs.style
-      && lhs.level == rhs.level
       && lhs.options == rhs.options
       && lhs.exposureLimit == rhs.exposureLimit
   }
@@ -355,7 +348,6 @@ public struct Log: Hashable, @unchecked Sendable {
     hasher.combine(system)
     hasher.combine(category)
     hasher.combine(style)
-    hasher.combine(level)
     hasher.combine(options)
     hasher.combine(exposureLimit)
   }
@@ -509,17 +501,17 @@ public struct Log: Hashable, @unchecked Sendable {
     #if DEBUG
       let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
     #endif
-    var mask: LevelMask
+    var resolvedMask: LevelMask
     #if DEBUG
       if let overrideMask {
-        mask = overrideMask
+        resolvedMask = overrideMask
       } else {
-        mask = LevelMask.threshold(self.level)
+        resolvedMask = .threshold(level)
       }
     #else
-      mask = LevelMask.threshold(self.level)
+      resolvedMask = LevelMask.threshold(self.level)
     #endif
-    mask.formIntersection(LevelMask.threshold(self.exposureLimit))
+    resolvedMask.formIntersection(LevelMask.threshold(self.exposureLimit))
     mask.formIntersection(globalMask)
     guard mask.contains(LevelMask.single(level)) else { return }
     let effectiveLevel = mask.maximumLevel
@@ -538,7 +530,6 @@ public struct Log: Hashable, @unchecked Sendable {
         )
 
     #if canImport(os)
-
       case .os:
         let logger: OSLog = Self.loggerQueue.sync {
           if let existing = Self.osLoggers[self] {
@@ -563,12 +554,12 @@ public struct Log: Hashable, @unchecked Sendable {
     case .swift:
       let logger: Logging.Logger = Self.loggerQueue.sync {
         if var existing = Self.swiftLoggers[self] {
-          existing.logLevel = effectiveLevel
+          existing.logLevel = level
           Self.swiftLoggers[self] = existing
           return existing
         }
         var newLogger = Logging.Logger(label: system)
-        newLogger.logLevel = effectiveLevel
+        newLogger.logLevel = level
         Self.swiftLoggers[self] = newLogger
         return newLogger
       }
@@ -600,7 +591,7 @@ extension Log {
     logLevel: Logging.Logger.Level,
     completion: ((Log) throws -> Void)?
   ) throws {
-    if level == logLevel
+    if logLevel <= self.exposureLimit
       && Log.globalLoggingLevelMask.contains(LevelMask.single(maxExposureLevel))
     {
       info("Log Level Enabled: \(logLevel)")

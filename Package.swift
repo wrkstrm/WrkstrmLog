@@ -15,7 +15,7 @@ let package = Package(
     .watchOS(.v9),
   ],
   products: [
-    .library(name: "WrkstrmLog", targets: ["WrkstrmLog"]),
+    .library(name: "WrkstrmLog", targets: ["WrkstrmLog"])
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.0"),

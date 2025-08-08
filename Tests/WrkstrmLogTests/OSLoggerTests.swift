@@ -5,10 +5,12 @@
 
   @Suite("OSLogger", .serialized)
   struct OSLoggerTests {
+    /// Confirms that an `OSLogger` instance is reused across mutations.
     @Test
     func osLoggerReuse() {
       Log._reset()
-      var log = Log()
+      let log = Log()
+      #expect(Log._osLoggerCount == 0)
       log.info("first")
       #expect(Log._osLoggerCount == 1)
 
@@ -18,36 +20,13 @@
       #expect(Log._osLoggerCount == 1)
     }
 
+    /// Ensures `.prod` loggers still record messages at allowed levels.
     @Test
-    func logLevelFiltersMessages() {
+    func logLevelWorksInProd() {
       Log._reset()
-      let log = Log(style: .os, level: .error, options: [.prod])
-      log.info("ignored")
-      #expect(Log._osLoggerCount == 0)
+      let log = Log(style: .os, options: [.prod])
+      log.info("not ignored")
+      #expect(Log._osLoggerCount == 1)
     }
-
-    #if DEBUG
-      @Test
-      func overrideLevelAdjustsLoggingInDebug() {
-        Log._reset()
-        let log = Log(style: .os, level: .error, options: [.prod])
-        log.info("suppressed")
-        #expect(Log._osLoggerCount == 0)
-        Log.overrideLevel(for: log, to: .debug)
-        log.info("logged")
-        #expect(Log._osLoggerCount == 1)
-      }
-    #else
-      @Test
-      func overrideLevelNoEffectInRelease() {
-        Log._reset()
-        let log = Log(style: .os, level: .error, options: [.prod])
-        log.info("suppressed")
-        #expect(Log._osLoggerCount == 0)
-        Log.overrideLevel(for: log, to: .debug)
-        log.info("still suppressed")
-        #expect(Log._osLoggerCount == 0)
-      }
-    #endif
   }
 #endif

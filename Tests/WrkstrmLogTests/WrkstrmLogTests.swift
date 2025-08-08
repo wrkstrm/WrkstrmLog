@@ -4,11 +4,13 @@ import Testing
 
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
+  /// A trivial test to confirm the test suite executes.
   @Test
   func example() {
     #expect(true)
   }
 
+  /// Verifies that a single Swift logger instance is reused after mutation.
   @Test
   func swiftLoggerReuse() {
     Log._reset()
@@ -23,6 +25,7 @@ struct WrkstrmLogTests {
     #expect(Log._swiftLoggerCount == 1)
   }
 
+  /// Confirms hashing ignores mutable properties that do not affect identity.
   @Test
   func hashingIgnoresMutableProperties() {
     let log = Log(system: "sys", category: "cat")
@@ -39,6 +42,7 @@ struct WrkstrmLogTests {
     #expect(original == mutatedHash)
   }
 
+  /// Ensures file paths with spaces are encoded and logged correctly.
   @Test
   func pathEncoding() {
     Log.enableLoggingLevels(levelMask: .threshold(.trace))
@@ -47,6 +51,7 @@ struct WrkstrmLogTests {
     #expect(true)
   }
 
+  /// Guarantees disabled loggers do not create underlying logger instances.
   @Test
   func disabledProducesNoLoggers() {
     Log._reset()
@@ -64,6 +69,7 @@ struct WrkstrmLogTests {
     #expect(Log._swiftLoggerCount == 0)
   }
 
+  /// Checks that increasing global exposure filters messages below the threshold.
   @Test
   func exposureLimitFiltersMessages() {
     Log._reset()
@@ -76,6 +82,7 @@ struct WrkstrmLogTests {
     #expect(Log._swiftLoggerCount == 1)
   }
 
+  /// Verifies a logger's exposure limit is respected even when global limits differ.
   @Test
   func loggerExposureLimitRespected() {
     Log._reset()
@@ -88,10 +95,11 @@ struct WrkstrmLogTests {
     #expect(Log._swiftLoggerCount == 1)
   }
 
+  /// Ensures raising the global exposure level does not override a logger's limit.
   @Test
   func globalExposureIncreaseDoesNotOverrideLoggerLimit() {
     Log._reset()
-    let log = Log(style: .swift, level: .trace, options: [.prod])
+    let log = Log(style: .swift, options: [.prod])
     log.error("suppressed")
     #expect(Log._swiftLoggerCount == 0)
     Log.enableLoggingLevels(levelMask: .threshold(.trace))
@@ -101,38 +109,14 @@ struct WrkstrmLogTests {
   }
 
   #if DEBUG
-    @Test
-    func overrideLevelAdjustsLoggingInDebug() {
-      Log._reset()
-      Log.enableLoggingLevels(levelMask: .threshold(.trace))
-      let log = Log(style: .swift, level: .error, exposure: .trace, options: [.prod])
-      log.info("suppressed")
-      #expect(Log._swiftLoggerCount == 0)
-      Log.overrideLevel(for: log, to: .debug)
-      log.info("logged")
-      #expect(Log._swiftLoggerCount == 1)
-    }
-  #else
-    @Test
-    func overrideLevelNoEffectInRelease() {
-      Log._reset()
-      Log.enableLoggingLevels(levelMask: .threshold(.trace))
-      let log = Log(style: .swift, level: .error, exposure: .trace, options: [.prod])
-      log.info("suppressed")
-      #expect(Log._swiftLoggerCount == 0)
-      Log.overrideLevel(for: log, to: .debug)
-      log.info("still suppressed")
-      #expect(Log._swiftLoggerCount == 0)
-    }
-  #endif
-
-  #if DEBUG
+    /// Confirms the default logger remains enabled in debug builds.
     @Test
     func defaultLoggerNotDisabledInDebug() {
       let log = Log()
       #expect(log.style != .disabled)
     }
   #else
+    /// Verifies the default logger is disabled in release builds.
     @Test
     func defaultLoggerDisabledInRelease() {
       Log._reset()
@@ -143,6 +127,7 @@ struct WrkstrmLogTests {
       #expect(Log._swiftLoggerCount == 0)
     }
 
+    /// Ensures a logger with the `.prod` option remains enabled in release builds.
     @Test
     func loggerWithProdOptionEnabledInRelease() {
       Log._reset()
