@@ -1,0 +1,50 @@
+@Tutorial(time: 15) {
+  @Intro(title: "Logging with WrkstrmLog") {
+    Learn how to configure and emit log messages with WrkstrmLog.
+  }
+
+  @Section(title: "Create a Logger") {
+    Instantiate a logger with a system and category to organize messages.
+
+    @ContentAndMedia {
+    ```swift
+    import WrkstrmLog
+
+    let logger = Log(system: "ExampleApp", category: "Networking")
+    ```
+    }
+  }
+
+  @Section(title: "Control Exposure Level") {
+    WrkstrmLog hides messages more verbose than `critical` by default. Raise
+    the global exposure level to view additional details.
+
+    @ContentAndMedia {
+    ```swift
+    Log.maxExposureLevel = .debug
+    ```
+    }
+  }
+
+  @Section(title: "Choose a Logging Style") {
+    Select the output style appropriate for your platform or environment.
+
+    @ContentAndMedia {
+    ```swift
+    let osLogger = Log(system: "ExampleApp", category: "Startup", style: .os)
+    let printLogger = Log(system: "ExampleApp", category: "Startup", style: .print)
+    ```
+    }
+  }
+
+  @Section(title: "Record Messages") {
+    Each logger provides methods for standard log levels.
+
+    @ContentAndMedia {
+    ```swift
+    logger.notice("Request finished")
+    logger.error("Request failed: \(error)")
+    ```
+    }
+  }
+}
