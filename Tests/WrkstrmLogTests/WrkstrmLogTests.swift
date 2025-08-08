@@ -63,7 +63,7 @@ struct WrkstrmLogTests {
   @Test
   func logLevelFiltersMessages() {
     Log._reset()
-    Log.enableLoggingLevels(levelMask: .threshold(.trace))
+    Log.enableLoggingLevels(levelMask: .threshold(.critical))
     let log = Log(style: .swift, exposure: .trace, options: [.prod])
     log.info("ignored")
     #expect(Log._swiftLoggerCount == 0)
