@@ -52,10 +52,10 @@ targets: [
 
 2. **Initialize a logger** ⚙️
 
-   Create a logger with your system and category. By default, each logger suppresses messages below the `.critical` level. Set an `exposure` limit to allow additional levels:
+   Create a logger with your system and category. By default, each logger suppresses messages below the `.critical` level. Set a `maxExposureLevel` to allow additional levels:
 
    ```swift
-   let logger = Log(system: "YourSystem", category: "YourCategory", exposure: .info)
+   let logger = Log(system: "YourSystem", category: "YourCategory", maxExposureLevel: .info)
    ```
 
 3. **Log messages** 📝
