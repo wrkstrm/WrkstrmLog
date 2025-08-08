@@ -205,20 +205,15 @@ public struct Log: Hashable, @unchecked Sendable {
     #endif
   }
 
-  /// Sets a global minimum log level applied across all loggers.
+  /// Global log exposure level applied across all loggers.
   ///
-  /// The provided `level` is clamped by each logger's `maxExposureLevel`,
-  /// ensuring libraries must explicitly opt in before more verbose logging
-  /// is emitted. Invoke during application initialization to expose
-  /// additional logs beyond the default `.critical` level.
-  ///
-  /// - Parameter level: The lowest level that will be emitted globally.
-  public static func limitExposure(to level: Logging.Logger.Level) {
-    loggerQueue.sync { exposureLevel = level }
-  }
-
-  public static var globalLogExposureLevel: Logging.Logger.Level {
-    exposureLevel
+  /// The value is clamped by each logger's `maxExposureLevel`, ensuring
+  /// libraries must explicitly opt in before more verbose logging is emitted.
+  /// Invoke during application initialization to expose additional logs beyond
+  /// the default `.critical` level.
+  public static var globalExposureLevel: Logging.Logger.Level {
+    get { loggerQueue.sync { exposureLevel } }
+    set { loggerQueue.sync { exposureLevel = newValue } }
   }
 
   /// Indicates whether a Swift logger exists for the given instance. Used in tests.
@@ -234,7 +229,7 @@ public struct Log: Hashable, @unchecked Sendable {
     /// Storage for OSLog loggers, keyed by `Log` instance.
     /// Access is synchronized using `loggerQueue`.
     private nonisolated(unsafe) static var osLoggers: [Log: OSLog] = [:]
-  
+
     /// Indicates whether an OS logger exists for the given instance. Used in tests.
     func _hasOSLogger() -> Bool {  // swiftlint:disable:this identifier_name
       Self.loggerQueue.sync { Self.osLoggers[self] != nil }
@@ -478,7 +473,7 @@ public struct Log: Hashable, @unchecked Sendable {
     dso: UnsafeRawPointer,
   ) {
     guard style != .disabled else { return }
-    let globalExposure = Self.loggerQueue.sync { Self.exposureLevel }
+    let globalExposure = Self.globalExposureLevel
     #if DEBUG
       let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
       var resolvedMask: LevelMask
@@ -591,7 +586,7 @@ extension Log {
     completion: ((Log) throws -> Void)?
   ) throws {
     if logLevel <= self.exposureLimit
-      && maxExposureLevel <= Log.globalLogExposureLevel
+      && maxExposureLevel <= Log.globalExposureLevel
     {
       info("Log Level Enabled: \(logLevel)")
       try completion?(self)
