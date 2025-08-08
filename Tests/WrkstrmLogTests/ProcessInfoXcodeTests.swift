@@ -11,6 +11,7 @@ import Testing
 
 @Suite("ProcessInfo Xcode detection", .serialized)
 struct ProcessInfoXcodeTests {
+  /// Temporarily sets an environment variable, returning a closure to restore it.
   func withEnv(_ key: String, value: String?) -> () -> Void {
     let old = getenv(key).map { String(cString: $0) }
     if let value {
@@ -27,6 +28,7 @@ struct ProcessInfoXcodeTests {
     }
   }
 
+  /// Detects the Xcode environment via the bundle identifier indicator.
   @Test
   func detectsBundleIdentifier() {
     let restore = withEnv("__CFBundleIdentifier", value: "com.apple.dt.Xcode")
@@ -34,6 +36,7 @@ struct ProcessInfoXcodeTests {
     #expect(ProcessInfo.inXcodeEnvironment)
   }
 
+  /// Detects Xcode presence using the `DYLD_LIBRARY_PATH` variable.
   @Test
   func detectsDyldLibraryPath() {
     let restoreCFBundle = withEnv("__CFBundleIdentifier", value: nil)
@@ -43,6 +46,7 @@ struct ProcessInfoXcodeTests {
     #expect(ProcessInfo.inXcodeEnvironment)
   }
 
+  /// Detects Xcode presence using the `DYLD_FRAMEWORK_PATH` variable.
   @Test
   func detectsDyldFrameworkPath() {
     let restoreCFBundle = withEnv("__CFBundleIdentifier", value: nil)
@@ -54,6 +58,7 @@ struct ProcessInfoXcodeTests {
     #expect(ProcessInfo.inXcodeEnvironment)
   }
 
+  /// Confirms the detection returns false when no Xcode indicators are present.
   @Test
   func returnsFalseWhenNoIndicators() {
     let restoreCFBundle = withEnv("__CFBundleIdentifier", value: nil)

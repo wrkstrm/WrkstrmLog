@@ -9,6 +9,7 @@ import Testing
 
 @Suite("Logging.Level extensions", .serialized)
 struct LevelExtensionsTests {
+  /// Ensures each logging level maps to the expected emoji.
   @Test
   func emojiMapping() {
     #expect(Logging.Logger.Level.trace.emoji == "🔍")
@@ -21,6 +22,7 @@ struct LevelExtensionsTests {
   }
 
   #if canImport(os)
+    /// Verifies that logging levels convert to the correct `OSLogType` values.
     @Test
     func osLogTypeMapping() {
       #expect(Logging.Logger.Level.trace.toOSType == .debug)

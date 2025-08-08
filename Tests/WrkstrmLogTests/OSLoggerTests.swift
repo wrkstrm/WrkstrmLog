@@ -5,6 +5,7 @@
 
   @Suite("OSLogger", .serialized)
   struct OSLoggerTests {
+    /// Confirms that an `OSLogger` instance is reused across mutations.
     @Test
     func osLoggerReuse() {
       Log._reset()
@@ -19,6 +20,7 @@
       #expect(Log._osLoggerCount == 1)
     }
 
+    /// Ensures `.prod` loggers still record messages at allowed levels.
     @Test
     func logLevelWorksInProd() {
       Log._reset()
