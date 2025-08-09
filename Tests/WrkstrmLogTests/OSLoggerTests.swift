@@ -1,6 +1,7 @@
+import Testing
+
 #if canImport(os)
   import os
-  import Testing
   @testable import WrkstrmLog
 
   @Suite("OSLogger", .serialized)
@@ -9,7 +10,8 @@
     @Test
     func osLoggerReuse() {
       Log._reset()
-      let log = Log()
+      Log.globalExposureLevel = .trace
+      let log = Log(style: .os, maxExposureLevel: .trace, options: [.prod])
       #expect(Log._osLoggerCount == 0)
       log.info("first")
       #expect(Log._osLoggerCount == 1)
@@ -24,7 +26,8 @@
     @Test
     func logLevelWorksInProd() {
       Log._reset()
-      let log = Log(style: .os, options: [.prod])
+      Log.globalExposureLevel = .trace
+      let log = Log(style: .os, maxExposureLevel: .trace, options: [.prod])
       log.info("not ignored")
       #expect(Log._osLoggerCount == 1)
     }
