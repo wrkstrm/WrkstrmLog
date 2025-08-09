@@ -91,7 +91,7 @@ struct WrkstrmLogTests {
   func isEnabledRespectsExposureLimits() {
     Log._reset()
     Log.globalExposureLevel = .warning
-    let log = Log(style: .swift, exposure: .info, options: [.prod])
+    let log = Log(style: .swift, maxExposureLevel: .info, options: [.prod])
     #expect(log.isEnabled(for: .info) == false)
     #expect(log.isEnabled(for: .warning) == true)
   }
@@ -101,7 +101,7 @@ struct WrkstrmLogTests {
   func ifEnabledExecutesConditionally() {
     Log._reset()
     Log.globalExposureLevel = .warning
-    let log = Log(style: .swift, exposure: .trace, options: [.prod])
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     var executed = false
     log.ifEnabled(for: .debug) { _ in executed = true }
     #expect(executed == false)
