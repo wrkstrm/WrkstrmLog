@@ -2,16 +2,6 @@
 import Foundation
 import PackageDescription
 
-#if os(Linux)
-  let osTargets: [Target] = [
-    .target(name: "os", path: "Sources/os")
-  ]
-  let osDependencies: [Target.Dependency] = ["os"]
-#else
-  let osTargets: [Target] = []
-  let osDependencies: [Target.Dependency] = []
-#endif
-
 // MARK: - Package Declaration
 
 let package = Package(
@@ -34,11 +24,11 @@ let package = Package(
   targets: [
     .target(
       name: "WrkstrmLog",
-      dependencies: [.product(name: "Logging", package: "swift-log")] + osDependencies,
+      dependencies: [.product(name: "Logging", package: "swift-log")],
       swiftSettings: Package.Inject.shared.swiftSettings,
     ),
     .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
-  ] + osTargets,
+  ],
 )
 
 // MARK: - Package Service
