@@ -42,6 +42,7 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .trace
     let logger = Log(system: "Test", category: "Encoding", style: .print, maxExposureLevel: .trace)
     logger.info("Testing path", file: "/tmp/Some Folder/File Name.swift")
+    // Using Bool(true) instead of true to silence compiler warning about always-passing test
     #expect(Bool(true))
   }
 
