@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220">
+  <style>
+    .box { fill: #eef; stroke: #99c; }
+    .text { font-family: monospace; font-size: 14px; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+    </marker>
+  </defs>
+  <rect x="130" y="10" width="140" height="40" class="box" />
+  <text x="200" y="35" text-anchor="middle" class="text">Log.globalExposureLevel</text>
+  <rect x="20" y="110" width="140" height="40" class="box" />
+  <text x="90" y="135" text-anchor="middle" class="text">Logger A\nmax: .info</text>
+  <rect x="240" y="110" width="140" height="40" class="box" />
+  <text x="310" y="135" text-anchor="middle" class="text">Logger B\nmax: .debug</text>
+  <line x1="200" y1="50" x2="90" y2="110" stroke="#333" marker-end="url(#arrow)" />
+  <line x1="200" y1="50" x2="310" y2="110" stroke="#333" marker-end="url(#arrow)" />
+</svg>
