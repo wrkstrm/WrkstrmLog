@@ -121,15 +121,10 @@ public struct Log: Hashable, @unchecked Sendable {
   /// The category name for the logger. Used to categorize and filter log messages.
   public let category: String
 
-  #if canImport(os)
-    /// The logging style used by the logger. Defaults to `.os` but is disabled in
-    /// production unless the `.prod` option is specified.
-    public let style: Style
-  #else  // canImport(os)
-    /// The logging style used by the logger. Defaults to `.swift` but is disabled in
-    /// production unless the `.prod` option is specified.
-    public let style: Style
-  #endif  // canImport(os)
+  /// The logging style used by the logger. Defaults to `.os` on Apple
+  /// platforms and `.swift` elsewhere, but is disabled in production unless
+  /// the `.prod` option is specified.
+  public let style: Style
 
   /// Options describing when the logger should be active.
   public let options: Options
@@ -239,76 +234,40 @@ public struct Log: Hashable, @unchecked Sendable {
     static var _osLoggerCount: Int {  // swiftlint:disable:this identifier_name
       loggerQueue.sync { osLoggers.count }
     }
-
-    /// Initializes a new `Log` instance.
-    ///
-    /// - Parameters:
-    ///   - system: The system name for the logger. Defaults to an empty string.
-    ///   - category: The category name for the logger. Defaults to an empty string.
-    ///   - style: The logging style used by the logger (`.print`, `.os`, `.swift`,
-    ///     `.disabled`). Defaults to `.os`.
-    ///   - level: The minimum log level that will be logged. Defaults to `.info`.
-    ///   - maxExposureLevel: The maximum log level permitted for this logger. Defaults to `.critical`.
-    ///   - options: Configuration options for the logger. Use `.prod` to keep the
-    ///     logger active in production. Defaults to an empty set.
-    ///
-    /// Example:
-    /// ```
-    /// let networkLogger = Log(system: "MyApp", category: "Networking")
-    /// ```
-    public init(
-      system: String = "",
-      category: String = "",
-      style: Style = ProcessInfo.inXcodeEnvironment ? defaultStyle : .print,
-      maxExposureLevel: Logging.Logger.Level = .critical,
-      options: Options = []
-    ) {
-      self.system = system
-      self.category = category
-      self.options = options
-      self.maxExposureLevelLimit = maxExposureLevel
-      #if DEBUG
-        self.style = style
-      #else
-        self.style = options.contains(.prod) ? style : .disabled
-      #endif
-    }
-
-  #else  // canImport(os)
-    /// Initializes a new `Log` instance.
-    ///
-    /// - Parameters:
-    ///   - system: The system name for the logger. Defaults to an empty string.
-    ///   - category: The category name for the logger. Defaults to an empty string.
-    ///   - style: The logging style used by the logger (`.print`, `.swift`, `.disabled`).
-    ///     Defaults to `.swift`.
-    ///   - level: The minimum log level that will be logged. Defaults to `.info`.
-    ///   - maxExposureLevel: The maximum log level permitted for this logger. Defaults to `.critical`.
-    ///   - options: Configuration options for the logger. Use `.prod` to keep the
-    ///     logger active in production. Defaults to an empty set.
-    ///
-    /// Example:
-    /// ```
-    /// let networkLogger = Log(system: "MyApp", category: "Networking")
-    /// ```
-    public init(
-      system: String = "",
-      category: String = "",
-      style: Style = ProcessInfo.inXcodeEnvironment ? defaultStyle : .print,
-      maxExposureLevel: Logging.Logger.Level = .critical,
-      options: Options = []
-    ) {
-      self.system = system
-      self.category = category
-      self.options = options
-      self.maxExposureLevelLimit = maxExposureLevel
-      #if DEBUG
-        self.style = style
-      #else
-        self.style = options.contains(.prod) ? style : .disabled
-      #endif
-    }
   #endif  // canImport(os)
+
+  /// Initializes a new `Log` instance.
+  ///
+  /// - Parameters:
+  ///   - system: The system name for the logger. Defaults to an empty string.
+  ///   - category: The category name for the logger. Defaults to an empty string.
+  ///   - style: The logging style used by the logger (`.print`, `.swift`, `.os`, `.disabled`).
+  ///     Defaults to the platform-specific `defaultStyle`.
+  ///   - maxExposureLevel: The maximum log level permitted for this logger. Defaults to `.critical`.
+  ///   - options: Configuration options for the logger. Use `.prod` to keep the
+  ///     logger active in production. Defaults to an empty set.
+  ///
+  /// Example:
+  /// ```
+  /// let networkLogger = Log(system: "MyApp", category: "Networking")
+  /// ```
+  public init(
+    system: String = "",
+    category: String = "",
+    style: Style = ProcessInfo.inXcodeEnvironment ? defaultStyle : .print,
+    maxExposureLevel: Logging.Logger.Level = .critical,
+    options: Options = []
+  ) {
+    self.system = system
+    self.category = category
+    self.options = options
+    self.maxExposureLevelLimit = maxExposureLevel
+    #if DEBUG
+      self.style = style
+    #else
+      self.style = options.contains(.prod) ? style : .disabled
+    #endif
+  }
 
   /// Maximum length for the function name in log messages.
   public var maxFunctionLength: Int?
@@ -493,7 +452,7 @@ public struct Log: Hashable, @unchecked Sendable {
       guard resolvedMask.contains(.single(level)) else { return }
       let effectiveLevel = resolvedMask.minimumLevel
     #else
-      let configuredLevel = self.level
+      let configuredLevel = self.maxExposureLevelLimit
       // Clamp the global exposure to the logger's maximum before evaluating.
       // Choose the more restrictive (higher-severity) level between the global
       // exposure setting and the logger's own limit.

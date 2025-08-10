@@ -4,13 +4,6 @@ import Testing
 
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
-  /// A trivial test to confirm the test suite executes.
-  @Test
-  func example() {
-    // Using Bool(true) instead of true to silence compiler warning about always-passing test
-    #expect(Bool(true))
-  }
-
   /// Verifies that a single Swift logger instance is reused after mutation.
   @Test
   func swiftLoggerReuse() {
@@ -87,7 +80,7 @@ struct WrkstrmLogTests {
     log.error("logged")
     #expect(Log._swiftLoggerCount == 1)
   }
-  
+
   /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
   @Test
   func isEnabledRespectsExposureLimits() {
