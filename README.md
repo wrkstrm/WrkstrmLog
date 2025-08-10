@@ -14,7 +14,7 @@ WrkstrmLog is a logging framework for Swift that provides consistent, configurab
 - 🔧 Customizable to fit specific logging requirements
 - 🚀 Simple integration with Swift Package Manager
 - 🔕 Optional disabled mode to silence logs
-- 🚦 Global exposure limit with per-logger `maxExposureLevel`
+- 🚦 Global exposure control via `Log.globalExposureLevel` and per-logger `maxExposureLevel` (replaces `Log.removeExposureLimit`)
 - 🆕 Swift 6 `#fileID` support for concise output
 
 ## 🖥️ Compatibility
@@ -108,7 +108,9 @@ targets: [
    opt-in ceiling through `maxExposureLevel`, ensuring verbose logs are only emitted
    when both the global and per-logger limits allow. When raising the global limit,
    compare it with each logger's `maxExposureLevel` to avoid surfacing unintended
-   verbosity from loggers that opt in to higher levels.
+   verbosity from loggers that opt in to higher levels. The former
+   `Log.removeExposureLimit` API has been removed, making explicit configuration
+   of `Log.globalExposureLevel` a required step.
 
 ## 🧩 Customization
 

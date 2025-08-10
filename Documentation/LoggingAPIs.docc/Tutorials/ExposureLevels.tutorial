@@ -1,0 +1,31 @@
+@Tutorial(time: 10) {
+  @Intro(title: "Manage Exposure Levels") {
+    Discover how to safely expose logs using the new global and per-logger controls.
+  }
+
+  @Section(title: "Set a Global Limit") {
+    Define the minimum level that should be visible across the application. The former
+    `Log.removeExposureLimit` API has been removed, so configure the global level explicitly.
+
+    @ContentAndMedia {
+    ```swift
+    Log.globalExposureLevel = .warning
+    ```
+    }
+  }
+
+  @Section(title: "Clamp with Per-Logger Limits") {
+    Each logger declares the highest level it may expose publicly, allowing
+    communities to share only critical or tracing data.
+
+    @ContentAndMedia {
+      @Image(source: "ExposureDiagram", alt: "Global exposure clamped by per-logger limits")
+
+    ```swift
+    let libraryLogger = Log(system: "Library", category: "Networking", maxExposureLevel: .debug)
+
+    Log.globalExposureLevel = .trace // emits up to .debug for libraryLogger
+    ```
+    }
+  }
+}
