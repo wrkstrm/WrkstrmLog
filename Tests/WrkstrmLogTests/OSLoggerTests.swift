@@ -4,6 +4,8 @@ import Testing
   import os
   @testable import WrkstrmLog
 
+  // MARK: - OS Logger
+
   @Suite("OSLogger", .serialized)
   struct OSLoggerTests {
     /// Confirms that an `OSLogger` instance is reused across mutations.

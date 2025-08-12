@@ -31,6 +31,8 @@ func expectFatalError(executing: @escaping () -> Void) -> (String, Int32) {
   }
 }
 
+// MARK: - Core Logging Behavior
+
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
   /// Verifies that a single Swift logger instance is reused after mutation.
