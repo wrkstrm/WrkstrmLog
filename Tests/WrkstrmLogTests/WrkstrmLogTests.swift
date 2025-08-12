@@ -1,12 +1,13 @@
-import Testing
 import Foundation
-#if canImport(Darwin)
-import Darwin
-#else
-import Glibc
-#endif
+import Testing
 
 @testable import WrkstrmLog
+
+#if canImport(Darwin)
+  import Darwin
+#else
+  import Glibc
+#endif
 
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
@@ -47,7 +48,8 @@ struct WrkstrmLogTests {
   func functionNameIsTruncated() {
     Log.reset()
     Log.globalExposureLevel = .trace
-    var logger = Log(system: "sys", category: "cat", style: .print, maxExposureLevel: .trace, options: [.prod])
+    var logger = Log(
+      system: "sys", category: "cat", style: .print, maxExposureLevel: .trace, options: [.prod])
     logger.maxFunctionLength = 5
 
     let pipe = Pipe()
@@ -152,6 +154,45 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .debug
     log.debug("logged")
     #expect(Log.swiftLoggerCount == 1)
+  }
+
+  /// Confirms verbose logs are emitted at the debug level.
+  @Test
+  func verboseBehavesLikeDebug() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    let logger = Log(style: .print, maxExposureLevel: .trace, options: [.prod])
+
+    func capture(_ block: () -> Void) -> String {
+      let pipe = Pipe()
+      let originalStdout = dup(STDOUT_FILENO)
+      dup2(pipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
+
+      block()
+
+      fflush(nil)
+      dup2(originalStdout, STDOUT_FILENO)
+      close(originalStdout)
+      pipe.fileHandleForWriting.closeFile()
+
+      let data = pipe.fileHandleForReading.readDataToEndOfFile()
+      return String(data: data, encoding: .utf8) ?? ""
+    }
+
+    func stripTimestamp(_ output: String) -> String {
+      let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard let spaceIndex = trimmed.firstIndex(of: " ") else { return trimmed }
+      return String(trimmed[spaceIndex...])
+    }
+
+    let verboseOutput = capture {
+      logger.verbose("same", file: "file", function: "func", line: 1)
+    }
+    let debugOutput = capture {
+      logger.debug("same", file: "file", function: "func", line: 1)
+    }
+
+    #expect(stripTimestamp(verboseOutput) == stripTimestamp(debugOutput))
   }
 
   /// Validates the notice helper respects exposure limits.
