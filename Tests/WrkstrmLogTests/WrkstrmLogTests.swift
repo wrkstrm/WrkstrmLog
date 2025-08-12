@@ -7,16 +7,16 @@ struct WrkstrmLogTests {
   /// Verifies that a single Swift logger instance is reused after mutation.
   @Test
   func swiftLoggerReuse() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .trace
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.info("first")
-    #expect(Log._swiftLoggerCount == 1)
+    #expect(Log.swiftLoggerCount == 1)
 
     var mutated = log
     mutated.maxFunctionLength = 10
     mutated.info("second")
-    #expect(Log._swiftLoggerCount == 1)
+    #expect(Log.swiftLoggerCount == 1)
   }
 
   /// Confirms hashing ignores mutable properties that do not affect identity.
@@ -49,91 +49,91 @@ struct WrkstrmLogTests {
   /// Guarantees disabled loggers do not create underlying logger instances.
   @Test
   func disabledProducesNoLoggers() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .trace
     Log.disabled.info("silence")
-    #expect(Log._swiftLoggerCount == 0)
+    #expect(Log.swiftLoggerCount == 0)
   }
 
   /// Checks that increasing global exposure filters messages below the threshold.
   @Test
   func exposureLimitFiltersMessages() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.info("suppressed")
-    #expect(Log._swiftLoggerCount == 0)
+    #expect(Log.swiftLoggerCount == 0)
     Log.globalExposureLevel = .trace
     log.info("logged")
-    #expect(Log._swiftLoggerCount == 1)
+    #expect(Log.swiftLoggerCount == 1)
   }
 
   /// Verifies a logger's max exposure level is respected even when global limits differ.
   @Test
   func loggerMaxExposureLevelRespected() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .trace
     let log = Log(style: .swift, maxExposureLevel: .error, options: [.prod])
     #expect(log.maxExposureLevel == .error)
     log.info("suppressed")
-    #expect(Log._swiftLoggerCount == 0)
+    #expect(Log.swiftLoggerCount == 0)
     log.error("logged")
-    #expect(Log._swiftLoggerCount == 1)
+    #expect(Log.swiftLoggerCount == 1)
   }
 
   /// Validates the debug helper respects exposure limits.
   @Test
   func debugHelperRespectsExposure() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .info
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.debug("suppressed")
-    #expect(Log._swiftLoggerCount == 0)
+    #expect(Log.swiftLoggerCount == 0)
     Log.globalExposureLevel = .debug
     log.debug("logged")
-    #expect(Log._swiftLoggerCount == 1)
+    #expect(Log.swiftLoggerCount == 1)
   }
 
   /// Validates the notice helper respects exposure limits.
   @Test
   func noticeHelperRespectsExposure() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.notice("suppressed")
-    #expect(Log._swiftLoggerCount == 0)
+    #expect(Log.swiftLoggerCount == 0)
     Log.globalExposureLevel = .notice
     log.notice("logged")
-    #expect(Log._swiftLoggerCount == 1)
+    #expect(Log.swiftLoggerCount == 1)
   }
 
   /// Validates the warning helper respects exposure limits.
   @Test
-    func warningHelperRespectsExposure() {
-      Log._reset()
-      Log.globalExposureLevel = .error
-      let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
-      log.warning("suppressed")
-      #expect(Log._swiftLoggerCount == 0)
-      Log.globalExposureLevel = .warning
-      log.warning("logged")
-      #expect(Log._swiftLoggerCount == 1)
-    }
+  func warningHelperRespectsExposure() {
+    Log.reset()
+    Log.globalExposureLevel = .error
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    log.warning("suppressed")
+    #expect(Log.swiftLoggerCount == 0)
+    Log.globalExposureLevel = .warning
+    log.warning("logged")
+    #expect(Log.swiftLoggerCount == 1)
+  }
 
-    /// Verifies `effectiveLevel(for:)` filters based on exposure settings.
-    @Test
-    func effectiveLevelRespectsExposure() {
-      Log._reset()
-      Log.globalExposureLevel = .warning
-      let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
-      #expect(log.effectiveLevel(for: .info) == nil)
-      #expect(log.effectiveLevel(for: .error) == .error)
-    }
+  /// Verifies `effectiveLevel(for:)` filters based on exposure settings.
+  @Test
+  func effectiveLevelRespectsExposure() {
+    Log.reset()
+    Log.globalExposureLevel = .warning
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    #expect(log.effectiveLevel(for: .info) == nil)
+    #expect(log.effectiveLevel(for: .error) == .error)
+  }
 
   /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
   @Test
   func isEnabledRespectsExposureLimits() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .info, options: [.prod])
     #expect(log.isEnabled(for: .info) == false)
@@ -143,7 +143,7 @@ struct WrkstrmLogTests {
   /// Validates `ifEnabled(for:_:)` executes the closure only when enabled.
   @Test
   func ifEnabledExecutesConditionally() {
-    Log._reset()
+    Log.reset()
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     var executed = false
@@ -156,28 +156,28 @@ struct WrkstrmLogTests {
   /// Ensures raising the global exposure level does not override a logger's limit.
   @Test
   func globalExposureIncreaseDoesNotOverrideLoggerMax() {
-    Log._reset()
+    Log.reset()
     let log = Log(style: .swift, options: [.prod])
     log.error("suppressed")
-    #expect(Log._swiftLoggerCount == 0)
+    #expect(Log.swiftLoggerCount == 0)
     Log.globalExposureLevel = .trace
     #expect(log.maxExposureLevel == .critical)
     log.error("still suppressed")
-    #expect(Log._swiftLoggerCount == 0)
+    #expect(Log.swiftLoggerCount == 0)
   }
 
   #if DEBUG
     /// Validates that overriding the level adjusts logging in debug builds.
     @Test
     func overrideLevelAdjustsLoggingInDebug() {
-      Log._reset()
+      Log.reset()
       Log.globalExposureLevel = .trace
       let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
       log.info("suppressed")
-      #expect(Log._swiftLoggerCount == 1)
+      #expect(Log.swiftLoggerCount == 1)
       Log.overrideLevel(for: log, to: .debug)
       log.info("logged")
-      #expect(Log._swiftLoggerCount == 1)
+      #expect(Log.swiftLoggerCount == 1)
     }
   #endif
 
@@ -192,23 +192,23 @@ struct WrkstrmLogTests {
     /// Verifies the default logger is disabled in release builds.
     @Test
     func defaultLoggerDisabledInRelease() {
-      Log._reset()
+      Log.reset()
       Log.globalExposureLevel = .trace
       let log = Log()
       log.info("silence")
       #expect(log.style == .disabled)
-      #expect(Log._swiftLoggerCount == 0)
+      #expect(Log.swiftLoggerCount == 0)
     }
 
     /// Ensures a logger with the `.prod` option remains enabled in release builds.
     @Test
     func loggerWithProdOptionEnabledInRelease() {
-      Log._reset()
+      Log.reset()
       Log.globalExposureLevel = .trace
       let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
       log.info("hello")
       #expect(log.style == .swift)
-      #expect(Log._swiftLoggerCount == 1)
+      #expect(Log.swiftLoggerCount == 1)
     }
   #endif
 }

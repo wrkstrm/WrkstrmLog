@@ -61,44 +61,5 @@ extension Log {
         return .critical
       }
     }
-
-    /// Override level masks used during debugging.
-    /// Access is synchronized using `loggerQueue`.
-    nonisolated(unsafe) static var overrideLevelMasks: [Log: LevelMask] = [:]
   #endif
-
-  /// Global minimum log level applied to all loggers to limit message exposure.
-  /// Defaults to `.critical` and must be configured explicitly to expose additional levels.
-  #if DEBUG
-    nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level = .trace
-  #else
-    nonisolated(unsafe) static var exposureLevel: Logging.Logger.Level = .critical
-  #endif
-
-  /// Overrides the minimum logging level for a specific logger. Only
-  /// available in debug builds.
-  /// - Parameters:
-  ///   - logger: The logger to override.
-  ///   - level: The new minimum logging level.
-  public static func overrideLevel(
-    for logger: Log,
-    to level: Logging.Logger.Level
-  ) {
-    #if DEBUG
-      loggerQueue.sync {
-        overrideLevelMasks[logger] = LevelMask.threshold(level)
-      }
-    #endif
-  }
-
-  /// Global log exposure level applied across all loggers.
-  ///
-  /// The value is clamped by each logger's `maxExposureLevel`, ensuring
-  /// libraries must explicitly opt in before more verbose logging is emitted.
-  /// Invoke during application initialization to expose additional logs beyond
-  /// the default `.critical` level.
-  public static var globalExposureLevel: Logging.Logger.Level {
-    get { loggerQueue.sync { exposureLevel } }
-    set { loggerQueue.sync { exposureLevel = newValue } }
-  }
 }
