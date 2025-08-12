@@ -1,4 +1,3 @@
-import Dispatch
 import Foundation
 import Logging
 
@@ -79,57 +78,9 @@ public struct Log: Hashable, @unchecked Sendable {
     @usableFromInline static let defaultStyle: Style = .swift
   #endif  // canImport(os)
 
-  /// Storage for SwiftLog loggers, keyed by `Log` instance.
-  /// Access is synchronized using `loggerQueue`.
-  private nonisolated(unsafe) static var swiftLoggers: [Log: Logging.Logger] =
-    [:]
-
-  /// Serial queue used to synchronize access to static logger storage.
-  static let loggerQueue = DispatchQueue(label: "wrkstrm.log.logger")
-
-  /// Current number of cached SwiftLog loggers. Used in tests.
-  static var _swiftLoggerCount: Int {  // swiftlint:disable:this identifier_name
-    loggerQueue.sync { swiftLoggers.count }
-  }
-
-  /// Removes all cached loggers. Intended for tests.
-  static func _reset() {  // swiftlint:disable:this identifier_name
-    loggerQueue.sync {
-      swiftLoggers.removeAll()
-      #if DEBUG
-        overrideLevelMasks.removeAll()
-      #endif
-      #if canImport(os)
-        osLoggers.removeAll()
-      #endif
-      exposureLevel = .critical
-    }
-  }
-
-  /// Indicates whether a Swift logger exists for the given instance. Used in tests.
-  func _hasSwiftLogger() -> Bool {  // swiftlint:disable:this identifier_name
-    Self.loggerQueue.sync { Self.swiftLoggers[self] != nil }
-  }
-
   /// A convenience logger instance with logging disabled.
   /// Useful for cases where a logger must be provided but logging should be suppressed.
   public static let disabled = Log(style: .disabled)
-
-  #if canImport(os)
-    /// Storage for OSLog loggers, keyed by `Log` instance.
-    /// Access is synchronized using `loggerQueue`.
-    private nonisolated(unsafe) static var osLoggers: [Log: OSLog] = [:]
-
-    /// Indicates whether an OS logger exists for the given instance. Used in tests.
-    func _hasOSLogger() -> Bool {  // swiftlint:disable:this identifier_name
-      Self.loggerQueue.sync { Self.osLoggers[self] != nil }
-    }
-
-    /// Current number of cached OSLog loggers. Used in tests.
-    static var _osLoggerCount: Int {  // swiftlint:disable:this identifier_name
-      loggerQueue.sync { osLoggers.count }
-    }
-  #endif  // canImport(os)
 
   /// Initializes a new `Log` instance.
   ///
@@ -403,93 +354,93 @@ public struct Log: Hashable, @unchecked Sendable {
     fatalError("Guard failed: \(String(describing: describable))")
   }
 
- private func log(
-   _ level: Logging.Logger.Level,
-   describable: Any,
-   file: String,
-   function: String,
-   line: UInt,
-   column _: UInt,
-   dso: UnsafeRawPointer
- ) {
-   guard let effectiveLevel = effectiveLevel(for: level) else { return }
-   let url = URL(fileURLWithPath: file)
-   let fileName = url.lastPathComponent.replacingOccurrences(
-     of: ".swift",
-     with: ""
-   )
-   let functionString = formattedFunction(function)
-   switch style {
-   case .print:
-     logPrint(
-       level,
-       fileName: fileName,
-       function: functionString,
-       line: line,
-       describable: describable
-     )
-   #if canImport(os)
-   case .os:
-     logOS(
-       level,
-       describable: describable,
-       url: url,
-       function: functionString,
-       line: line,
-       dso: dso
-     )
-   #endif  // canImport(os)
-   case .swift:
-     logSwift(
-       level,
-       effectiveLevel: effectiveLevel,
-       describable: describable,
-       url: url,
-       function: functionString,
-       file: file,
-       line: line
-     )
-   case .disabled:
-     break
-   }
- }
+  private func log(
+    _ level: Logging.Logger.Level,
+    describable: Any,
+    file: String,
+    function: String,
+    line: UInt,
+    column _: UInt,
+    dso: UnsafeRawPointer
+  ) {
+    guard let effectiveLevel = effectiveLevel(for: level) else { return }
+    let url = URL(fileURLWithPath: file)
+    let fileName = url.lastPathComponent.replacingOccurrences(
+      of: ".swift",
+      with: ""
+    )
+    let functionString = formattedFunction(function)
+    switch style {
+    case .print:
+      logPrint(
+        level,
+        fileName: fileName,
+        function: functionString,
+        line: line,
+        describable: describable
+      )
+    #if canImport(os)
+      case .os:
+        logOS(
+          level,
+          describable: describable,
+          url: url,
+          function: functionString,
+          line: line,
+          dso: dso
+        )
+    #endif  // canImport(os)
+    case .swift:
+      logSwift(
+        level,
+        effectiveLevel: effectiveLevel,
+        describable: describable,
+        url: url,
+        function: functionString,
+        file: file,
+        line: line
+      )
+    case .disabled:
+      break
+    }
+  }
 
- internal func effectiveLevel(
-   for level: Logging.Logger.Level
- ) -> Logging.Logger.Level? {
-   guard style != .disabled else { return nil }
-   let globalExposure = Self.globalExposureLevel
-   #if DEBUG
-     let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
-     var resolvedMask: LevelMask
-     if let overrideMask {
-       resolvedMask = overrideMask
-     } else {
-       resolvedMask = .threshold(level)
-     }
-     let clampedExposure =
-       globalExposure.naturalIntegralValue
-         <= self.maxExposureLevelLimit.naturalIntegralValue
-       ? globalExposure : self.maxExposureLevelLimit
-     resolvedMask.formIntersection(.threshold(clampedExposure))
-     guard resolvedMask.contains(.single(level)) else { return nil }
-     return resolvedMask.minimumLevel
-   #else
-     let configuredLevel = self.maxExposureLevelLimit
-     let clampedExposure =
-       globalExposure.naturalIntegralValue
-         <= self.maxExposureLevelLimit.naturalIntegralValue
-       ? globalExposure : self.maxExposureLevelLimit
-     let effectiveLevel: Logging.Logger.Level
-     if clampedExposure > configuredLevel {
-       effectiveLevel = clampedExposure
-     } else {
-       effectiveLevel = configuredLevel
-     }
-     guard level >= effectiveLevel else { return nil }
-     return effectiveLevel
-   #endif
- }
+  internal func effectiveLevel(
+    for level: Logging.Logger.Level
+  ) -> Logging.Logger.Level? {
+    guard style != .disabled else { return nil }
+    let globalExposure = Cache.shared.globalExposureLevel
+    #if DEBUG
+      let overrideMask = Cache.shared.overrideMask(for: self)
+      var resolvedMask: LevelMask
+      if let overrideMask {
+        resolvedMask = overrideMask
+      } else {
+        resolvedMask = .threshold(level)
+      }
+      let clampedExposure =
+        globalExposure.naturalIntegralValue
+          <= self.maxExposureLevelLimit.naturalIntegralValue
+        ? globalExposure : self.maxExposureLevelLimit
+      resolvedMask.formIntersection(.threshold(clampedExposure))
+      guard resolvedMask.contains(.single(level)) else { return nil }
+      return resolvedMask.minimumLevel
+    #else
+      let configuredLevel = self.maxExposureLevelLimit
+      let clampedExposure =
+        globalExposure.naturalIntegralValue
+          <= self.maxExposureLevelLimit.naturalIntegralValue
+        ? globalExposure : self.maxExposureLevelLimit
+      let effectiveLevel: Logging.Logger.Level
+      if clampedExposure > configuredLevel {
+        effectiveLevel = clampedExposure
+      } else {
+        effectiveLevel = configuredLevel
+      }
+      guard level >= effectiveLevel else { return nil }
+      return effectiveLevel
+    #endif
+  }
 
   private func logPrint(
     _ level: Logging.Logger.Level,
@@ -505,64 +456,47 @@ public struct Log: Hashable, @unchecked Sendable {
       )
   }
 
- #if canImport(os)
-   private func logOS(
-     _ level: Logging.Logger.Level,
-     describable: Any,
-     url: URL,
-     function: String,
-     line: UInt,
-     dso: UnsafeRawPointer
-   ) {
-     let logger: OSLog = Self.loggerQueue.sync {
-       if let existing = Self.osLoggers[self] {
-         return existing
-       }
-       let created = OSLog(subsystem: system, category: category)
-       Self.osLoggers[self] = created
-       return created
-     }
-     os_log(
-       level.toOSType,
-       dso: dso,
-       log: logger,
-       "%s-%i|%s| %s",
-       url.lastPathComponent,
-       line,
-       function,
-       String(describing: describable)
-     )
-   }
- #endif  // canImport(os)
+  #if canImport(os)
+    private func logOS(
+      _ level: Logging.Logger.Level,
+      describable: Any,
+      url: URL,
+      function: String,
+      line: UInt,
+      dso: UnsafeRawPointer
+    ) {
+      let logger = Cache.shared.osLogger(for: self)
+      os_log(
+        level.toOSType,
+        dso: dso,
+        log: logger,
+        "%s-%i|%s| %s",
+        url.lastPathComponent,
+        line,
+        function,
+        String(describing: describable)
+      )
+    }
+  #endif  // canImport(os)
 
- private func logSwift(
-   _ level: Logging.Logger.Level,
-   effectiveLevel: Logging.Logger.Level,
-   describable: Any,
-   url: URL,
-   function: String,
-   file: String,
-   line: UInt
- ) {
-   let logger: Logging.Logger = Self.loggerQueue.sync {
-     if var existing = Self.swiftLoggers[self] {
-       existing.logLevel = effectiveLevel
-       Self.swiftLoggers[self] = existing
-       return existing
-     }
-     var newLogger = Logging.Logger(label: system)
-     newLogger.logLevel = effectiveLevel
-     Self.swiftLoggers[self] = newLogger
-     return newLogger
-   }
-  logger.log(
-    level: level,
-    "\(line)|\(function)| \(String(describing: describable))",
-    source: url.lastPathComponent,
-    file: file,
-    function: function,
-    line: line
-  )
+  private func logSwift(
+    _ level: Logging.Logger.Level,
+    effectiveLevel: Logging.Logger.Level,
+    describable: Any,
+    url: URL,
+    function: String,
+    file: String,
+    line: UInt
+  ) {
+    let logger = Cache.shared.logger(for: self, effectiveLevel: effectiveLevel)
+    logger.log(
+      level: level,
+      "\(line)|\(function)| \(String(describing: describable))",
+      source: url.lastPathComponent,
+      file: file,
+      function: function,
+      line: line
+    )
   }
 
 }
@@ -575,7 +509,7 @@ extension Log {
   /// - Parameter level: The level to evaluate.
   /// - Returns: `true` if logging at the specified level is enabled.
   public func isEnabled(for level: Logging.Logger.Level) -> Bool {
-    level >= self.maxExposureLevel && level >= Log.globalExposureLevel
+    level >= self.maxExposureLevel && level >= Cache.shared.globalExposureLevel
   }
 
   /// Invokes `body` only when logging is enabled for the given level.
