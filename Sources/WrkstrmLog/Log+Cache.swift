@@ -25,10 +25,15 @@ extension Log {
   // MARK: - Internal helpers for tests
   static func reset() {
     Cache.shared.reset()
+    Inject.usePathInfoCache(true)
   }
 
   static var swiftLoggerCount: Int {
     Cache.shared.swiftLoggerCount
+  }
+
+  static var pathInfoCount: Int {
+    Cache.shared.pathInfoCount
   }
 
   #if canImport(os)

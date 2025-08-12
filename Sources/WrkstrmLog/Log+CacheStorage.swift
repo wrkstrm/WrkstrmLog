@@ -1,4 +1,5 @@
 import Dispatch
+import Foundation
 import Logging
 
 #if canImport(os)
@@ -31,6 +32,14 @@ extension Log {
       private var exposureLevel: Logging.Logger.Level = .critical
     #endif
 
+    struct PathInfo {
+      let url: URL
+      let fileName: String
+      let lastPathComponent: String
+    }
+
+    private var pathInfos: [String: PathInfo] = [:]
+
     /// Returns the cached Swift logger for the provided `Log` instance, creating
     /// one if necessary and updating its log level to `effectiveLevel`.
     func logger(for log: Log, effectiveLevel: Logging.Logger.Level) -> Logging.Logger {
@@ -62,6 +71,20 @@ extension Log {
       }
     #endif
 
+    func pathInfo(for file: String) -> PathInfo {
+      queue.sync {
+        if let existing = pathInfos[file] {
+          return existing
+        }
+        let url = URL(fileURLWithPath: file)
+        let lastComponent = url.lastPathComponent
+        let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
+        let info = PathInfo(url: url, fileName: trimmed, lastPathComponent: lastComponent)
+        pathInfos[file] = info
+        return info
+      }
+    }
+
     /// Removes all cached loggers and resets the global exposure level. Intended
     /// primarily for tests.
     func reset() {
@@ -78,11 +101,14 @@ extension Log {
         #else
           exposureLevel = .critical
         #endif
+        pathInfos.removeAll()
       }
     }
 
     /// Current number of cached SwiftLog loggers. Used in tests.
     var swiftLoggerCount: Int { queue.sync { swiftLoggers.count } }
+
+    var pathInfoCount: Int { queue.sync { pathInfos.count } }
 
     /// Returns whether a Swift logger exists for the given `Log`.
     func hasSwiftLogger(for log: Log) -> Bool {
