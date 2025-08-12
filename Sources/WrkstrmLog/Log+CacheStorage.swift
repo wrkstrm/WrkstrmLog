@@ -73,7 +73,11 @@ extension Log {
         #if DEBUG
           overrideLevelMasks.removeAll()
         #endif
-        exposureLevel = .critical
+        #if DEBUG
+          exposureLevel = .trace
+        #else
+          exposureLevel = .critical
+        #endif
       }
     }
 
