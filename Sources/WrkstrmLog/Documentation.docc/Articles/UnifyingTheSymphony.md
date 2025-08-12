@@ -48,6 +48,7 @@ func someFunction() {
 - 🔀 Multiple output styles: console, Apple's unified logging, and SwiftLog
 - 🌍 Consistent behavior on Linux, macOS, and in Xcode
 - 🔌 Extensibility
+- 📏 Configurable global and per-logger exposure limits
 - 📴 Disabled mode for silent logging
 
 ## 4. Getting Started 🚀
@@ -58,7 +59,7 @@ Add WrkstrmLog to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.1.2"))
+    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "2.0.0"))
 ]
 ```
 
