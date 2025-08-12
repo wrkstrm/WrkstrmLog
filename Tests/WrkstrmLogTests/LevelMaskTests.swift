@@ -3,6 +3,8 @@ import Testing
 
 @testable import WrkstrmLog
 
+// MARK: - Level Masks
+
 #if DEBUG
   @Suite("Log.LevelMask", .serialized)
   struct LevelMaskTests {

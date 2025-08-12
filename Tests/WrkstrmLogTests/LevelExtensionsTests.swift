@@ -7,6 +7,8 @@ import Testing
   import os
 #endif
 
+// MARK: - Level Extensions
+
 @Suite("Logging.Level extensions", .serialized)
 struct LevelExtensionsTests {
   /// Ensures each logging level maps to the expected emoji.

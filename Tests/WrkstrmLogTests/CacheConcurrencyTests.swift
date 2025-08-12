@@ -3,6 +3,8 @@ import Testing
 
 @testable import WrkstrmLog
 
+// MARK: - Cache Concurrency
+
 extension WrkstrmLogTests {
   /// Ensures the cache produces consistent results when accessed from many concurrent tasks.
   @Test

@@ -9,6 +9,8 @@ import Testing
   import Glibc
 #endif
 
+// MARK: - Xcode Environment Detection
+
 @Suite("ProcessInfo Xcode detection", .serialized)
 struct ProcessInfoXcodeTests {
   /// Temporarily sets an environment variable, returning a closure to restore it.
