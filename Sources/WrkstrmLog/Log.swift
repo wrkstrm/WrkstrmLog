@@ -341,7 +341,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) -> Never {
-    guard style != .disabled else { fatalError() }
+    guard style != .disabled else { fatalErrorHandler() }
     log(
       .critical,
       describable: describable ?? "",
@@ -351,7 +351,7 @@ public struct Log: Hashable, @unchecked Sendable {
       column: column,
       dso: dso,
     )
-    fatalError("Guard failed: \(String(describing: describable))")
+    fatalErrorHandler("Guard failed: \(String(describing: describable))")
   }
 
   private func log(
