@@ -60,11 +60,14 @@ targets: [
 
 3. **Log messages** 📝
 
-   Use the provided methods such as `verbose`, `info`, `error`, and `guard`. `verbose` logs are emitted at the debug level.
+   Use the provided methods such as `debug`, `verbose`, `info`, `notice`, `warning`, `error`, and `guard`. `verbose` logs are emitted at the debug level.
 
    ```swift
+   logger.debug("Debug message")
    logger.verbose("Verbose message")
    logger.info("Info message")
+   logger.notice("Notice message")
+   logger.warning("Warning message")
    logger.error("Error message")
    Log.guard("Critical error")
    ```

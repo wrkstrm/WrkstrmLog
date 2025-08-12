@@ -43,7 +43,11 @@
 
     @ContentAndMedia {
     ```swift
+    logger.verbose("Request started")
+    logger.debug("Parsing response")
+    logger.info("Request progress")
     logger.notice("Request finished")
+    logger.warning("Slow response")
     logger.error("Request failed: \(error)")
     ```
     }

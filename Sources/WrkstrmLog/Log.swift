@@ -227,6 +227,35 @@ public struct Log: Hashable, @unchecked Sendable {
     )
   }
 
+  /// Logs a debug message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The object or string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public func debug(
+    _ describable: Any,
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    guard style != .disabled else { return }
+    log(
+      .debug,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
+
   /// Logs an informational message with the specified parameters.
   ///
   /// - Parameters:
@@ -247,6 +276,64 @@ public struct Log: Hashable, @unchecked Sendable {
     guard style != .disabled else { return }
     log(
       .info,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
+
+  /// Logs a notice message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The object or string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public func notice(
+    _ describable: Any = "",
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    guard style != .disabled else { return }
+    log(
+      .notice,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
+
+  /// Logs a warning message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The object or string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public func warning(
+    _ describable: Any,
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    guard style != .disabled else { return }
+    log(
+      .warning,
       describable: describable,
       file: file,
       function: function,
