@@ -9,6 +9,28 @@ import Testing
   import Glibc
 #endif
 
+// MARK: - Fatal Error Testing Helpers
+
+@MainActor
+func expectFatalError(executing: @escaping () -> Void) -> (String, Int32) {
+  var fds: [Int32] = [0, 0]
+  precondition(pipe(&fds) == 0)
+  let pid = fork()
+  if pid == 0 {
+    dup2(fds[1], STDOUT_FILENO)
+    close(fds[0])
+    executing()
+    _exit(0)
+  } else {
+    close(fds[1])
+    let handle = FileHandle(fileDescriptor: fds[0])
+    let data = handle.readDataToEndOfFile()
+    var status: Int32 = 0
+    waitpid(pid, &status, 0)
+    return (String(data: data, encoding: .utf8) ?? "", status)
+  }
+}
+
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
   /// Verifies that a single Swift logger instance is reused after mutation.
@@ -162,6 +184,45 @@ struct WrkstrmLogTests {
     #expect(Log.swiftLoggerCount == 1)
   }
 
+  /// Confirms verbose logs are emitted at the debug level.
+  @Test
+  func verboseBehavesLikeDebug() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    let logger = Log(style: .print, maxExposureLevel: .trace, options: [.prod])
+
+    func capture(_ block: () -> Void) -> String {
+      let pipe = Pipe()
+      let originalStdout = dup(STDOUT_FILENO)
+      dup2(pipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
+
+      block()
+
+      fflush(nil)
+      dup2(originalStdout, STDOUT_FILENO)
+      close(originalStdout)
+      pipe.fileHandleForWriting.closeFile()
+
+      let data = pipe.fileHandleForReading.readDataToEndOfFile()
+      return String(data: data, encoding: .utf8) ?? ""
+    }
+
+    func stripTimestamp(_ output: String) -> String {
+      let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard let spaceIndex = trimmed.firstIndex(of: " ") else { return trimmed }
+      return String(trimmed[spaceIndex...])
+    }
+
+    let verboseOutput = capture {
+      logger.verbose("same", file: "file", function: "func", line: 1)
+    }
+    let debugOutput = capture {
+      logger.debug("same", file: "file", function: "func", line: 1)
+    }
+
+    #expect(stripTimestamp(verboseOutput) == stripTimestamp(debugOutput))
+  }
+
   /// Validates the notice helper respects exposure limits.
   @Test
   func noticeHelperRespectsExposure() {
@@ -196,6 +257,26 @@ struct WrkstrmLogTests {
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     #expect(log.effectiveLevel(for: .info) == nil)
     #expect(log.effectiveLevel(for: .error) == .error)
+  }
+
+  /// Global level below logger max uses the global level as effective.
+  @Test
+  func effectiveLevelUsesGlobalWhenBelowMax() {
+    Log.reset()
+    Log.globalExposureLevel = .debug
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    #expect(log.effectiveLevel(for: .debug) == .debug)
+    #expect(log.effectiveLevel(for: .trace) == nil)
+  }
+
+  /// Global level above logger max clamps the level to the logger's maximum.
+  @Test
+  func effectiveLevelClampsToLoggerMax() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    let log = Log(style: .swift, maxExposureLevel: .info, options: [.prod])
+    #expect(log.effectiveLevel(for: .trace) == nil)
+    #expect(log.effectiveLevel(for: .info) == .info)
   }
 
   /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
@@ -234,6 +315,35 @@ struct WrkstrmLogTests {
     #expect(Log.swiftLoggerCount == 0)
   }
 
+  /// Asserts `guard` logs a critical message before terminating execution.
+  @Test
+  @MainActor
+  func guardLogsBeforeFatalError() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    let log = Log(style: .print, maxExposureLevel: .trace, options: [.prod])
+
+    let (output, status) = expectFatalError {
+      log.guard("boom")
+    }
+
+    #expect(status != 0)
+    #expect(output.contains("boom"))
+    #expect(output.contains("🚨"))
+  }
+
+  /// Verifies no crash occurs when the logger style is `.disabled`.
+  @Test
+  @MainActor
+  func guardNoCrashWhenDisabled() {
+    Log.reset()
+    let log = Log.disabled
+    if log.style != .disabled {
+      log.guard("unreachable")
+    }
+    #expect(log.style == .disabled)
+  }
+
   #if DEBUG
     /// Validates that overriding the level adjusts logging in debug builds.
     @Test
@@ -250,6 +360,14 @@ struct WrkstrmLogTests {
   #endif
 
   #if DEBUG
+    /// Ensures `Log.globalExposureLevel` defaults to `.trace` in debug builds after a reset.
+    @Test
+    func globalExposureDefaultsToTraceInDebug() {
+      Log.globalExposureLevel = .critical
+      Log.reset()
+      #expect(Log.globalExposureLevel == .trace)
+    }
+
     /// Confirms the default logger remains enabled in debug builds.
     @Test
     func defaultLoggerNotDisabledInDebug() {
@@ -257,6 +375,14 @@ struct WrkstrmLogTests {
       #expect(log.style != .disabled)
     }
   #else
+    /// Ensures `Log.globalExposureLevel` defaults to `.critical` in release builds after a reset.
+    @Test
+    func globalExposureDefaultsToCriticalInRelease() {
+      Log.globalExposureLevel = .trace
+      Log.reset()
+      #expect(Log.globalExposureLevel == .critical)
+    }
+
     /// Verifies the default logger is disabled in release builds.
     @Test
     func defaultLoggerDisabledInRelease() {
