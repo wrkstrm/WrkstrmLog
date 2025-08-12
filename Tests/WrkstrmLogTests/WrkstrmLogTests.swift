@@ -125,7 +125,7 @@ struct WrkstrmLogTests {
     #expect(Log.pathInfoCount == 1)
   }
 
-  /// Allows disabling path information caching at runtime.
+  /// Allows toggling path information caching at runtime.
   @Test
   func pathInfoCachingCanBeDisabled() {
     Log.reset()
@@ -137,6 +137,12 @@ struct WrkstrmLogTests {
     #expect(Log.pathInfoCount == 0)
     logger.info("second")
     #expect(Log.pathInfoCount == 0)
+
+    Log.Inject.usePathInfoCache(true)
+    logger.info("third")
+    #expect(Log.pathInfoCount == 1)
+    logger.info("fourth")
+    #expect(Log.pathInfoCount == 1)
   }
 
   /// Checks that increasing global exposure filters messages below the threshold.
