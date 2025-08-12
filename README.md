@@ -153,7 +153,7 @@ Project link: [https://github.com/wrkstrm/WrkstrmLog](https://github.com/wrkstrm
 
 Developed by [rismay](https://github.com/rismay)
 
-For a narrative overview of the project's goals 🎶, see [Sources/WrkstrmLog/Documentation.docc/Articles/WrkstrmLogUnifyingTheSymphony.md](Sources/WrkstrmLog/Documentation.docc/Articles/WrkstrmLogUnifyingTheSymphony.md).
+For a narrative overview of the project's goals 🎶, see [Sources/WrkstrmLog/Documentation.docc/Articles/UnifyingTheSymphony.md](Sources/WrkstrmLog/Documentation.docc/Articles/UnifyingTheSymphony.md).
 
 [lint-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swiftlint.yml/badge.svg
 [test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
