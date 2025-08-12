@@ -1,12 +1,13 @@
-import Testing
 import Foundation
-#if canImport(Darwin)
-import Darwin
-#else
-import Glibc
-#endif
+import Testing
 
 @testable import WrkstrmLog
+
+#if canImport(Darwin)
+  import Darwin
+#else
+  import Glibc
+#endif
 
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
@@ -47,7 +48,8 @@ struct WrkstrmLogTests {
   func functionNameIsTruncated() {
     Log.reset()
     Log.globalExposureLevel = .trace
-    var logger = Log(system: "sys", category: "cat", style: .print, maxExposureLevel: .trace, options: [.prod])
+    var logger = Log(
+      system: "sys", category: "cat", style: .print, maxExposureLevel: .trace, options: [.prod])
     logger.maxFunctionLength = 5
 
     let pipe = Pipe()
@@ -242,6 +244,14 @@ struct WrkstrmLogTests {
   #endif
 
   #if DEBUG
+    /// Ensures `Log.globalExposureLevel` defaults to `.trace` in debug builds after a reset.
+    @Test
+    func globalExposureDefaultsToTraceInDebug() {
+      Log.globalExposureLevel = .critical
+      Log.reset()
+      #expect(Log.globalExposureLevel == .trace)
+    }
+
     /// Confirms the default logger remains enabled in debug builds.
     @Test
     func defaultLoggerNotDisabledInDebug() {
@@ -249,6 +259,14 @@ struct WrkstrmLogTests {
       #expect(log.style != .disabled)
     }
   #else
+    /// Ensures `Log.globalExposureLevel` defaults to `.critical` in release builds after a reset.
+    @Test
+    func globalExposureDefaultsToCriticalInRelease() {
+      Log.globalExposureLevel = .trace
+      Log.reset()
+      #expect(Log.globalExposureLevel == .critical)
+    }
+
     /// Verifies the default logger is disabled in release builds.
     @Test
     func defaultLoggerDisabledInRelease() {
