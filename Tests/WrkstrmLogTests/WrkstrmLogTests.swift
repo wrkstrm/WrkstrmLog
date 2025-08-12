@@ -1,4 +1,10 @@
 import Testing
+import Foundation
+#if canImport(Darwin)
+import Darwin
+#else
+import Glibc
+#endif
 
 @testable import WrkstrmLog
 
@@ -34,6 +40,33 @@ struct WrkstrmLogTests {
     let mutatedHash = hasher2.finalize()
 
     #expect(original == mutatedHash)
+  }
+
+  /// Verifies function names are truncated when `maxFunctionLength` is set.
+  @Test
+  func functionNameIsTruncated() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    var logger = Log(system: "sys", category: "cat", style: .print, maxExposureLevel: .trace, options: [.prod])
+    logger.maxFunctionLength = 5
+
+    let pipe = Pipe()
+    let originalStdout = dup(STDOUT_FILENO)
+    dup2(pipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
+
+    logger.info("test", function: "SomeVeryLongFunctionName")
+
+    fflush(nil)
+    dup2(originalStdout, STDOUT_FILENO)
+    close(originalStdout)
+    pipe.fileHandleForWriting.closeFile()
+
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output = String(data: data, encoding: .utf8) ?? ""
+    let parts = output.split(separator: "|")
+    #expect(parts.count >= 3)
+    let functionPart = String(parts[1])
+    #expect(functionPart == "SomeV")
   }
 
   /// Ensures file paths with spaces are encoded and logged correctly.
