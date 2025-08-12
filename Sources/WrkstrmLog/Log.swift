@@ -403,117 +403,172 @@ public struct Log: Hashable, @unchecked Sendable {
     fatalError("Guard failed: \(String(describing: describable))")
   }
 
-  // swiftlint:disable:next function_parameter_count function_body_length
-  private func log(
+ private func log(
+   _ level: Logging.Logger.Level,
+   describable: Any,
+   file: String,
+   function: String,
+   line: UInt,
+   column _: UInt,
+   dso: UnsafeRawPointer
+ ) {
+   guard let effectiveLevel = effectiveLevel(for: level) else { return }
+   let url = URL(fileURLWithPath: file)
+   let fileName = url.lastPathComponent.replacingOccurrences(
+     of: ".swift",
+     with: ""
+   )
+   let functionString = formattedFunction(function)
+   switch style {
+   case .print:
+     logPrint(
+       level,
+       fileName: fileName,
+       function: functionString,
+       line: line,
+       describable: describable
+     )
+   #if canImport(os)
+   case .os:
+     logOS(
+       level,
+       describable: describable,
+       url: url,
+       function: functionString,
+       line: line,
+       dso: dso
+     )
+   #endif  // canImport(os)
+   case .swift:
+     logSwift(
+       level,
+       effectiveLevel: effectiveLevel,
+       describable: describable,
+       url: url,
+       function: functionString,
+       file: file,
+       line: line
+     )
+   case .disabled:
+     break
+   }
+ }
+
+ internal func effectiveLevel(
+   for level: Logging.Logger.Level
+ ) -> Logging.Logger.Level? {
+   guard style != .disabled else { return nil }
+   let globalExposure = Self.globalExposureLevel
+   #if DEBUG
+     let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
+     var resolvedMask: LevelMask
+     if let overrideMask {
+       resolvedMask = overrideMask
+     } else {
+       resolvedMask = .threshold(level)
+     }
+     let clampedExposure =
+       globalExposure.naturalIntegralValue
+         <= self.maxExposureLevelLimit.naturalIntegralValue
+       ? globalExposure : self.maxExposureLevelLimit
+     resolvedMask.formIntersection(.threshold(clampedExposure))
+     guard resolvedMask.contains(.single(level)) else { return nil }
+     return resolvedMask.minimumLevel
+   #else
+     let configuredLevel = self.maxExposureLevelLimit
+     let clampedExposure =
+       globalExposure.naturalIntegralValue
+         <= self.maxExposureLevelLimit.naturalIntegralValue
+       ? globalExposure : self.maxExposureLevelLimit
+     let effectiveLevel: Logging.Logger.Level
+     if clampedExposure > configuredLevel {
+       effectiveLevel = clampedExposure
+     } else {
+       effectiveLevel = configuredLevel
+     }
+     guard level >= effectiveLevel else { return nil }
+     return effectiveLevel
+   #endif
+ }
+
+  private func logPrint(
     _ level: Logging.Logger.Level,
-    describable: Any,
-    file: String,
+    fileName: String,
     function: String,
     line: UInt,
-    column _: UInt,
-    dso: UnsafeRawPointer,
+    describable: Any
   ) {
-    guard style != .disabled else { return }
-    let globalExposure = Self.globalExposureLevel
-    #if DEBUG
-      let overrideMask = Self.loggerQueue.sync { Self.overrideLevelMasks[self] }
-      var resolvedMask: LevelMask
-      if let overrideMask {
-        resolvedMask = overrideMask
-      } else {
-        resolvedMask = .threshold(level)
-      }
-      // Clamp the global exposure to the logger's maximum before evaluating.
-      // Choose the more restrictive (higher-severity) level between the global
-      // exposure setting and the logger's own limit.
-      let clampedExposure =
-        globalExposure.naturalIntegralValue
-          <= self.maxExposureLevelLimit.naturalIntegralValue
-        ? globalExposure : self.maxExposureLevelLimit
-      resolvedMask.formIntersection(.threshold(clampedExposure))
-      guard resolvedMask.contains(.single(level)) else { return }
-      let effectiveLevel = resolvedMask.minimumLevel
-    #else
-      let configuredLevel = self.maxExposureLevelLimit
-      // Clamp the global exposure to the logger's maximum before evaluating.
-      // Choose the more restrictive (higher-severity) level between the global
-      // exposure setting and the logger's own limit.
-      let clampedExposure =
-        globalExposure.naturalIntegralValue
-          <= self.maxExposureLevelLimit.naturalIntegralValue
-        ? globalExposure : self.maxExposureLevelLimit
-      let effectiveLevel: Logging.Logger.Level
-      if clampedExposure > configuredLevel {
-        effectiveLevel = clampedExposure
-      } else {
-        effectiveLevel = configuredLevel
-      }
-      guard level >= effectiveLevel else { return }
-    #endif
-    let url = URL(fileURLWithPath: file)
-    let fileName = url.lastPathComponent.replacingOccurrences(
-      of: ".swift",
-      with: ""
-    )
-    let functionString = formattedFunction(function)
-    switch style {
-    case .print:
-      Swift
-        .print(
-          "\(system):\(category):\(level.emoji) \(fileName):\(String(line))|\(functionString)| "
-            + String(describing: describable)
-        )
-
-    #if canImport(os)
-      case .os:
-        let logger: OSLog = Self.loggerQueue.sync {
-          if let existing = Self.osLoggers[self] {
-            return existing
-          }
-          let created = OSLog(subsystem: system, category: category)
-          Self.osLoggers[self] = created
-          return created
-        }
-        os_log(
-          level.toOSType,
-          dso: dso,
-          log: logger,
-          "%s-%i|%s| %s",
-          url.lastPathComponent,
-          line,
-          functionString,
-          String(describing: describable),
-        )
-    #endif  // canImport(os)
-
-    case .swift:
-      let logger: Logging.Logger = Self.loggerQueue.sync {
-        if var existing = Self.swiftLoggers[self] {
-          existing.logLevel = level
-          Self.swiftLoggers[self] = existing
-          return existing
-        }
-        var newLogger = Logging.Logger(label: system)
-        newLogger.logLevel = level
-        Self.swiftLoggers[self] = newLogger
-        return newLogger
-      }
-      logger.log(
-        level: level,
-        "\(line)|\(functionString)| \(String(describing: describable))",
-        source: url.lastPathComponent,
-        file: file,
-        function: functionString,
-        line: line,
+    Swift
+      .print(
+        "\(system):\(category):\(level.emoji) \(fileName):\(String(line))|\(function)| "
+          + String(describing: describable)
       )
-
-    case .disabled:
-      break
-    }
   }
+
+ #if canImport(os)
+   private func logOS(
+     _ level: Logging.Logger.Level,
+     describable: Any,
+     url: URL,
+     function: String,
+     line: UInt,
+     dso: UnsafeRawPointer
+   ) {
+     let logger: OSLog = Self.loggerQueue.sync {
+       if let existing = Self.osLoggers[self] {
+         return existing
+       }
+       let created = OSLog(subsystem: system, category: category)
+       Self.osLoggers[self] = created
+       return created
+     }
+     os_log(
+       level.toOSType,
+       dso: dso,
+       log: logger,
+       "%s-%i|%s| %s",
+       url.lastPathComponent,
+       line,
+       function,
+       String(describing: describable)
+     )
+   }
+ #endif  // canImport(os)
+
+ private func logSwift(
+   _ level: Logging.Logger.Level,
+   effectiveLevel: Logging.Logger.Level,
+   describable: Any,
+   url: URL,
+   function: String,
+   file: String,
+   line: UInt
+ ) {
+   let logger: Logging.Logger = Self.loggerQueue.sync {
+     if var existing = Self.swiftLoggers[self] {
+       existing.logLevel = effectiveLevel
+       Self.swiftLoggers[self] = existing
+       return existing
+     }
+     var newLogger = Logging.Logger(label: system)
+     newLogger.logLevel = effectiveLevel
+     Self.swiftLoggers[self] = newLogger
+     return newLogger
+   }
+  logger.log(
+    level: level,
+    "\(line)|\(function)| \(String(describing: describable))",
+    source: url.lastPathComponent,
+    file: file,
+    function: function,
+    line: line
+  )
+  }
+
 }
 
 extension Log {
+
   /// Determines whether logging is enabled for the provided level based on
   /// both the logger's `maxExposureLevel` and the global exposure level.
   ///

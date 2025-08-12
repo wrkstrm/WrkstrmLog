@@ -109,16 +109,26 @@ struct WrkstrmLogTests {
 
   /// Validates the warning helper respects exposure limits.
   @Test
-  func warningHelperRespectsExposure() {
-    Log._reset()
-    Log.globalExposureLevel = .error
-    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
-    log.warning("suppressed")
-    #expect(Log._swiftLoggerCount == 0)
-    Log.globalExposureLevel = .warning
-    log.warning("logged")
-    #expect(Log._swiftLoggerCount == 1)
-  }
+    func warningHelperRespectsExposure() {
+      Log._reset()
+      Log.globalExposureLevel = .error
+      let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+      log.warning("suppressed")
+      #expect(Log._swiftLoggerCount == 0)
+      Log.globalExposureLevel = .warning
+      log.warning("logged")
+      #expect(Log._swiftLoggerCount == 1)
+    }
+
+    /// Verifies `effectiveLevel(for:)` filters based on exposure settings.
+    @Test
+    func effectiveLevelRespectsExposure() {
+      Log._reset()
+      Log.globalExposureLevel = .warning
+      let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+      #expect(log.effectiveLevel(for: .info) == nil)
+      #expect(log.effectiveLevel(for: .error) == .error)
+    }
 
   /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
   @Test
