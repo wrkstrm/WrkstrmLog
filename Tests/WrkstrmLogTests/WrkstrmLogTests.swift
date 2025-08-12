@@ -55,6 +55,33 @@ struct WrkstrmLogTests {
     #expect(Log.swiftLoggerCount == 0)
   }
 
+  /// Ensures path information is cached and reused across log calls.
+  @Test
+  func pathInfoCaching() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    let logger = Log(style: .print, maxExposureLevel: .trace, options: [.prod])
+    #expect(Log.pathInfoCount == 0)
+    logger.info("first")
+    #expect(Log.pathInfoCount == 1)
+    logger.info("second")
+    #expect(Log.pathInfoCount == 1)
+  }
+
+  /// Allows disabling path information caching at runtime.
+  @Test
+  func pathInfoCachingCanBeDisabled() {
+    Log.reset()
+    Log.Inject.usePathInfoCache(false)
+    Log.globalExposureLevel = .trace
+    let logger = Log(style: .print, maxExposureLevel: .trace, options: [.prod])
+    #expect(Log.pathInfoCount == 0)
+    logger.info("first")
+    #expect(Log.pathInfoCount == 0)
+    logger.info("second")
+    #expect(Log.pathInfoCount == 0)
+  }
+
   /// Checks that increasing global exposure filters messages below the threshold.
   @Test
   func exposureLimitFiltersMessages() {
