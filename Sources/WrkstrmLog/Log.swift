@@ -364,17 +364,13 @@ public struct Log: Hashable, @unchecked Sendable {
     dso: UnsafeRawPointer
   ) {
     guard let effectiveLevel = effectiveLevel(for: level) else { return }
-    let url = URL(fileURLWithPath: file)
-    let fileName = url.lastPathComponent.replacingOccurrences(
-      of: ".swift",
-      with: ""
-    )
+    let pathInfo = Inject.pathInfo(for: file)
     let functionString = formattedFunction(function)
     switch style {
     case .print:
       logPrint(
         level,
-        fileName: fileName,
+        fileName: pathInfo.fileName,
         function: functionString,
         line: line,
         describable: describable
@@ -384,7 +380,7 @@ public struct Log: Hashable, @unchecked Sendable {
         logOS(
           level,
           describable: describable,
-          url: url,
+          pathInfo: pathInfo,
           function: functionString,
           line: line,
           dso: dso
@@ -395,7 +391,7 @@ public struct Log: Hashable, @unchecked Sendable {
         level,
         effectiveLevel: effectiveLevel,
         describable: describable,
-        url: url,
+        pathInfo: pathInfo,
         function: functionString,
         file: file,
         line: line
@@ -460,7 +456,7 @@ public struct Log: Hashable, @unchecked Sendable {
     private func logOS(
       _ level: Logging.Logger.Level,
       describable: Any,
-      url: URL,
+      pathInfo: Cache.PathInfo,
       function: String,
       line: UInt,
       dso: UnsafeRawPointer
@@ -471,7 +467,7 @@ public struct Log: Hashable, @unchecked Sendable {
         dso: dso,
         log: logger,
         "%s-%i|%s| %s",
-        url.lastPathComponent,
+        pathInfo.lastPathComponent,
         line,
         function,
         String(describing: describable)
@@ -483,7 +479,7 @@ public struct Log: Hashable, @unchecked Sendable {
     _ level: Logging.Logger.Level,
     effectiveLevel: Logging.Logger.Level,
     describable: Any,
-    url: URL,
+    pathInfo: Cache.PathInfo,
     function: String,
     file: String,
     line: UInt
@@ -492,7 +488,7 @@ public struct Log: Hashable, @unchecked Sendable {
     logger.log(
       level: level,
       "\(line)|\(function)| \(String(describing: describable))",
-      source: url.lastPathComponent,
+      source: pathInfo.lastPathComponent,
       file: file,
       function: function,
       line: line
