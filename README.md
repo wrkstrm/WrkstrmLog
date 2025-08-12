@@ -72,6 +72,18 @@ targets: [
    Log.guard("Critical error")
    ```
 
+   Each level maps to a visual emoji for quick scanning:
+
+   | Level    | Emoji |
+   |----------|:-----:|
+   | trace    | 🔍 |
+   | debug    | 🐞 |
+   | info     | ℹ️ |
+   | notice   | 📝 |
+   | warning  | ⚠️ |
+   | error    | ❗ |
+   | critical | 🚨 |
+
 4. **Disable or enable logging in production** 🔇
 
    Loggers default to `.disabled` in release builds. Use the `.prod` option to keep them active or the `.disabled` style for a silent logger.
