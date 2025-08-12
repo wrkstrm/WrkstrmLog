@@ -1,5 +1,5 @@
-import Testing
 import Foundation
+import Testing
 
 @testable import WrkstrmLog
 
@@ -229,6 +229,26 @@ struct WrkstrmLogTests {
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     #expect(log.effectiveLevel(for: .info) == nil)
     #expect(log.effectiveLevel(for: .error) == .error)
+  }
+
+  /// Global level below logger max uses the global level as effective.
+  @Test
+  func effectiveLevelUsesGlobalWhenBelowMax() {
+    Log.reset()
+    Log.globalExposureLevel = .debug
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    #expect(log.effectiveLevel(for: .debug) == .debug)
+    #expect(log.effectiveLevel(for: .trace) == nil)
+  }
+
+  /// Global level above logger max clamps the level to the logger's maximum.
+  @Test
+  func effectiveLevelClampsToLoggerMax() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    let log = Log(style: .swift, maxExposureLevel: .info, options: [.prod])
+    #expect(log.effectiveLevel(for: .trace) == nil)
+    #expect(log.effectiveLevel(for: .info) == .info)
   }
 
   /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
