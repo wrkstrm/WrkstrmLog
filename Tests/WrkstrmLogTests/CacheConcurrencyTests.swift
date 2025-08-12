@@ -24,7 +24,8 @@ extension WrkstrmLogTests {
       }
     }
     group.wait()
-
+    let waitResult = group.wait(timeout: .now() + 5)
+    #expect(waitResult == .success, "DispatchGroup wait timed out")
     #expect(Log.swiftLoggerCount == 1)
     #expect(Log.pathInfoCount == 1)
   }
