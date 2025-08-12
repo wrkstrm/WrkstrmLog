@@ -7,6 +7,8 @@
 
 WrkstrmLog is a logging framework for Swift that provides consistent, configurable log output across Linux, macOS, and Xcode. It offers multiple logging styles and can be completely disabled for production builds. 🔧
 
+For up-to-date build and platform compatibility reports, visit the [Swift Package Index](https://swiftpackageindex.com/wrkstrm/WrkstrmLog).
+
 ## ✨ Key Features
 
 - 🌐 Adaptive logging across Linux, Xcode, and the macOS terminal
@@ -16,11 +18,6 @@ WrkstrmLog is a logging framework for Swift that provides consistent, configurab
 - 🔕 Optional disabled mode to silence logs
 - 🚦 Global exposure control via `Log.globalExposureLevel` and per-logger `maxExposureLevel` (replaces `Log.removeExposureLimit`)
 - 🆕 Swift 6 `#fileID` support for concise output
-
-## 🖥️ Compatibility
-
-- 🍎 macOS
-- 🐧 Linux
 
 ## 📦 Installation
 
