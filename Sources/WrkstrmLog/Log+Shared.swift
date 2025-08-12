@@ -49,6 +49,33 @@ extension Log {
     )
   }
 
+  /// Logs a debug message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The message string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public static func debug(
+    _ describable: Any,
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    Log.shared.debug(
+      describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
+
   /// Logs a info message with the specified parameters.
   ///
   /// - Parameters:
@@ -67,6 +94,60 @@ extension Log {
     dso: UnsafeRawPointer = #dsohandle,
   ) {
     Log.shared.info(
+      describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
+
+  /// Logs a notice message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The message string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public static func notice(
+    _ describable: Any,
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    Log.shared.notice(
+      describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
+
+  /// Logs a warning message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The message string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public static func warning(
+    _ describable: Any,
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    Log.shared.warning(
       describable,
       file: file,
       function: function,

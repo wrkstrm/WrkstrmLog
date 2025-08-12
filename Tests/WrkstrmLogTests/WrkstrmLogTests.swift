@@ -81,6 +81,45 @@ struct WrkstrmLogTests {
     #expect(Log._swiftLoggerCount == 1)
   }
 
+  /// Validates the debug helper respects exposure limits.
+  @Test
+  func debugHelperRespectsExposure() {
+    Log._reset()
+    Log.globalExposureLevel = .info
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    log.debug("suppressed")
+    #expect(Log._swiftLoggerCount == 0)
+    Log.globalExposureLevel = .debug
+    log.debug("logged")
+    #expect(Log._swiftLoggerCount == 1)
+  }
+
+  /// Validates the notice helper respects exposure limits.
+  @Test
+  func noticeHelperRespectsExposure() {
+    Log._reset()
+    Log.globalExposureLevel = .warning
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    log.notice("suppressed")
+    #expect(Log._swiftLoggerCount == 0)
+    Log.globalExposureLevel = .notice
+    log.notice("logged")
+    #expect(Log._swiftLoggerCount == 1)
+  }
+
+  /// Validates the warning helper respects exposure limits.
+  @Test
+  func warningHelperRespectsExposure() {
+    Log._reset()
+    Log.globalExposureLevel = .error
+    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    log.warning("suppressed")
+    #expect(Log._swiftLoggerCount == 0)
+    Log.globalExposureLevel = .warning
+    log.warning("logged")
+    #expect(Log._swiftLoggerCount == 1)
+  }
+
   /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
   @Test
   func isEnabledRespectsExposureLimits() {

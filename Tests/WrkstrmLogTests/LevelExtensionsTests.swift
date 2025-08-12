@@ -12,13 +12,18 @@ struct LevelExtensionsTests {
   /// Ensures each logging level maps to the expected emoji.
   @Test
   func emojiMapping() {
-    #expect(Logging.Logger.Level.trace.emoji == "🔍")
-    #expect(Logging.Logger.Level.debug.emoji == "🐞")
-    #expect(Logging.Logger.Level.info.emoji == "ℹ️")
-    #expect(Logging.Logger.Level.notice.emoji == "📝")
-    #expect(Logging.Logger.Level.warning.emoji == "⚠️")
-    #expect(Logging.Logger.Level.error.emoji == "❗")
-    #expect(Logging.Logger.Level.critical.emoji == "🚨")
+    let mappings: [(Logging.Logger.Level, String)] = [
+      (.trace, "🔍"),
+      (.debug, "🐞"),
+      (.info, "ℹ️"),
+      (.notice, "📝"),
+      (.warning, "⚠️"),
+      (.error, "❗"),
+      (.critical, "🚨"),
+    ]
+    for (level, emoji) in mappings {
+      #expect(level.emoji == emoji)
+    }
   }
 
   #if canImport(os)
