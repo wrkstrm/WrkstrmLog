@@ -1,4 +1,4 @@
-# WrkstrmLog: Unifying the Symphony of Swift Logging 🎶
+# WrkstrmLog: Exploring the Problem Space of Swift Logging 🎶
 
 ###### Synopsis
 Managing logs across different environments and configurations can quickly become complex. WrkstrmLog is a flexible and extensible logging utility designed to streamline this process.
