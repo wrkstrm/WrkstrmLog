@@ -52,4 +52,9 @@
     ```
     }
   }
+
+  @Section(title: "Understand Log Levels") {
+    For a deeper explanation of each level and example messages, see
+    <doc:LogLevels>.
+  }
 }
