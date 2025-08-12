@@ -1,7 +1,7 @@
-# 📝 WrkstrmLog: Simplifying Logging in Swift Projects
+# WrkstrmLog: Exploring the Problem Space of Swift Logging 🎶
 
 ###### Synopsis
-Managing logs across different environments and configurations can quickly become complex. Introducing `WrkstrmLog`, a flexible and extensible logging utility designed to streamline this process.
+Managing logs across different environments and configurations can quickly become complex. WrkstrmLog is a flexible and extensible logging utility designed to streamline this process.
 
 ## 🎭 The Challenge: Cross-Platform Swift Logging
 
@@ -61,6 +61,7 @@ func fetchData() {
 When run from Xcode, you might see nicely formatted logs in the console. However, when running the same code from the command line or on a Linux server, the output might be different or even missing certain log levels. 😕
 
 ## 🚀 Enter WrkstrmLog: A Swift Solution
+
 WrkstrmLog addresses these issues by providing a unified, flexible logging interface that ensures consistency across all environments. Here's a glimpse of how it works:
 
 ```swift
@@ -89,7 +90,7 @@ With WrkstrmLog, the logging experience remains consistent whether you're runnin
 3. 🏷️ **Categorization**: Log messages can be categorized for easier filtering and analysis.
 4. 🔀 **Multiple Output Styles**: Supports console output, Apple's Unified Logging System, and Swift's logging framework.
 5. 🌍 **Cross-Environment Consistency**: Provides the same logging experience across Xcode, command line, and Linux environments.
-6. 🧩 **Extensibility**: Can be easily extended to support additional logging destinations.
+6. 🔌 **Extensibility**: Can be easily extended to support additional logging destinations.
 
 ## 🏁 Getting Started
 
@@ -98,7 +99,7 @@ With WrkstrmLog, the logging experience remains consistent whether you're runnin
 Add the following to your `Package.swift` file:
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "1.1.0"))
+    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "2.0.0"))
 ]
 ```
 
@@ -145,8 +146,6 @@ log.info("Now logged")
 ```
 
 `overrideLevel` is available only in `DEBUG` builds and lets you adjust a logger's level at runtime.
-
-
 
 ## ⚡ Performance Considerations
 Developing WrkstrmLog presented its own set of challenges, particularly in terms of performance:
