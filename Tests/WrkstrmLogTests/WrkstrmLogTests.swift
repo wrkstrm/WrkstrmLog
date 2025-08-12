@@ -9,6 +9,28 @@ import Testing
   import Glibc
 #endif
 
+// MARK: - Fatal Error Testing Helpers
+
+@MainActor
+func expectFatalError(executing: @escaping () -> Void) -> (String, Int32) {
+  var fds: [Int32] = [0, 0]
+  precondition(pipe(&fds) == 0)
+  let pid = fork()
+  if pid == 0 {
+    dup2(fds[1], STDOUT_FILENO)
+    close(fds[0])
+    executing()
+    _exit(0)
+  } else {
+    close(fds[1])
+    let handle = FileHandle(fileDescriptor: fds[0])
+    let data = handle.readDataToEndOfFile()
+    var status: Int32 = 0
+    waitpid(pid, &status, 0)
+    return (String(data: data, encoding: .utf8) ?? "", status)
+  }
+}
+
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
   /// Verifies that a single Swift logger instance is reused after mutation.
@@ -285,6 +307,35 @@ struct WrkstrmLogTests {
     #expect(log.maxExposureLevel == .critical)
     log.error("still suppressed")
     #expect(Log.swiftLoggerCount == 0)
+  }
+
+  /// Asserts `guard` logs a critical message before terminating execution.
+  @Test
+  @MainActor
+  func guardLogsBeforeFatalError() {
+    Log.reset()
+    Log.globalExposureLevel = .trace
+    let log = Log(style: .print, maxExposureLevel: .trace, options: [.prod])
+
+    let (output, status) = expectFatalError {
+      log.guard("boom")
+    }
+
+    #expect(status != 0)
+    #expect(output.contains("boom"))
+    #expect(output.contains("🚨"))
+  }
+
+  /// Verifies no crash occurs when the logger style is `.disabled`.
+  @Test
+  @MainActor
+  func guardNoCrashWhenDisabled() {
+    Log.reset()
+    let log = Log.disabled
+    if log.style != .disabled {
+      log.guard("unreachable")
+    }
+    #expect(log.style == .disabled)
   }
 
   #if DEBUG
