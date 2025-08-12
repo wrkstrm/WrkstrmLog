@@ -1,12 +1,13 @@
-import Testing
 import Foundation
-#if canImport(Darwin)
-import Darwin
-#else
-import Glibc
-#endif
+import Testing
 
 @testable import WrkstrmLog
+
+#if canImport(Darwin)
+  import Darwin
+#else
+  import Glibc
+#endif
 
 @Suite("WrkstrmLog", .serialized)
 struct WrkstrmLogTests {
@@ -47,7 +48,8 @@ struct WrkstrmLogTests {
   func functionNameIsTruncated() {
     Log.reset()
     Log.globalExposureLevel = .trace
-    var logger = Log(system: "sys", category: "cat", style: .print, maxExposureLevel: .trace, options: [.prod])
+    var logger = Log(
+      system: "sys", category: "cat", style: .print, maxExposureLevel: .trace, options: [.prod])
     logger.maxFunctionLength = 5
 
     let pipe = Pipe()
@@ -101,7 +103,7 @@ struct WrkstrmLogTests {
     #expect(Log.pathInfoCount == 1)
   }
 
-  /// Allows disabling path information caching at runtime.
+  /// Allows toggling path information caching at runtime.
   @Test
   func pathInfoCachingCanBeDisabled() {
     Log.reset()
@@ -113,6 +115,12 @@ struct WrkstrmLogTests {
     #expect(Log.pathInfoCount == 0)
     logger.info("second")
     #expect(Log.pathInfoCount == 0)
+
+    Log.Inject.usePathInfoCache(true)
+    logger.info("third")
+    #expect(Log.pathInfoCount == 1)
+    logger.info("fourth")
+    #expect(Log.pathInfoCount == 1)
   }
 
   /// Checks that increasing global exposure filters messages below the threshold.
