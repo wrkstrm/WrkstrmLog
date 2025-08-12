@@ -12,23 +12,35 @@ import Testing
 // MARK: - Fatal Error Testing Helpers
 
 @MainActor
-func expectFatalError(executing: @escaping () -> Void) -> (String, Int32) {
-  var fds: [Int32] = [0, 0]
-  precondition(pipe(&fds) == 0)
-  let pid = fork()
-  if pid == 0 {
-    dup2(fds[1], STDOUT_FILENO)
-    close(fds[0])
-    executing()
-    _exit(0)
-  } else {
-    close(fds[1])
-    let handle = FileHandle(fileDescriptor: fds[0])
-    let data = handle.readDataToEndOfFile()
-    var status: Int32 = 0
-    waitpid(pid, &status, 0)
-    return (String(data: data, encoding: .utf8) ?? "", status)
+func expectFatalError(executing: @escaping @Sendable () -> Void) -> (String, Int32) {
+  let pipe = Pipe()
+  let originalStdout = dup(STDOUT_FILENO)
+  dup2(pipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
+
+  let semaphore = DispatchSemaphore(value: 0)
+  let originalFatal = fatalErrorStorage.handler
+  fatalErrorStorage.handler = { _, _, _ in
+    semaphore.signal()
+    Thread.exit()
+    fatalError("unreachable")
   }
+
+  let thread = Thread {
+    executing()
+  }
+  thread.start()
+
+  semaphore.wait()
+
+  fflush(nil)
+  dup2(originalStdout, STDOUT_FILENO)
+  close(originalStdout)
+  pipe.fileHandleForWriting.closeFile()
+  let data = pipe.fileHandleForReading.readDataToEndOfFile()
+
+  fatalErrorStorage.handler = originalFatal
+
+  return (String(data: data, encoding: .utf8) ?? "", 1)
 }
 
 // MARK: - Core Logging Behavior
