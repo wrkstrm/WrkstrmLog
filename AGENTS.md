@@ -11,3 +11,8 @@ These instructions apply to all files in the WrkstrmLog repository unless a more
 - Run the full test suite with `swift test` and ensure it passes.
 - Write descriptive commit messages and keep pull requests focused.
 
+
+## Release Naming Convention
+WrkstrmLog releases are nicknamed after tree species in alphabetical order—a nod to logging.
+For example, v2.1.0 is "Aspen"; upcoming releases will continue with names like "Birch", "Cedar", etc.
+Use the codename in release notes, tags, and announcements.
