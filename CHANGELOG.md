@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [2.0.0]
+## [2.0.0] - 2025-08-13
 ### Added
 - Introduce a global exposure limit to restrict logging output across libraries. The limit
   defaults to `.critical` and must be configured at startup to enable more verbose logging.
