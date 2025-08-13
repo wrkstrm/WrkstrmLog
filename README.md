@@ -27,7 +27,11 @@ Add WrkstrmLog as a dependency in your `Package.swift` file:
 
 ```swift
 dependencies: [
+<<<<<<< Updated upstream
     .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .upToNextMajor(from: "2.0.0"))
+=======
+    .package(url: "https://github.com/wrkstrm/WrkstrmLog.git", .from: "2.0.0")
+>>>>>>> Stashed changes
 ]
 ```
 
