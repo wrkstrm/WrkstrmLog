@@ -168,7 +168,7 @@ public struct Log: Hashable, @unchecked Sendable {
     // Verbose messages are lower priority than standard informational logs.
     // Map them to the debug log level so they can be filtered separately.
     log(
-      .debug,
+      .trace,
       describable: describable,
       file: file,
       function: function,
