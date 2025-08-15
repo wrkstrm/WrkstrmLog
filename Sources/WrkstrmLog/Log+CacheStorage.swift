@@ -106,7 +106,7 @@ extension Log {
     }
 
     /// Current number of cached SwiftLog loggers. Used in tests.
-    var swiftLoggerCount: Int { queue.sync { swiftLoggers.count } }
+    var swiftCount: Int { queue.sync { swiftLoggers.count } }
 
     var pathInfoCount: Int { queue.sync { pathInfos.count } }
 

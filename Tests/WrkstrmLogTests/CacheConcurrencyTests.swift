@@ -11,7 +11,7 @@ extension WrkstrmLogTests {
   func cacheConcurrency() {
     Log.reset()
     Log.globalExposureLevel = .trace
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
     #expect(Log.pathInfoCount == 0)
 
     let logger = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
@@ -28,7 +28,7 @@ extension WrkstrmLogTests {
     group.wait()
     let waitResult = group.wait(timeout: .now() + 5)
     #expect(waitResult == .success, "DispatchGroup wait timed out")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
     #expect(Log.pathInfoCount == 1)
   }
 }
