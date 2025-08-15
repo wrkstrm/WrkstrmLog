@@ -28,8 +28,8 @@ extension Log {
     Inject.usePathInfoCache(true)
   }
 
-  static var swiftLoggerCount: Int {
-    Cache.shared.swiftLoggerCount
+  static var swiftCount: Int {
+    Cache.shared.swiftCount
   }
 
   static var pathInfoCount: Int {
@@ -37,8 +37,8 @@ extension Log {
   }
 
   #if canImport(os)
-  static var osLoggerCount: Int {
-    Cache.shared.osLoggerCount
+  static var osCount: Int {
+    Cache.shared.osCount
   }
   #endif
 }

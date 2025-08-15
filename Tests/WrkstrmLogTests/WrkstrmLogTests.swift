@@ -54,12 +54,12 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .trace
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.info("first")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
 
     var mutated = log
     mutated.maxFunctionLength = 10
     mutated.info("second")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
 
   /// Confirms hashing ignores mutable properties that do not affect identity.
@@ -123,7 +123,7 @@ struct WrkstrmLogTests {
     Log.reset()
     Log.globalExposureLevel = .trace
     Log.disabled.info("silence")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
   }
 
   /// Ensures path information is cached and reused across log calls.
@@ -166,10 +166,10 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.info("suppressed")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
     Log.globalExposureLevel = .trace
     log.info("logged")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
 
   /// Verifies a logger's max exposure level is respected even when global limits differ.
@@ -180,9 +180,9 @@ struct WrkstrmLogTests {
     let log = Log(style: .swift, maxExposureLevel: .error, options: [.prod])
     #expect(log.maxExposureLevel == .error)
     log.info("suppressed")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
     log.error("logged")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
 
   /// Validates the debug helper respects exposure limits.
@@ -192,10 +192,10 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .info
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.debug("suppressed")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
     Log.globalExposureLevel = .debug
     log.debug("logged")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
 
   /// Confirms verbose logs are emitted at the debug level.
@@ -244,10 +244,10 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.notice("suppressed")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
     Log.globalExposureLevel = .notice
     log.notice("logged")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
 
   /// Validates the warning helper respects exposure limits.
@@ -257,10 +257,10 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .error
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.warning("suppressed")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
     Log.globalExposureLevel = .warning
     log.warning("logged")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
 
   /// Verifies `effectiveLevel(for:)` filters based on exposure settings.
@@ -322,11 +322,11 @@ struct WrkstrmLogTests {
     Log.reset()
     let log = Log(style: .swift, options: [.prod])
     log.error("suppressed")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
     Log.globalExposureLevel = .trace
     #expect(log.maxExposureLevel == .critical)
     log.error("still suppressed")
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
   }
 
   /// Asserts `guard` logs a critical message before terminating execution.
@@ -366,10 +366,10 @@ struct WrkstrmLogTests {
     Log.globalExposureLevel = .trace
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.info("suppressed")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
     Log.overrideLevel(for: log, to: .debug)
     log.info("logged")
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
   #endif
 
@@ -405,7 +405,7 @@ struct WrkstrmLogTests {
     let log = Log()
     log.info("silence")
     #expect(log.style == .disabled)
-    #expect(Log.swiftLoggerCount == 0)
+    #expect(Log.swiftCount == 0)
   }
 
   /// Ensures a logger with the `.prod` option remains enabled in release builds.
@@ -416,7 +416,7 @@ struct WrkstrmLogTests {
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
     log.info("hello")
     #expect(log.style == .swift)
-    #expect(Log.swiftLoggerCount == 1)
+    #expect(Log.swiftCount == 1)
   }
   #endif
 }

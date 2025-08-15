@@ -106,7 +106,7 @@ extension Log {
     }
 
     /// Current number of cached SwiftLog loggers. Used in tests.
-    var swiftLoggerCount: Int { queue.sync { swiftLoggers.count } }
+    var swiftCount: Int { queue.sync { swiftLoggers.count } }
 
     var pathInfoCount: Int { queue.sync { pathInfos.count } }
 
@@ -117,7 +117,7 @@ extension Log {
 
     #if canImport(os)
     /// Current number of cached OSLog loggers. Used in tests.
-    var osLoggerCount: Int { queue.sync { osLoggers.count } }
+    var osCount: Int { queue.sync { osLoggers.count } }
 
     /// Returns whether an OS logger exists for the given `Log`.
     func hasOSLogger(for log: Log) -> Bool {
