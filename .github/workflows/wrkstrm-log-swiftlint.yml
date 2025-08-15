@@ -51,5 +51,10 @@ jobs:
         sudo mv swiftlint_tmp/swiftlint /usr/local/bin/
     - name: Download SwiftLint Configuration
       run: curl -O https://raw.githubusercontent.com/wrkstrm/configs/main/linting/.swiftlint.yml
+    - name: Download Swift Format Configuration
+      run: curl -O https://raw.githubusercontent.com/wrkstrm/configs/main/linting/.swift-format
+    - name: Swift Format
+      # This is the only Swift formatting step.
+      run: swift format --configuration .swift-format -i -r -p
     - name: SwiftLint
       run: swiftlint

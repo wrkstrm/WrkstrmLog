@@ -6,7 +6,7 @@ WrkstrmLog is a Swift logging framework. Use these guidelines when contributing 
 These instructions apply to all files in the WrkstrmLog repository unless a more specific `AGENTS.md` file overrides them.
 
 ## Contribution Guidelines
-- Format any modified Swift files with `swift format -i -r -p`.
+- Format any modified Swift files with `swift format --configuration https://raw.githubusercontent.com/wrkstrm/configs/main/linting/.swift-format -i -r -p`. This is the only Swift formatting step to run.
 - Lint the project with `swiftlint` using the included configuration.
 - Run the full test suite with `swift test` and ensure it passes.
 - Write descriptive commit messages and keep pull requests focused.
