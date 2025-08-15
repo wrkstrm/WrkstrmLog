@@ -28,8 +28,8 @@ extension Log {
     Inject.usePathInfoCache(true)
   }
 
-  static var swiftLoggerCount: Int {
-    Cache.shared.swiftLoggerCount
+  static var swiftCount: Int {
+    Cache.shared.swiftCount
   }
 
   static var pathInfoCount: Int {
