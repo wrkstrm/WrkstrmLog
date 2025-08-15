@@ -3,7 +3,7 @@
 | CI System | Status |
 |-----------|--------|
 | Swift Package Index | [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog) |
-| GitHub Action Status | [![Lint Status][lint-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swiftlint.yml) [![Test Status][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) |
+| GitHub Action Status | [![Format Status][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swiftformat.yml) [![Test Status][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) |
 
 WrkstrmLog is a logging framework for Swift that provides consistent, configurable log output across Linux, macOS, and Xcode. It offers multiple logging styles and can be completely disabled for production builds. 🔧
 
@@ -180,5 +180,5 @@ Developed by [rismay](https://github.com/rismay)
 
 For a narrative overview of the project's goals 🎶, see [Sources/WrkstrmLog/Documentation.docc/Articles/UnifyingTheSymphony.md](Sources/WrkstrmLog/Documentation.docc/Articles/UnifyingTheSymphony.md).
 
-[lint-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swiftlint.yml/badge.svg
+[format-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swiftformat.yml/badge.svg
 [test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
