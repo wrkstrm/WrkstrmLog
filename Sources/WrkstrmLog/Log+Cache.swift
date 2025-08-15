@@ -9,17 +9,17 @@ extension Log {
   }
 
   #if DEBUG
-    /// Overrides the minimum logging level for the specified logger.
-    /// Available only in debug builds.
-    /// - Parameters:
-    ///   - logger: The logger to override.
-    ///   - level: The new minimum level to expose.
-    public static func overrideLevel(
-      for logger: Log,
-      to level: Logging.Logger.Level
-    ) {
-      Cache.shared.overrideLevel(for: logger, to: level)
-    }
+  /// Overrides the minimum logging level for the specified logger.
+  /// Available only in debug builds.
+  /// - Parameters:
+  ///   - logger: The logger to override.
+  ///   - level: The new minimum level to expose.
+  public static func overrideLevel(
+    for logger: Log,
+    to level: Logging.Logger.Level
+  ) {
+    Cache.shared.overrideLevel(for: logger, to: level)
+  }
   #endif
 
   // MARK: - Internal helpers for tests
@@ -37,8 +37,8 @@ extension Log {
   }
 
   #if canImport(os)
-    static var osLoggerCount: Int {
-      Cache.shared.osLoggerCount
-    }
+  static var osLoggerCount: Int {
+    Cache.shared.osLoggerCount
+  }
   #endif
 }

@@ -4,9 +4,9 @@ import Testing
 @testable import WrkstrmLog
 
 #if canImport(Darwin)
-  import Darwin
+import Darwin
 #else
-  import Glibc
+import Glibc
 #endif
 
 // MARK: - Xcode Environment Detection

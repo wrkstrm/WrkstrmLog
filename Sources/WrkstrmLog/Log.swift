@@ -2,7 +2,7 @@ import Foundation
 import Logging
 
 #if canImport(os)
-  import os
+import os
 #endif
 
 /// A flexible and extensible logging utility supporting multiple styles and destinations for
@@ -26,9 +26,9 @@ public struct Log: Hashable, @unchecked Sendable {
     /// Typically used for debugging in local or development environments.
     case print
     #if canImport(os)
-      /// OSLog style, logs messages using Apple's Unified Logging System (OSLog).
-      /// Recommended for production use on Apple platforms for detailed and performant logging.
-      case os  // swiftlint:disable:this identifier_name
+    /// OSLog style, logs messages using Apple's Unified Logging System (OSLog).
+    /// Recommended for production use on Apple platforms for detailed and performant logging.
+    case os  // swiftlint:disable:this identifier_name
     #endif  // canImport(os)
     /// Swift style, logs messages using Swift's built-in logging framework (SwiftLog).
     /// Ideal for server-side Swift applications or when consistent logging behavior across
@@ -73,9 +73,9 @@ public struct Log: Hashable, @unchecked Sendable {
   public var maxExposureLevel: Logging.Logger.Level { maxExposureLevelLimit }
 
   #if canImport(os)
-    @usableFromInline static let defaultStyle: Style = .os
+  @usableFromInline static let defaultStyle: Style = .os
   #else  // canImport(os)
-    @usableFromInline static let defaultStyle: Style = .swift
+  @usableFromInline static let defaultStyle: Style = .swift
   #endif  // canImport(os)
 
   /// A convenience logger instance with logging disabled.
@@ -109,9 +109,9 @@ public struct Log: Hashable, @unchecked Sendable {
     self.options = options
     self.maxExposureLevelLimit = maxExposureLevel
     #if DEBUG
-      self.style = style
+    self.style = style
     #else
-      self.style = options.contains(.prod) ? style : .disabled
+    self.style = options.contains(.prod) ? style : .disabled
     #endif
   }
 
@@ -376,15 +376,15 @@ public struct Log: Hashable, @unchecked Sendable {
         describable: describable
       )
     #if canImport(os)
-      case .os:
-        logOS(
-          level,
-          describable: describable,
-          pathInfo: pathInfo,
-          function: functionString,
-          line: line,
-          dso: dso
-        )
+    case .os:
+      logOS(
+        level,
+        describable: describable,
+        pathInfo: pathInfo,
+        function: functionString,
+        line: line,
+        dso: dso
+      )
     #endif  // canImport(os)
     case .swift:
       logSwift(
@@ -407,34 +407,34 @@ public struct Log: Hashable, @unchecked Sendable {
     guard style != .disabled else { return nil }
     let globalExposure = Cache.shared.globalExposureLevel
     #if DEBUG
-      let overrideMask = Cache.shared.overrideMask(for: self)
-      var resolvedMask: LevelMask
-      if let overrideMask {
-        resolvedMask = overrideMask
-      } else {
-        resolvedMask = .threshold(level)
-      }
-      let clampedExposure =
-        globalExposure.naturalIntegralValue
-          <= self.maxExposureLevelLimit.naturalIntegralValue
-        ? globalExposure : self.maxExposureLevelLimit
-      resolvedMask.formIntersection(.threshold(clampedExposure))
-      guard resolvedMask.contains(.single(level)) else { return nil }
-      return resolvedMask.minimumLevel
+    let overrideMask = Cache.shared.overrideMask(for: self)
+    var resolvedMask: LevelMask
+    if let overrideMask {
+      resolvedMask = overrideMask
+    } else {
+      resolvedMask = .threshold(level)
+    }
+    let clampedExposure =
+      globalExposure.naturalIntegralValue
+        <= self.maxExposureLevelLimit.naturalIntegralValue
+      ? globalExposure : self.maxExposureLevelLimit
+    resolvedMask.formIntersection(.threshold(clampedExposure))
+    guard resolvedMask.contains(.single(level)) else { return nil }
+    return resolvedMask.minimumLevel
     #else
-      let configuredLevel = self.maxExposureLevelLimit
-      let clampedExposure =
-        globalExposure.naturalIntegralValue
-          <= self.maxExposureLevelLimit.naturalIntegralValue
-        ? globalExposure : self.maxExposureLevelLimit
-      let effectiveLevel: Logging.Logger.Level
-      if clampedExposure > configuredLevel {
-        effectiveLevel = clampedExposure
-      } else {
-        effectiveLevel = configuredLevel
-      }
-      guard level >= effectiveLevel else { return nil }
-      return effectiveLevel
+    let configuredLevel = self.maxExposureLevelLimit
+    let clampedExposure =
+      globalExposure.naturalIntegralValue
+        <= self.maxExposureLevelLimit.naturalIntegralValue
+      ? globalExposure : self.maxExposureLevelLimit
+    let effectiveLevel: Logging.Logger.Level
+    if clampedExposure > configuredLevel {
+      effectiveLevel = clampedExposure
+    } else {
+      effectiveLevel = configuredLevel
+    }
+    guard level >= effectiveLevel else { return nil }
+    return effectiveLevel
     #endif
   }
 
@@ -453,26 +453,26 @@ public struct Log: Hashable, @unchecked Sendable {
   }
 
   #if canImport(os)
-    private func logOS(
-      _ level: Logging.Logger.Level,
-      describable: Any,
-      pathInfo: Cache.PathInfo,
-      function: String,
-      line: UInt,
-      dso: UnsafeRawPointer
-    ) {
-      let logger = Cache.shared.osLogger(for: self)
-      os_log(
-        level.toOSType,
-        dso: dso,
-        log: logger,
-        "%s-%i|%s| %s",
-        pathInfo.lastPathComponent,
-        line,
-        function,
-        String(describing: describable)
-      )
-    }
+  private func logOS(
+    _ level: Logging.Logger.Level,
+    describable: Any,
+    pathInfo: Cache.PathInfo,
+    function: String,
+    line: UInt,
+    dso: UnsafeRawPointer
+  ) {
+    let logger = Cache.shared.osLogger(for: self)
+    os_log(
+      level.toOSType,
+      dso: dso,
+      log: logger,
+      "%s-%i|%s| %s",
+      pathInfo.lastPathComponent,
+      line,
+      function,
+      String(describing: describable)
+    )
+  }
   #endif  // canImport(os)
 
   private func logSwift(

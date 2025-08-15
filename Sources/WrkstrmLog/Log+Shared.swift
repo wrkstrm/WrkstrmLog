@@ -13,9 +13,9 @@ extension Log {
   {
     didSet {
       #if DEBUG
-        if let mask = Cache.shared.removeOverride(for: oldValue) {
-          Cache.shared.overrideLevel(for: shared, to: mask.minimumLevel)
-        }
+      if let mask = Cache.shared.removeOverride(for: oldValue) {
+        Cache.shared.overrideLevel(for: shared, to: mask.minimumLevel)
+      }
       #endif
       shared.verbose("New Logger: \(shared)")
     }

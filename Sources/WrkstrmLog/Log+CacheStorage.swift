@@ -3,7 +3,7 @@ import Foundation
 import Logging
 
 #if canImport(os)
-  import os
+import os
 #endif
 
 extension Log {
@@ -20,16 +20,16 @@ extension Log {
 
     private var swiftLoggers: [Log: Logging.Logger] = [:]
     #if canImport(os)
-      private var osLoggers: [Log: OSLog] = [:]
+    private var osLoggers: [Log: OSLog] = [:]
     #endif
     #if DEBUG
-      private var overrideLevelMasks: [Log: Log.LevelMask] = [:]
+    private var overrideLevelMasks: [Log: Log.LevelMask] = [:]
     #endif
 
     #if DEBUG
-      private var exposureLevel: Logging.Logger.Level = .trace
+    private var exposureLevel: Logging.Logger.Level = .trace
     #else
-      private var exposureLevel: Logging.Logger.Level = .critical
+    private var exposureLevel: Logging.Logger.Level = .critical
     #endif
 
     struct PathInfo {
@@ -57,18 +57,18 @@ extension Log {
     }
 
     #if canImport(os)
-      /// Returns the cached `OSLog` instance for the provided `Log`, creating one
-      /// if necessary.
-      func osLogger(for log: Log) -> OSLog {
-        queue.sync {
-          if let existing = osLoggers[log] {
-            return existing
-          }
-          let created = OSLog(subsystem: log.system, category: log.category)
-          osLoggers[log] = created
-          return created
+    /// Returns the cached `OSLog` instance for the provided `Log`, creating one
+    /// if necessary.
+    func osLogger(for log: Log) -> OSLog {
+      queue.sync {
+        if let existing = osLoggers[log] {
+          return existing
         }
+        let created = OSLog(subsystem: log.system, category: log.category)
+        osLoggers[log] = created
+        return created
       }
+    }
     #endif
 
     func pathInfo(for file: String) -> PathInfo {
@@ -91,15 +91,15 @@ extension Log {
       queue.sync {
         swiftLoggers.removeAll()
         #if canImport(os)
-          osLoggers.removeAll()
+        osLoggers.removeAll()
         #endif
         #if DEBUG
-          overrideLevelMasks.removeAll()
+        overrideLevelMasks.removeAll()
         #endif
         #if DEBUG
-          exposureLevel = .trace
+        exposureLevel = .trace
         #else
-          exposureLevel = .critical
+        exposureLevel = .critical
         #endif
         pathInfos.removeAll()
       }
@@ -116,13 +116,13 @@ extension Log {
     }
 
     #if canImport(os)
-      /// Current number of cached OSLog loggers. Used in tests.
-      var osLoggerCount: Int { queue.sync { osLoggers.count } }
+    /// Current number of cached OSLog loggers. Used in tests.
+    var osLoggerCount: Int { queue.sync { osLoggers.count } }
 
-      /// Returns whether an OS logger exists for the given `Log`.
-      func hasOSLogger(for log: Log) -> Bool {
-        queue.sync { osLoggers[log] != nil }
-      }
+    /// Returns whether an OS logger exists for the given `Log`.
+    func hasOSLogger(for log: Log) -> Bool {
+      queue.sync { osLoggers[log] != nil }
+    }
     #endif
 
     /// Global log exposure level applied across all loggers. Clamped by each
@@ -142,20 +142,20 @@ extension Log {
       to level: Logging.Logger.Level
     ) {
       #if DEBUG
-        queue.sync { overrideLevelMasks[logger] = Log.LevelMask.threshold(level) }
+      queue.sync { overrideLevelMasks[logger] = Log.LevelMask.threshold(level) }
       #endif
     }
 
     #if DEBUG
-      /// Returns the override mask for the specified logger, if any.
-      func overrideMask(for logger: Log) -> Log.LevelMask? {
-        queue.sync { overrideLevelMasks[logger] }
-      }
+    /// Returns the override mask for the specified logger, if any.
+    func overrideMask(for logger: Log) -> Log.LevelMask? {
+      queue.sync { overrideLevelMasks[logger] }
+    }
 
-      /// Removes and returns the override mask for the specified logger.
-      func removeOverride(for logger: Log) -> Log.LevelMask? {
-        queue.sync { overrideLevelMasks.removeValue(forKey: logger) }
-      }
+    /// Removes and returns the override mask for the specified logger.
+    func removeOverride(for logger: Log) -> Log.LevelMask? {
+      queue.sync { overrideLevelMasks.removeValue(forKey: logger) }
+    }
     #endif
 
     // MARK: - Private
