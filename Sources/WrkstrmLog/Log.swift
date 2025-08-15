@@ -166,7 +166,7 @@ public struct Log: Hashable, @unchecked Sendable {
   ) {
     guard style != .disabled else { return }
     // Verbose messages are lower priority than standard informational logs.
-    // Map them to the debug log level so they can be filtered separately.
+    // Map them to the trace log level so they can be filtered separately.
     log(
       .trace,
       describable: describable,
