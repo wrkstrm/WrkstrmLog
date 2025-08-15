@@ -75,7 +75,7 @@ extension Log {
     )
   }
 
-  /// Logs a info message with the specified parameters.
+  /// Logs an info message with the specified parameters.
   ///
   /// - Parameters:
   ///   - describable: The message string to log.
