@@ -37,8 +37,8 @@ extension Log {
   }
 
   #if canImport(os)
-  static var osLoggerCount: Int {
-    Cache.shared.osLoggerCount
+  static var osCount: Int {
+    Cache.shared.osCount
   }
   #endif
 }

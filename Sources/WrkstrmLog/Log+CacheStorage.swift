@@ -117,7 +117,7 @@ extension Log {
 
     #if canImport(os)
     /// Current number of cached OSLog loggers. Used in tests.
-    var osLoggerCount: Int { queue.sync { osLoggers.count } }
+    var osCount: Int { queue.sync { osLoggers.count } }
 
     /// Returns whether an OS logger exists for the given `Log`.
     func hasOSLogger(for log: Log) -> Bool {
