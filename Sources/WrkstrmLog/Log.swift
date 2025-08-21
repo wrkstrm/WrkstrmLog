@@ -144,6 +144,39 @@ public struct Log: Hashable, @unchecked Sendable {
     return String(function.prefix(maxLength))
   }
 
+  /// Logs a trace message with the specified parameters.
+  ///
+  /// Trace output is mapped to the `.trace` log level so that it has to be enabled manually.
+  /// This is to avoid clogging the console.
+  ///
+  /// - Parameters:
+  ///   - string: The message string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public func trace(
+    _ describable: Any,
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    // Trace messages are lower priority and higher frequency than standard logs.
+    // Map them to the trace log level so they can be filtered separately.
+    log(
+      .trace,
+      describable: describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
+
   /// Logs a verbose message with the specified parameters.
   ///
   /// Verbose output is mapped to the `.debug` log level so it can be
@@ -164,11 +197,10 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) {
-    guard style != .disabled else { return }
     // Verbose messages are lower priority than standard informational logs.
     // Map them to the trace log level so they can be filtered separately.
     log(
-      .trace,
+      .debug,
       describable: describable,
       file: file,
       function: function,
@@ -195,7 +227,6 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) {
-    guard style != .disabled else { return }
     log(
       .debug,
       describable: describable,
@@ -224,7 +255,6 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) {
-    guard style != .disabled else { return }
     log(
       .info,
       describable: describable,
@@ -253,7 +283,6 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) {
-    guard style != .disabled else { return }
     log(
       .notice,
       describable: describable,
@@ -282,7 +311,6 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) {
-    guard style != .disabled else { return }
     log(
       .warning,
       describable: describable,
@@ -311,7 +339,6 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) {
-    guard style != .disabled else { return }
     log(
       .error,
       describable: describable,
@@ -363,6 +390,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column _: UInt,
     dso: UnsafeRawPointer
   ) {
+    guard style != .disabled else { return }
     guard let effectiveLevel = effectiveLevel(for: level) else { return }
     let pathInfo = Inject.pathInfo(for: file)
     let functionString = formattedFunction(function)

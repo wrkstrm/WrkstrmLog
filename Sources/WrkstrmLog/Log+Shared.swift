@@ -20,6 +20,32 @@ extension Log {
       shared.verbose("New Logger: \(shared)")
     }
   }
+  /// Logs a trace message with the specified parameters.
+  ///
+  /// - Parameters:
+  ///   - describable: The message string to log.
+  ///   - file: The source file where the log message is generated.
+  ///   - function: The name of the function where the log message is generated.
+  ///   - line: The line number in the source file where the log message is generated.
+  ///   - column: The column number in the source file where the log message is generated.
+  ///   - dso: The address of the shared object where the log message is generated.
+  public static func trace(
+    _ describable: Any,
+    file: String = #fileID,
+    function: String = #function,
+    line: UInt = #line,
+    column: UInt = #column,
+    dso: UnsafeRawPointer = #dsohandle,
+  ) {
+    Log.shared.trace(
+      describable,
+      file: file,
+      function: function,
+      line: line,
+      column: column,
+      dso: dso,
+    )
+  }
 
   /// Logs a verbose message with the specified parameters.
   ///
