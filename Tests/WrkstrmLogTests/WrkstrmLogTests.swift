@@ -161,7 +161,7 @@ struct WrkstrmLogTests {
 
   /// Checks that increasing global exposure filters messages below the threshold.
   @Test
-  func exposureLimitFiltersMessages() {
+  func exposureLevelFiltersMessages() {
     Log.reset()
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
@@ -172,7 +172,7 @@ struct WrkstrmLogTests {
     #expect(Log.swiftCount == 1)
   }
 
-  /// Verifies a logger's max exposure level is respected even when global limits differ.
+  /// Verifies a logger's max exposure level is respected even when global levels differ.
   @Test
   func loggerMaxExposureLevelRespected() {
     Log.reset()
@@ -185,7 +185,7 @@ struct WrkstrmLogTests {
     #expect(Log.swiftCount == 1)
   }
 
-  /// Validates the debug helper respects exposure limits.
+  /// Validates the debug helper respects exposure levels.
   @Test
   func debugHelperRespectsExposure() {
     Log.reset()
@@ -237,7 +237,7 @@ struct WrkstrmLogTests {
     #expect(stripTimestamp(verboseOutput) == stripTimestamp(debugOutput))
   }
 
-  /// Validates the notice helper respects exposure limits.
+  /// Validates the notice helper respects exposure levels.
   @Test
   func noticeHelperRespectsExposure() {
     Log.reset()
@@ -250,7 +250,7 @@ struct WrkstrmLogTests {
     #expect(Log.swiftCount == 1)
   }
 
-  /// Validates the warning helper respects exposure limits.
+  /// Validates the warning helper respects exposure levels.
   @Test
   func warningHelperRespectsExposure() {
     Log.reset()
@@ -293,9 +293,9 @@ struct WrkstrmLogTests {
     #expect(log.effectiveLevel(for: .info) == .info)
   }
 
-  /// Confirms `isEnabled(for:)` evaluates both global and logger limits.
+  /// Confirms `isEnabled(for:)` evaluates both global and logger levels.
   @Test
-  func isEnabledRespectsExposureLimits() {
+  func isEnabledRespectsExposureLevels() {
     Log.reset()
     Log.globalExposureLevel = .warning
     let log = Log(style: .swift, maxExposureLevel: .info, options: [.prod])

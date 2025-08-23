@@ -150,7 +150,7 @@ log.info("Now logged")
 ### Limiting Log Exposure
 
 WrkstrmLog suppresses messages more verbose than `critical` until you raise the
-global exposure limit. Set `Log.globalExposureLevel` during application startup
+global exposure level. Set `Log.globalExposureLevel` during application startup
 to surface additional detail:
 
 ```swift

@@ -4,7 +4,7 @@
   }
 
   @Section(title: "Create a Logger") {
-    Instantiate a logger with a system, category, and optional exposure limit to organize messages.
+    Instantiate a logger with a system, category, and optional `maxExposureLevel` to opt in to additional logs.
 
     @ContentAndMedia {
     ```swift
@@ -17,7 +17,7 @@
 
   @Section(title: "Control Global Exposure") {
     WrkstrmLog hides messages more verbose than `critical` by default. Raise
-    the global exposure level to view additional details. The previous
+    the global exposure level with `Log.globalExposureLevel` to view additional details. The previous
     `Log.removeExposureLimit` API has been removed; configure the level explicitly.
 
     @ContentAndMedia {
