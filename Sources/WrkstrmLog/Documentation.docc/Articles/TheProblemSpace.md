@@ -147,6 +147,30 @@ log.info("Now logged")
 
 `overrideLevel` is available only in `DEBUG` builds and lets you adjust a logger's level at runtime.
 
+### Limiting Log Exposure
+
+WrkstrmLog suppresses messages more verbose than `critical` until you raise the
+global exposure limit. Set `Log.globalExposureLevel` during application startup
+to surface additional detail:
+
+```swift
+Log.globalExposureLevel = .warning
+```
+
+Each logger may expose extra messages by declaring its own
+`maxExposureLevel`, which clamps the global setting. Libraries opt in to more
+verbose output by increasing this limit:
+
+```swift
+let libraryLogger = Log(system: "Library", category: "Networking", maxExposureLevel: .debug)
+if libraryLogger.maxExposureLevel >= .debug {
+    libraryLogger.debug("Handshake succeeded")
+}
+```
+
+The former `Log.removeExposureLimit` API has been removed, making explicit
+configuration of exposure levels a required step.
+
 ## ⚡ Performance Considerations
 Developing WrkstrmLog presented its own set of challenges, particularly in terms of performance:
 
