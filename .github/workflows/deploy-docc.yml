@@ -43,7 +43,7 @@ jobs:
           output: ./public
           transform-for-static-hosting: 'true'
           disable-indexing: 'false'
-          hosting-base-path: wrkstrm-log
+          hosting-base-path: WrkstrmLog
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
