@@ -27,7 +27,7 @@ jobs:
         with:
           submodules: recursive
       - name: Set up Pages
-        uses: actions/configure-pages@v1
+        uses: actions/configure-pages@v5
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         if: matrix.os == 'macos-latest' || matrix.os == 'macos-15' || matrix.os == 'self-hosted'
@@ -45,7 +45,7 @@ jobs:
           disable-indexing: 'false'
           hosting-base-path: wrkstrm-log
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./public
 
@@ -58,4 +58,5 @@ jobs:
 
     steps:
     - name: Deploy Docs
-      uses: actions/deploy-pages@v1
+      id: deployment
+      uses: actions/deploy-pages@v4
