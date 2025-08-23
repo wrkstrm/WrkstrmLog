@@ -16,7 +16,7 @@ For up-to-date build and platform compatibility reports, visit the [Swift Packag
 - 🔧 Customizable to fit specific logging requirements
 - 🚀 Simple integration with Swift Package Manager
 - 🔕 Optional disabled mode to silence logs
-- 🚦 Global exposure control via `Log.globalExposureLevel` and per-logger `maxExposureLevel` (replaces `Log.removeExposureLimit`)
+- 🚦 Global and per-logger exposure levels via `Log.globalExposureLevel` and `maxExposureLevel` (replaces `Log.removeExposureLimit`)
 - 🆕 Swift 6 `#fileID` support for concise output
 
 ## 📦 Installation
@@ -132,7 +132,7 @@ targets: [
 
 6. **Limit log exposure** 🚦
 
-   Logging is suppressed to `.critical` messages by default. Set a global minimum level during application startup to expose additional logs. The global setting is clamped by each logger's `maxExposureLevel`, requiring libraries to opt in before emitting more verbose messages:
+   Logging is suppressed to `.critical` messages by default. Set the global exposure level during application startup to expose additional logs. The global level is clamped by each logger's `maxExposureLevel`, requiring libraries to opt in before emitting more verbose messages:
 
    ```swift
    Log.globalExposureLevel = .warning
@@ -144,9 +144,9 @@ targets: [
    }
    ```
 
-   The global limit is configured via `Log.globalExposureLevel`. Each logger exposes its
+   The global level is configured via `Log.globalExposureLevel`. Each logger exposes its
    opt-in ceiling through `maxExposureLevel`, ensuring verbose logs are only emitted
-   when both the global and per-logger limits allow. When raising the global limit,
+   when both the global and per-logger levels allow. When raising the global level,
    compare it with each logger's `maxExposureLevel` to avoid surfacing unintended
    verbosity from loggers that opt in to higher levels. The former
    `Log.removeExposureLimit` API has been removed, making explicit configuration

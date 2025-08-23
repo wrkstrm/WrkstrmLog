@@ -4,15 +4,15 @@
 
 ## [2.0.0] - 2025-08-13
 ### Added
-- Introduce a global exposure limit to restrict logging output across libraries. The limit
+- Introduce a global exposure level to restrict logging output across libraries. The level
   defaults to `.critical` and must be configured at startup to enable more verbose logging.
-- Provide a per-logger exposure limit defaulting to `.critical`, exposing a public
+- Provide a per-logger max exposure level defaulting to `.critical`, exposing a public
   `maxExposureLevel` for consumers to inspect.
-- Clamp global exposure increases to each logger's `maxExposureLevel`, ensuring
+- Clamp global exposure raises to each logger's `maxExposureLevel`, ensuring
   opt-in behavior for more verbose logging.
 - Install SwiftLint on Ubuntu runners in CI to enable linting across platforms.
 ### Removed
-- Remove `Log.removeExposureLimit` in favor of requiring an explicit exposure limit.
+- Remove `Log.removeExposureLimit` in favor of requiring explicit `globalExposureLevel` configuration.
 
 ## [1.1.2] - 2024-08-29
 ### Added
