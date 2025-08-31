@@ -3,16 +3,21 @@
 WrkstrmLog is a Swift logging framework. Use these guidelines when contributing to this repository.
 
 ## Scope
-These instructions apply to all files in the WrkstrmLog repository unless a more specific `AGENTS.md` file overrides them.
+
+These instructions apply to all files in the WrkstrmLog repository unless a more specific
+`AGENTS.md` file overrides them.
 
 ## Contribution Guidelines
-- Format any modified Swift files with `swift format --configuration https://raw.githubusercontent.com/wrkstrm/configs/main/linting/.swift-format -i -r -p`. This is the only Swift formatting step to run.
+
+- Format any modified Swift files with
+  `swift format --configuration https://raw.githubusercontent.com/wrkstrm/configs/main/linting/.swift-format -i -r -p`.
+  This is the only Swift formatting step to run.
 - Lint the project with `swiftlint` using the included configuration.
 - Run the full test suite with `swift test` and ensure it passes.
 - Write descriptive commit messages and keep pull requests focused.
 
-
 ## Release Naming Convention
-WrkstrmLog releases are nicknamed after tree species in alphabetical order—a nod to logging.
-For example, v2.1.0 is "Aspen"; upcoming releases will continue with names like "Birch", "Cedar", etc.
+
+WrkstrmLog releases are nicknamed after tree species in alphabetical order—a nod to logging. For
+example, v2.1.0 is "Aspen"; upcoming releases will continue with names like "Birch", "Cedar", etc.
 Use the codename in release notes, tags, and announcements.
