@@ -1,4 +1,4 @@
-import Foundation
+// Foundation not required; keep this portable across platforms.
 
 extension Log {
   /// The shared logger instance, often used for default logging.

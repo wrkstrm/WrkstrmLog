@@ -1,7 +1,10 @@
+// Exclude this Foundation/OSLog-backed cache on WASM builds.
+#if !(os(WASI) || arch(wasm32))
 import Dispatch
+#if canImport(Foundation)
 import Foundation
+#endif
 import Logging
-
 #if canImport(os)
 import os
 #endif
@@ -163,3 +166,5 @@ extension Log {
     private init() {}
   }
 }
+
+#endif  // !(os(WASI) || arch(wasm32))

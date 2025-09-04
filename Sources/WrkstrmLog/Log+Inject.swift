@@ -29,5 +29,51 @@ extension Log {
         }
       }
     }
+
+    // MARK: - Backend Selection (Service Architecture)
+
+    /// Supported logging backends.
+    public enum Backend: Sendable, Hashable {
+      case print
+      case swift
+      #if canImport(os)
+      case os
+      #endif
+      case disabled
+      case auto  // Choose a sensible default for the current platform.
+    }
+
+    /// Runtime-selected backend. Defaults to `.auto`.
+    internal nonisolated(unsafe) static var selectedBackend: Backend = .auto
+
+    /// Selects the active backend at runtime.
+    /// - Note: On WASM builds, selection is clamped to `.print`.
+    public static func setBackend(_ backend: Backend) {
+      #if os(WASI) || arch(wasm32)
+      selectedBackend = .print
+      #else
+      selectedBackend = backend
+      #endif
+    }
+
+    /// Resolves the effective backend for the current platform and selection.
+    internal static func currentBackend() -> Backend {
+      switch selectedBackend {
+      case .auto:
+        #if os(WASI) || arch(wasm32)
+        return .print
+        #elseif canImport(os)
+        return .os
+        #else
+        return .swift
+        #endif
+      default:
+        #if os(WASI) || arch(wasm32)
+        return .print
+        #else
+        return selectedBackend
+        #endif
+      }
+    }
   }
 }

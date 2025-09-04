@@ -9,16 +9,16 @@
 > statements." —Brian Kernighan
 
 WrkstrmLog is a logging framework for Swift that provides consistent, configurable log output across
-Linux, macOS, and Xcode. It offers multiple logging styles and can be completely disabled for
-production builds. 🔧
+Linux, macOS, Xcode, and now WASM. Backends are selected at compile time and logs are disabled by
+default in release builds unless explicitly enabled. 🔧
 
 For up-to-date build and platform compatibility reports, visit the
 [Swift Package Index](https://swiftpackageindex.com/wrkstrm/WrkstrmLog).
 
 ## ✨ Key Features
 
-- 🌐 Adaptive logging across Linux, Xcode, and the macOS terminal
-- 💼 Support for print, OSLog, and SwiftLog styles
+- 🌐 Adaptive logging across Linux, Xcode, macOS terminal, and WASM
+- 💼 Backends: print (WASM), OSLog (Apple), SwiftLog (portable)
 - 🔧 Customizable to fit specific logging requirements
 - 🚀 Simple integration with Swift Package Manager
 - 🔕 Optional disabled mode to silence logs
@@ -120,8 +120,7 @@ targets: [
    the `.disabled` style for a silent logger.
 
    ```swift
-   let silent = Log.disabled
-   let active = Log(style: .swift, options: [.prod])
+   let active = Log(system: "YourSystem", category: "YourCategory", options: [.prod])
    ```
 
 5. **Control log level** 🎚️
@@ -159,6 +158,24 @@ targets: [
    `maxExposureLevel` to avoid surfacing unintended verbosity from loggers that opt in to higher
    levels. The former `Log.removeExposureLimit` API has been removed, making explicit configuration
    of `Log.globalExposureLevel` a required step.
+
+## 🕸️ WASM targeting
+
+- Backend selection is compile-time; on WASM (`#if os(WASI) || arch(wasm32)`) WrkstrmLog uses a
+  print-based backend with no Foundation/OSLog/Dispatch dependencies.
+- The logging API surface (trace, debug, info, notice, warning, error, critical/guard) is identical
+  across platforms.
+- Build example (requires a Swift toolchain with WASI support):
+
+  ```bash
+  swift build --target WrkstrmLog --triple wasm32-unknown-wasi -c release
+  ```
+
+- Notes:
+  - On macOS, Xcode/Swift may write caches to `~/Library` during resolution/build. If running in a
+    sandbox that blocks this, run the build outside the sandbox or allow SwiftPM caches.
+  - No Foundation or OSLog is linked on WASM; output is emitted via `print` in a stable one-line
+    format suitable for console capture.
 
 ## 🧩 Customization
 

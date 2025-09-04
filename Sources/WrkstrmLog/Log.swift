@@ -1,6 +1,9 @@
-import Foundation
 import Logging
 
+#if canImport(Foundation)
+import Foundation
+#endif
+// OSLog only when available (not on WASM)
 #if canImport(os)
 import os
 #endif
@@ -20,7 +23,12 @@ import os
 /// ```
 @preconcurrency
 public struct Log: Hashable, @unchecked Sendable {
-  /// Enum defining different logging styles.
+  /// Concrete backend used by this logger instance.
+  private let backend: any LogBackend
+  // Backward-compatibility shim for projects still passing a runtime style.
+  @available(
+    *, deprecated, message: "Use Log.Inject.setBackend(_:) to select a backend at runtime."
+  )
   public enum Style: Sendable {
     /// Print style, logs messages to standard output.
     /// Typically used for debugging in local or development environments.
@@ -58,37 +66,53 @@ public struct Log: Hashable, @unchecked Sendable {
   /// The category name for the logger. Used to categorize and filter log messages.
   public let category: String
 
-  /// The logging style used by the logger. Defaults to `.os` on Apple
-  /// platforms and `.swift` elsewhere, but is disabled in production unless
-  /// the `.prod` option is specified.
-  public let style: Style
-
   /// Options describing when the logger should be active.
   public let options: Options
 
   /// Internal maximum log level this logger is permitted to expose.
   private let maxExposureLevelLimit: Logging.Logger.Level
 
+  /// When true, this logger is forced disabled regardless of build/options.
+  private let forceDisabled: Bool
+
   /// The maximum log level this logger can emit.
   public var maxExposureLevel: Logging.Logger.Level { maxExposureLevelLimit }
 
-  #if canImport(os)
-  @usableFromInline static let defaultStyle: Style = .os
-  #else  // canImport(os)
-  @usableFromInline static let defaultStyle: Style = .swift
-  #endif  // canImport(os)
+  /// Whether this logger is enabled for output given build configuration and options.
+  /// In Debug, logging is enabled; in Release, require `.prod` to remain active.
+  public var isEnabled: Bool {
+    if forceDisabled { return false }
+    #if DEBUG
+    return true
+    #else
+    return options.contains(.prod)
+    #endif
+  }
 
-  /// A convenience logger instance with logging disabled.
-  /// Useful for cases where a logger must be provided but logging should be suppressed.
-  public static let disabled = Log(style: .disabled)
+  // Best-effort style reporting for compatibility. In release without `.prod`, reports `.disabled`.
+  @available(
+    *, deprecated, message: "Use Log.Inject.currentBackend() to inspect the active backend."
+  )
+  public var style: Style {
+    guard isEnabled else { return .disabled }
+    switch Inject.currentBackend() {
+    case .print: return .print
+    case .swift: return .swift
+    #if canImport(os)
+    case .os: return .os
+    #endif
+    case .disabled: return .disabled
+    case .auto:
+      // Map to resolved default
+      return Self(system: system, category: category).style
+    }
+  }
 
   /// Initializes a new `Log` instance.
   ///
   /// - Parameters:
   ///   - system: The system name for the logger. Defaults to an empty string.
   ///   - category: The category name for the logger. Defaults to an empty string.
-  ///   - style: The logging style used by the logger (`.print`, `.swift`, `.os`, `.disabled`).
-  ///     Defaults to the platform-specific `defaultStyle`.
   ///   - maxExposureLevel: The maximum log level permitted for this logger. Defaults to `.critical`.
   ///   - options: Configuration options for the logger. Use `.prod` to keep the
   ///     logger active in production. Defaults to an empty set.
@@ -100,7 +124,24 @@ public struct Log: Hashable, @unchecked Sendable {
   public init(
     system: String = "",
     category: String = "",
-    style: Style = ProcessInfo.inXcodeEnvironment ? defaultStyle : .print,
+    maxExposureLevel: Logging.Logger.Level = .critical,
+    options: Options = [],
+    backend: (any LogBackend)? = nil
+  ) {
+    self.system = system
+    self.category = category
+    self.options = options
+    self.maxExposureLevelLimit = maxExposureLevel
+    self.forceDisabled = false
+    self.backend = backend ?? Log.makeDefaultBackend()
+  }
+
+  // Deprecated initializer retaining the old `style:` parameter for source compatibility.
+  @available(*, deprecated, message: "Pass only system/category; backend is compile-time selected.")
+  public init(
+    system: String = "",
+    category: String = "",
+    style: Style,
     maxExposureLevel: Logging.Logger.Level = .critical,
     options: Options = []
   ) {
@@ -108,29 +149,67 @@ public struct Log: Hashable, @unchecked Sendable {
     self.category = category
     self.options = options
     self.maxExposureLevelLimit = maxExposureLevel
-    #if DEBUG
-    self.style = style
+    self.forceDisabled = (style == .disabled)
+    // Map the legacy style selection to a concrete backend.
+    #if canImport(os)
+    switch style {
+    case .print: self.backend = PrintLogBackend()
+    case .swift: self.backend = SwiftLogBackend()
+    case .os: self.backend = OSLogBackend()
+    case .disabled: self.backend = DisabledLogBackend()
+    }
     #else
-    self.style = options.contains(.prod) ? style : .disabled
+    switch style {
+    case .print: self.backend = PrintLogBackend()
+    case .swift: self.backend = SwiftLogBackend()
+    case .disabled: self.backend = DisabledLogBackend()
+    }
     #endif
   }
+
+  // Private designated initializer for factory helpers
+  private init(
+    system: String,
+    category: String,
+    options: Options,
+    maxExposureLevel: Logging.Logger.Level,
+    forceDisabled: Bool,
+    backend: any LogBackend
+  ) {
+    self.system = system
+    self.category = category
+    self.options = options
+    self.maxExposureLevelLimit = maxExposureLevel
+    self.forceDisabled = forceDisabled
+    self.backend = backend
+  }
+
+  /// A convenience logger instance with logging disabled regardless of build configuration.
+  public static let disabled: Log = .init(
+    system: "",
+    category: "",
+    options: [],
+    maxExposureLevel: .critical,
+    forceDisabled: true,
+    backend: Log.makeDefaultBackend()
+  )
 
   /// Maximum length for the function name in log messages.
   public var maxFunctionLength: Int?
 
   public static func == (lhs: Log, rhs: Log) -> Bool {
     lhs.system == rhs.system && lhs.category == rhs.category
-      && lhs.style == rhs.style
       && lhs.options == rhs.options
       && lhs.maxExposureLevelLimit == rhs.maxExposureLevelLimit
+      && lhs.forceDisabled == rhs.forceDisabled
   }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(system)
     hasher.combine(category)
-    hasher.combine(style)
     hasher.combine(options)
     hasher.combine(maxExposureLevelLimit)
+    hasher.combine(forceDisabled)
   }
 
   /// Formats the function name to fit within the specified maximum length.
@@ -368,7 +447,7 @@ public struct Log: Hashable, @unchecked Sendable {
     column: UInt = #column,
     dso: UnsafeRawPointer = #dsohandle,
   ) -> Never {
-    guard style != .disabled else { fatalErrorHandler() }
+    guard isEnabled else { fatalErrorHandler() }
     log(
       .critical,
       describable: describable ?? "",
@@ -390,49 +469,26 @@ public struct Log: Hashable, @unchecked Sendable {
     column _: UInt,
     dso: UnsafeRawPointer
   ) {
-    guard style != .disabled else { return }
-    guard let effectiveLevel = effectiveLevel(for: level) else { return }
-    let pathInfo = Inject.pathInfo(for: file)
+    guard isEnabled else { return }
+    guard effectiveLevel(for: level) != nil else { return }
     let functionString = formattedFunction(function)
-    switch style {
-    case .print:
-      logPrint(
-        level,
-        fileName: pathInfo.fileName,
-        function: functionString,
-        line: line,
-        describable: describable
-      )
-    #if canImport(os)
-    case .os:
-      logOS(
-        level,
-        describable: describable,
-        pathInfo: pathInfo,
-        function: functionString,
-        line: line,
-        dso: dso
-      )
-    #endif  // canImport(os)
-    case .swift:
-      logSwift(
-        level,
-        effectiveLevel: effectiveLevel,
-        describable: describable,
-        pathInfo: pathInfo,
-        function: functionString,
-        file: file,
-        line: line
-      )
-    case .disabled:
-      break
-    }
+    // Pass through to the selected concrete backend.
+    let context: any CommonLogContext = SwiftCommonLogContext()
+    backend.log(
+      level,
+      message: String(describing: describable),
+      logger: self,
+      file: file,
+      function: functionString,
+      line: line,
+      context: context
+    )
   }
 
   internal func effectiveLevel(
     for level: Logging.Logger.Level
   ) -> Logging.Logger.Level? {
-    guard style != .disabled else { return nil }
+    guard isEnabled else { return nil }
     let globalExposure = Cache.shared.globalExposureLevel
     #if DEBUG
     let overrideMask = Cache.shared.overrideMask(for: self)
@@ -523,6 +579,21 @@ public struct Log: Hashable, @unchecked Sendable {
     )
   }
 
+}
+
+// MARK: - Backend defaults
+
+extension Log {
+  /// Choose a default backend at compile time based on platform.
+  internal static func makeDefaultBackend() -> any LogBackend {
+    #if os(WASI) || arch(wasm32)
+    return PrintLogBackend()
+    #elseif canImport(os)
+    return OSLogBackend()
+    #else
+    return SwiftLogBackend()
+    #endif
+  }
 }
 
 extension Log {

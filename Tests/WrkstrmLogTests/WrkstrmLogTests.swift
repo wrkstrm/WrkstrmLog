@@ -59,7 +59,11 @@ struct WrkstrmLogTests {
     var mutated = log
     mutated.maxFunctionLength = 10
     mutated.info("second")
+    #if canImport(os)
+    #expect(Log.osCount == 1)
+    #else
     #expect(Log.swiftCount == 1)
+    #endif
   }
 
   /// Confirms hashing ignores mutable properties that do not affect identity.
@@ -278,7 +282,7 @@ struct WrkstrmLogTests {
   func effectiveLevelUsesGlobalWhenBelowMax() {
     Log.reset()
     Log.globalExposureLevel = .debug
-    let log = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    let log = Log(maxExposureLevel: .trace, options: [.prod])
     #expect(log.effectiveLevel(for: .debug) == .debug)
     #expect(log.effectiveLevel(for: .trace) == nil)
   }
