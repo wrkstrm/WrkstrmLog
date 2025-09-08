@@ -26,6 +26,38 @@ For up-to-date build and platform compatibility reports, visit the
   (replaces `Log.removeExposureLimit`)
 - 🆕 Swift 6 `#fileID` support for concise output
 
+## 🧭 Migration (next major)
+
+We are deprecating “style” in favor of explicit backend(s). In the next major
+release, `Log.Style` and `init(style:)` will be removed. Use backend instances
+instead. Common mappings:
+
+```swift
+// Before
+let log1 = Log(system: "App", category: "UI", style: .os)
+let log2 = Log(system: "Srv", category: "Net", style: .swift)
+
+// After (single backend)
+let log1 = Log(system: "App", category: "UI", backends: [OSLogBackend()])
+let log2 = Log(system: "Srv", category: "Net", backends: [SwiftLogBackend()])
+
+// After (multi-backend fan-out; primary is index 0)
+let capture = /* CapturingLogBackend(...) */
+let log3 = Log(system: "App", category: "UI", backends: [OSLogBackend(), capture])
+```
+
+Injection mapping:
+
+```swift
+// Before
+Log.Inject.setBackend(.os)
+
+// After
+Log.Inject.setBackends([OSLogBackend()])
+```
+
+Behavior remains unchanged unless you opt into multiple backends.
+
 ## 📦 Installation
 
 ### 🛠️ Swift Package Manager

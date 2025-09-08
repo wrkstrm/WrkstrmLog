@@ -235,3 +235,12 @@ options in WrkstrmLog! 📚🔍
 
 For more information, visit our [GitHub repository](https://github.com/wrkstrm/WrkstrmLog) or the
 [SPI site](https://swiftpackageindex.com/wrkstrm/WrkstrmLog). Happy logging! 🎉📝
+
+## Planned changes (next major)
+
+WrkstrmLog is transitioning away from the legacy “style” naming toward explicit
+backend/backend(s) selection. In the next major release, `Log.Style` and
+`init(style:)` will be removed in favor of constructors that accept explicit
+backends. Multi-backend fan-out will be supported (primary = index 0).
+
+See the project’s `MIGRATION.md` and changelog for mappings and examples.
