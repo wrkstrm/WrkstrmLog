@@ -43,37 +43,146 @@ extension Log {
       case auto  // Choose a sensible default for the current platform.
     }
 
-    /// Runtime-selected backend. Defaults to `.auto`.
+    /// Runtime-selected single backend (legacy). Defaults to `.auto`.
+    /// Kept for backward compatibility with earlier callers.
     internal nonisolated(unsafe) static var selectedBackend: Backend = .auto
 
-    /// Selects the active backend at runtime.
+    /// Runtime-selected ordered list of backends. When set, index 0 is treated
+    /// as the primary backend. If unset, resolution falls back to the legacy
+    /// single-backend selection logic.
+    internal nonisolated(unsafe) static var selectedBackends: [Backend]? = nil
+
+    /// Convenience: selects a single active backend at runtime.
+    /// Same as calling `setBackends([backend])`.
     /// - Note: On WASM builds, selection is clamped to `.print`.
     public static func setBackend(_ backend: Backend) {
       #if os(WASI) || arch(wasm32)
       selectedBackend = .print
+      selectedBackends = [.print]
       #else
       selectedBackend = backend
+      selectedBackends = [backend]
+      #endif
+    }
+
+    /// Selects the active ordered list of backends at runtime.
+    /// - Note: On WASM builds, selection is clamped to `[.print]` regardless of input.
+    public static func setBackends(_ backends: [Backend]) {
+      #if os(WASI) || arch(wasm32)
+      selectedBackends = [.print]
+      selectedBackend = .print
+      #else
+      // Preserve order; empty input resets to platform default behavior.
+      selectedBackends = backends.isEmpty ? nil : backends
+      selectedBackend = backends.first ?? .auto
+      #endif
+    }
+
+    /// Appends a backend to the ordered list if not already present.
+    /// If no backends are set yet, this becomes the sole backend.
+    /// - Note: On WASM builds, selection is clamped to `[.print]`.
+    public static func appendBackend(_ backend: Backend) {
+      #if os(WASI) || arch(wasm32)
+      selectedBackends = [.print]
+      selectedBackend = .print
+      return
+      #else
+      if selectedBackends == nil {
+        selectedBackends = [backend]
+        selectedBackend = backend
+        return
+      }
+      if let existing = selectedBackends, !existing.contains(backend) {
+        selectedBackends = existing + [backend]
+        selectedBackend = selectedBackends?.first ?? .auto
+      }
+      #endif
+    }
+
+    /// Removes a backend kind from the ordered list, if present.
+    /// If the list becomes empty, reverts to platform default behavior.
+    /// - Note: On WASM builds, selection is clamped to `[.print]`.
+    public static func removeBackend(_ backend: Backend) {
+      #if os(WASI) || arch(wasm32)
+      selectedBackends = [.print]
+      selectedBackend = .print
+      return
+      #else
+      guard let existing = selectedBackends else { return }
+      let filtered = existing.filter { $0 != backend }
+      if filtered.isEmpty {
+        selectedBackends = nil
+        selectedBackend = .auto
+      } else {
+        selectedBackends = filtered
+        selectedBackend = filtered.first!
+      }
+      #endif
+    }
+
+    /// Clears any custom backend selection, reverting to platform default behavior.
+    /// On WASM, clamps to `[.print]`.
+    public static func removeAllCustomBackends() {
+      #if os(WASI) || arch(wasm32)
+      selectedBackends = [.print]
+      selectedBackend = .print
+      #else
+      selectedBackends = nil
+      selectedBackend = .auto
       #endif
     }
 
     /// Resolves the effective backend for the current platform and selection.
     internal static func currentBackend() -> Backend {
+      // Prefer array resolution when available, falling back to the legacy
+      // single-backend selection for source compatibility.
+      if let first = currentBackends().first {
+        return first
+      }
+      // Should not happen; return platform default.
+      #if os(WASI) || arch(wasm32)
+      return .print
+      #elseif canImport(os)
+      return .os
+      #else
+      return .swift
+      #endif
+    }
+
+    /// Resolves the effective ordered list of backends for the current platform
+    /// and selection. When not explicitly set, returns a single platform-default
+    /// backend.
+    internal static func currentBackends() -> [Backend] {
+      if let explicit = selectedBackends {
+        #if os(WASI) || arch(wasm32)
+        return [.print]
+        #else
+        return explicit
+        #endif
+      }
+      // Resolve from legacy single selection
       switch selectedBackend {
       case .auto:
         #if os(WASI) || arch(wasm32)
-        return .print
+        return [.print]
         #elseif canImport(os)
-        return .os
+        return [.os]
         #else
-        return .swift
+        return [.swift]
         #endif
       default:
         #if os(WASI) || arch(wasm32)
-        return .print
+        return [.print]
         #else
-        return selectedBackend
+        return [selectedBackend]
         #endif
       }
+    }
+
+    /// Reset injection state to platform defaults. Intended for tests.
+    internal static func resetInjection() {
+      selectedBackends = nil
+      selectedBackend = .auto
     }
   }
 }

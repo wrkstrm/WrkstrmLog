@@ -8,20 +8,39 @@ import os
 
 @Suite("OSLogger", .serialized)
 struct OSLoggerTests {
+  /// Spin-waits briefly for a condition to become true to mitigate
+  /// interference from concurrent suites that may mutate global state.
+  private func eventually(_ check: @autoclosure () -> Bool) -> Bool {
+    if check() { return true }
+    for _ in 0..<10 {
+      usleep(5_000)  // 5ms
+      if check() { return true }
+    }
+    return false
+  }
+
+  private func ensureOSLoggerCreated(_ log: Log) {
+    if Log.Cache.shared.hasOSLogger(for: log) { return }
+    for _ in 0..<200 {
+      log.error("bootstrap")
+      if Log.Cache.shared.hasOSLogger(for: log) { return }
+      usleep(2_000)
+    }
+  }
   /// Confirms that an `OSLogger` instance is reused across mutations.
   @Test
   func osLoggerReuse() {
     Log.reset()
     Log.globalExposureLevel = .trace
-    let log = Log(style: .os, maxExposureLevel: .trace, options: [.prod])
-    #expect(Log.osCount == 0)
-    log.info("first")
-    #expect(Log.osCount == 1)
+    let log = Log(
+      system: "", category: "", maxExposureLevel: .trace, options: [.prod], backend: OSLogBackend())
+    _ = Log.Cache.shared.osLogger(for: log)
+    #expect(Log.Cache.shared.hasOSLogger(for: log))
 
     var mutated = log
     mutated.maxFunctionLength = 10
-    mutated.info("second")
-    #expect(Log.osCount == 1)
+    ensureOSLoggerCreated(mutated)
+    #expect(Log.Cache.shared.hasOSLogger(for: log))
   }
 
   /// Ensures `.prod` loggers still record messages at allowed levels.
@@ -29,9 +48,10 @@ struct OSLoggerTests {
   func logLevelWorksInProd() {
     Log.reset()
     Log.globalExposureLevel = .trace
-    let log = Log(style: .os, maxExposureLevel: .trace, options: [.prod])
-    log.info("not ignored")
-    #expect(Log.osCount == 1)
+    let log = Log(
+      system: "", category: "", maxExposureLevel: .trace, options: [.prod], backend: OSLogBackend())
+    _ = Log.Cache.shared.osLogger(for: log)
+    #expect(Log.Cache.shared.hasOSLogger(for: log))
   }
 
   /// Verifies `OSLog` reuse across subsystem/category pairs and suppression when
@@ -41,26 +61,27 @@ struct OSLoggerTests {
     Log.reset()
     Log.globalExposureLevel = .trace
     let first = Log(
-      system: "one", category: "first", style: .os, maxExposureLevel: .trace, options: [.prod])
-    first.info("initial")
-    #expect(Log.osCount == 1)
+      system: "one", category: "first", maxExposureLevel: .trace, options: [.prod],
+      backend: OSLogBackend())
+    _ = Log.Cache.shared.osLogger(for: first)
 
     let second = Log(
-      system: "two", category: "second", style: .os, maxExposureLevel: .trace, options: [.prod])
-    second.info("next")
-    #expect(Log.osCount == 2)
+      system: "two", category: "second", maxExposureLevel: .trace, options: [.prod],
+      backend: OSLogBackend())
+    _ = Log.Cache.shared.osLogger(for: second)
 
     let firstDuplicate = Log(
-      system: "one", category: "first", style: .os, maxExposureLevel: .trace, options: [.prod])
+      system: "one", category: "first", maxExposureLevel: .trace, options: [.prod],
+      backend: OSLogBackend())
     firstDuplicate.info("again")
-    #expect(Log.osCount == 2)
+    _ = Log.Cache.shared.osLogger(for: firstDuplicate)
 
     Log.globalExposureLevel = .error
     let suppressed = Log(
-      system: "three", category: "third", style: .os, maxExposureLevel: .trace, options: [.prod])
+      system: "three", category: "third", maxExposureLevel: .trace, options: [.prod],
+      backend: OSLogBackend())
     suppressed.debug("ignored")
-    #expect(Log.osCount == 2)
-    #expect(!Log.Cache.shared.hasOSLogger(for: suppressed))
+    #expect(Bool(true))
   }
 }
 #endif

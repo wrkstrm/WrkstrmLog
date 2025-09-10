@@ -25,6 +25,8 @@ import os
 public struct Log: Hashable, @unchecked Sendable {
   /// Concrete backend used by this logger instance.
   private let backend: any LogBackend
+  /// Decorator for message formatting. Defaults to current style.
+  public var decorator: any LogDecorator = Decorator.Current()
   // Backward-compatibility shim for projects still passing a runtime style.
   @available(
     *, deprecated, message: "Use Log.Inject.setBackend(_:) to select a backend at runtime."
@@ -134,6 +136,28 @@ public struct Log: Hashable, @unchecked Sendable {
     self.maxExposureLevelLimit = maxExposureLevel
     self.forceDisabled = false
     self.backend = backend ?? Log.makeDefaultBackend()
+  }
+
+  /// Initializes a new `Log` instance using an ordered list of backends.
+  /// The first backend is treated as the primary.
+  public init(
+    system: String = "",
+    category: String = "",
+    maxExposureLevel: Logging.Logger.Level = .critical,
+    options: Options = [],
+    backends: [any LogBackend]
+  ) {
+    self.system = system
+    self.category = category
+    self.options = options
+    self.maxExposureLevelLimit = maxExposureLevel
+    self.forceDisabled = false
+    // Use index 0 as the primary backend; fall back to default if empty.
+    if let first = backends.first {
+      self.backend = first
+    } else {
+      self.backend = Log.makeDefaultBackend()
+    }
   }
 
   // Deprecated initializer retaining the old `style:` parameter for source compatibility.
@@ -586,13 +610,29 @@ public struct Log: Hashable, @unchecked Sendable {
 extension Log {
   /// Choose a default backend at compile time based on platform.
   internal static func makeDefaultBackend() -> any LogBackend {
-    #if os(WASI) || arch(wasm32)
-    return PrintLogBackend()
-    #elseif canImport(os)
-    return OSLogBackend()
-    #else
-    return SwiftLogBackend()
+    // Resolve from injected selection first (primary = index 0),
+    // otherwise choose a sensible platform default.
+    switch Inject.currentBackend() {
+    case .print:
+      return PrintLogBackend()
+    case .swift:
+      return SwiftLogBackend()
+    #if canImport(os)
+    case .os:
+      return OSLogBackend()
     #endif
+    case .disabled:
+      return DisabledLogBackend()
+    case .auto:
+      // Fall through to platform default below
+      #if os(WASI) || arch(wasm32)
+      return PrintLogBackend()
+      #elseif canImport(os)
+      return OSLogBackend()
+      #else
+      return SwiftLogBackend()
+      #endif
+    }
   }
 }
 

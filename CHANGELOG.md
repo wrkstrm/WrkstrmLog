@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- Log.Inject runtime management helpers:
+  - `setBackend(_:)` convenience (single-kind)
+  - `setBackends(_:)` (ordered kinds; primary = index 0)
+  - `appendBackend(_:)` (no-dup append)
+  - `removeBackend(_:)` (kind removal; preserves order)
+  - `removeAllCustomBackends()` (clear selection; revert to platform default)
+- Log.Decorator:
+  - `Decorator.Current` (default): preserves existing formatted body
+  - `Decorator.Plain`: message-only body (no file/function/line)
+  - `Decorator.JSON` (Foundation-only): JSON-encodes message + metadata keys
+
 ## [3.0.0] - TBD
 
 ### Breaking
@@ -14,6 +27,8 @@
 
 - Backend-first API surface with support for multi-backend fan-out (primary =
   index 0). Injection APIs support setting an ordered list of backends.
+- Soft deprecation wrappers retained for `Log.Style` and `Inject.setBackend(_:)` to
+  enable incremental migration; new `Log.init(backends:)` and `Inject.setBackends(_:)` added.
 
 ### Changed
 

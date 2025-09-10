@@ -26,6 +26,7 @@ extension Log {
   static func reset() {
     Cache.shared.reset()
     Inject.usePathInfoCache(true)
+    Inject.resetInjection()
   }
 
   static var swiftCount: Int {

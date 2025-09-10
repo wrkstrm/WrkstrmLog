@@ -14,10 +14,15 @@ public struct PrintLogBackend: LogBackend, Sendable {
   ) {
     let sys = context.system(for: logger)
     let cat = context.category(for: logger)
-    let fileName = context.fileName(for: file)
-    let fn = context.formattedFunction(function, maxLength: logger.maxFunctionLength)
-    Swift.print(
-      "\(sys):\(cat):\(level.emoji) \(fileName):\(String(line))|\(fn)| "
-        + String(describing: message()))
+    let body = logger.decorator.format(
+      level,
+      message: message(),
+      logger: logger,
+      file: file,
+      function: function,
+      line: line,
+      context: context
+    )
+    Swift.print("\(sys):\(cat):\(level.emoji) \(body)")
   }
 }

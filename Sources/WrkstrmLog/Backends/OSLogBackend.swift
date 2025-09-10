@@ -1,4 +1,4 @@
-#if canImport(os)
+#if canImport(Foundation) && !os(WASI) && canImport(os)
 import Logging
 import os
 
@@ -14,9 +14,8 @@ public struct OSLogBackend: LogBackend, Sendable {
     line: UInt,
     context: any CommonLogContext
   ) {
-    let subsystem = context.system(for: logger)
-    let category = context.category(for: logger)
-    let oslog = OSLog(subsystem: subsystem, category: category)
+    // Reuse cached OSLog for compatibility and performance.
+    let oslog = Log.Cache.shared.osLogger(for: logger)
     let last = context.lastPathComponent(for: file)
     let fn = context.formattedFunction(function, maxLength: logger.maxFunctionLength)
     os_log(

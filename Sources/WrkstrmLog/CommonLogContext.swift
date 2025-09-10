@@ -51,7 +51,7 @@ public struct SwiftCommonLogContext: CommonLogContext, Sendable {
   public init() {}
 }
 
-#if canImport(os)
+#if canImport(Foundation) && !os(WASI) && canImport(os)
 /// OSLog backend context — default computed values are sufficient.
 public struct OSCommonLogContext: CommonLogContext, Sendable {
   public init() {}

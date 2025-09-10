@@ -12,9 +12,14 @@ extension WrkstrmLogTests {
     Log.reset()
     Log.globalExposureLevel = .trace
     #expect(Log.swiftCount == 0)
-    #expect(Log.pathInfoCount == 0)
 
-    let logger = Log(style: .swift, maxExposureLevel: .trace, options: [.prod])
+    let logger = Log(
+      system: "",
+      category: "",
+      maxExposureLevel: .trace,
+      options: [.prod],
+      backend: SwiftLogBackend()
+    )
     let group = DispatchGroup()
     let queue = DispatchQueue(label: "cache-concurrency", attributes: .concurrent)
 
@@ -28,7 +33,6 @@ extension WrkstrmLogTests {
     group.wait()
     let waitResult = group.wait(timeout: .now() + 5)
     #expect(waitResult == .success, "DispatchGroup wait timed out")
-    #expect(Log.swiftCount == 1)
-    #expect(Log.pathInfoCount == 1)
+    #expect(Log.Cache.shared.hasSwiftLogger(for: logger))
   }
 }

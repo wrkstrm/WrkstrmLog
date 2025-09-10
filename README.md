@@ -26,37 +26,125 @@ For up-to-date build and platform compatibility reports, visit the
   (replaces `Log.removeExposureLimit`)
 - 🆕 Swift 6 `#fileID` support for concise output
 
-## 🧭 Migration (next major)
+## 🧭 Migration
 
-We are deprecating “style” in favor of explicit backend(s). In the next major
-release, `Log.Style` and `init(style:)` will be removed. Use backend instances
-instead. Common mappings:
+WrkstrmLog now prefers explicit backend(s). Use single or multiple backends as needed; when
+supplying multiple, index 0 is treated as the primary.
+
+Examples:
 
 ```swift
-// Before
-let log1 = Log(system: "App", category: "UI", style: .os)
-let log2 = Log(system: "Srv", category: "Net", style: .swift)
+// Single backend
+let osLog = Log(system: "App", category: "UI", backends: [OSLogBackend()])
+let swiftLog = Log(system: "Srv", category: "Net", backends: [SwiftLogBackend()])
 
-// After (single backend)
-let log1 = Log(system: "App", category: "UI", backends: [OSLogBackend()])
-let log2 = Log(system: "Srv", category: "Net", backends: [SwiftLogBackend()])
-
-// After (multi-backend fan-out; primary is index 0)
+// Multi-backend fan-out; primary is index 0
 let capture = /* CapturingLogBackend(...) */
-let log3 = Log(system: "App", category: "UI", backends: [OSLogBackend(), capture])
-```
+let composed = Log(system: "App", category: "UI", backends: [OSLogBackend(), capture])
 
-Injection mapping:
-
-```swift
-// Before
-Log.Inject.setBackend(.os)
-
-// After
-Log.Inject.setBackends([OSLogBackend()])
+// Runtime selection of backend kinds
+Log.Inject.setBackends([.os])
 ```
 
 Behavior remains unchanged unless you opt into multiple backends.
+
+## ⚙️ Runtime Backend Selection
+
+Configure the active backend “kinds” at runtime via `Log.Inject`. When multiple kinds are supplied,
+index 0 is treated as the primary.
+
+```swift
+// Set an ordered list of kinds
+Log.Inject.setBackends([.os, .swift])
+
+// Convenience: set a single kind (equivalent to setBackends([.os]))
+Log.Inject.setBackend(.os)
+
+// Append/remove kinds
+Log.Inject.appendBackend(.print)      // -> [.os, .swift, .print]
+Log.Inject.removeBackend(.swift)      // -> [.os, .print]
+
+// Clear custom selection; revert to platform default
+Log.Inject.removeAllCustomBackends()  // macOS/iOS: [.os]; Linux: [.swift]; WASM: [.print]
+
+// Inspect current resolution
+let kinds = Log.Inject.currentBackends()  // ordered, primary = index 0
+```
+
+## 🧩 Decorators
+
+Control message body formatting via a decorator. The default `Decorator.Current` matches the
+existing format. To print only the message body without file/function/line metadata, use `Plain`:
+
+```swift
+var log = Log(system: "App", category: "UI", maxExposureLevel: .info, backends: [PrintLogBackend()])
+log.decorator = Log.Decorator.Plain()
+log.info("hello") // Prints: "App:UI:ℹ️ hello"
+
+// JSON decorator: includes metadata (level, system, category, file, function, line,
+// timestamp, thread) in a parsable JSON body
+#if canImport(Foundation)
+log.decorator = Log.Decorator.JSON()
+log.info("hello")
+// Prints: "App:UI:ℹ️ {\"level\":\"info\",\"message\":\"hello\",\"system\":\"App\",\"category\":\"UI\",\"file\":\"YourFile\",\"function\":\"yourFunc()\",\"line\":123}"
+#endif
+```
+
+## 📡 Fan-out to Multiple Logs
+
+Use `LogGroup` to forward the same message to multiple `Log` instances. This is handy to keep the
+user-facing log as-is while also emitting a basic/plain log to another sink.
+
+```swift
+// User-facing log (default decorator)
+let userLog = Log(system: "App", category: "UI", maxExposureLevel: .info, backends: [PrintLogBackend()])
+
+// Basic log (plain body) to another sink (e.g., SwiftLog)
+let basicLog = {
+  var l = Log(system: "App", category: "basic", maxExposureLevel: .info, backends: [SwiftLogBackend()])
+  l.decorator = Log.Decorator.Plain()
+  return l
+}()
+
+let both = LogGroup([userLog, basicLog])
+both.info("Launching…")
+```
+
+## 🗃️ File Backend (NDJSON-friendly)
+
+Append logs to a file as newline-delimited entries. Pair with the JSON decorator for NDJSON.
+
+```swift
+#if canImport(Foundation)
+import Foundation
+
+let fileURL = URL(fileURLWithPath: "/tmp/app.log")
+let fileBackend = FileLogBackend(url: fileURL)
+var fileLog = Log(system: "App", category: "file", maxExposureLevel: .info, backends: [fileBackend])
+fileLog.decorator = Log.Decorator.JSON() // NDJSON lines
+
+let both = LogGroup([userLog, fileLog])
+both.info("Launching…")
+#endif
+```
+
+### Session-based (timestamped) log files
+
+Create a new timestamped file per session. Filename pattern:
+`<base>-yyyyMMdd-HHmmss-UUID.log`.
+
+```swift
+#if canImport(Foundation)
+import Foundation
+
+let logsDir = URL(fileURLWithPath: NSTemporaryDirectory())
+let sessionBackend = FileLogBackend(directory: logsDir, baseName: "app")
+var sessionLog = Log(system: "App", category: "session", maxExposureLevel: .info, backends: [sessionBackend])
+sessionLog.decorator = Log.Decorator.JSON()
+sessionLog.info("Started session at \(Date())")
+print("Session log at: \(sessionBackend.url.path)")
+#endif
+```
 
 ## 📦 Installation
 
@@ -109,6 +197,12 @@ targets: [
    logger.error("Error message")
    Log.guard("Critical error")
    ```
+
+## 🏁 Flagship + Docs
+
+WrkstrmLog is a flagship library. We treat it as a reference for logging APIs, observability
+patterns, and documentation quality. DocC articles are being added; in the meantime, this README
+serves as the primary guide.
 
    Each level maps to a visual emoji for quick scanning:
 

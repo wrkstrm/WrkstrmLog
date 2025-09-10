@@ -1,7 +1,8 @@
 # Migration Guide: Style → Backend(s)
 
 This guide helps you migrate from legacy “style” APIs to explicit
-backend/backend(s) in the next major release (3.0.0).
+backend/backend(s). Style APIs are soft‑deprecated now; wrappers remain to ease
+incremental migration. The next major (3.0.0) removes them.
 
 ## Summary
 
@@ -9,20 +10,15 @@ backend/backend(s) in the next major release (3.0.0).
 - Use explicit backend instances. Multi-backend fan-out is supported with
   primary = index 0 (backward-compatible defaults keep a single backend).
 
-## Constructor mappings
+## Constructors
 
 ```swift
-// Before
-let log1 = Log(system: "App", category: "UI", style: .os)
-let log2 = Log(system: "Srv", category: "Net", style: .swift)
-let log3 = Log(system: "Tool", category: "IO", style: .print)
-
-// After (single backend)
+// Single backend
 let log1 = Log(system: "App", category: "UI", backends: [OSLogBackend()])
 let log2 = Log(system: "Srv", category: "Net", backends: [SwiftLogBackend()])
 let log3 = Log(system: "Tool", category: "IO", backends: [PrintLogBackend()])
 
-// After (multi-backend fan-out; primary is index 0)
+// Multi-backend fan-out; primary is index 0
 let capture = /* CapturingLogBackend(...) */
 let log4 = Log(system: "App", category: "UI", backends: [OSLogBackend(), capture])
 ```
@@ -30,15 +26,10 @@ let log4 = Log(system: "App", category: "UI", backends: [OSLogBackend(), capture
 ## Injection mappings
 
 ```swift
-// Before
-Log.Inject.setBackend(.os)
-Log.Inject.setBackend(.swift)
-Log.Inject.setBackend(.print)
-
-// After
-Log.Inject.setBackends([OSLogBackend()])
-Log.Inject.setBackends([SwiftLogBackend()])
-Log.Inject.setBackends([PrintLogBackend()])
+// Select kinds; construction can receive concrete instances
+Log.Inject.setBackends([.os])
+Log.Inject.setBackends([.swift])
+Log.Inject.setBackends([.print])
 ```
 
 Notes:

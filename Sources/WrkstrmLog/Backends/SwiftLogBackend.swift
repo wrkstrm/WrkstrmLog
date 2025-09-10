@@ -12,15 +12,20 @@ public struct SwiftLogBackend: LogBackend, Sendable {
     line: UInt,
     context: any CommonLogContext
   ) {
-    let swiftLogger = Logging.Logger(label: context.system(for: logger))
-    // Intentionally avoid global state; log as-is.
-    swiftLogger.log(
-      level: level,
-      "\(line)|\(context.formattedFunction(function, maxLength: logger.maxFunctionLength))| \(String(describing: message()))",
-      source: context.source(for: file),
+    // Reuse cached Swift logger for compatibility and performance.
+    // We do not compute effective level here; use the current level as a floor.
+    let swiftLogger = Log.Cache.shared.logger(for: logger, effectiveLevel: level)
+    let body = logger.decorator.format(
+      level,
+      message: message(),
+      logger: logger,
       file: file,
       function: function,
-      line: line
+      line: line,
+      context: context
     )
+    swiftLogger.log(
+      level: level, "\(body)", source: context.source(for: file), file: file, function: function,
+      line: line)
   }
 }

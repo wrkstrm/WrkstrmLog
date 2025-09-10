@@ -27,13 +27,36 @@
     }
   }
 
-  @Section(title: "Choose a Logging Style") {
-    Select the output style appropriate for your platform or environment.
+  @Section(title: "Choose Backends") {
+    Select the backend(s) appropriate for your platform or environment. When multiple are supplied,
+    index 0 is treated as the primary.
 
     @ContentAndMedia {
     ```swift
-    let osLogger = Log(system: "ExampleApp", category: "Startup", style: .os)
-    let printLogger = Log(system: "ExampleApp", category: "Startup", style: .print)
+    let osLogger = Log(system: "ExampleApp", category: "Startup", backends: [OSLogBackend()])
+    let printLogger = Log(system: "ExampleApp", category: "Startup", backends: [PrintLogBackend()])
+    ```
+    }
+  }
+
+  @Section(title: "Runtime Backend Selection") {
+    Adjust the active backend kinds at runtime. When multiple are set, index 0 is treated as
+    the primary.
+
+    @ContentAndMedia {
+    ```swift
+    // Set an ordered list of kinds
+    Log.Inject.setBackends([.os, .swift])
+
+    // Convenience: set a single kind
+    Log.Inject.setBackend(.os)
+
+    // Append/remove kinds
+    Log.Inject.appendBackend(.print)
+    Log.Inject.removeBackend(.swift)
+
+    // Clear custom selection; revert to platform default
+    Log.Inject.removeAllCustomBackends()
     ```
     }
   }

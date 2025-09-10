@@ -1,4 +1,4 @@
-#if canImport(os)
+#if canImport(Foundation) && !os(WASI) && canImport(os)
 import Logging
 import os
 
