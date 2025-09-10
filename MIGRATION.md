@@ -33,6 +33,7 @@ Log.Inject.setBackends([.print])
 ```
 
 Notes:
+
 - Omit injection to use platform defaults, or set a single explicit backend.
 - Multi-backend is optional; the default remains identical to prior releases.
 

@@ -204,41 +204,41 @@ WrkstrmLog is a flagship library. We treat it as a reference for logging APIs, o
 patterns, and documentation quality. DocC articles are being added; in the meantime, this README
 serves as the primary guide.
 
-   Each level maps to a visual emoji for quick scanning:
+Each level maps to a visual emoji for quick scanning:
 
-   | Level    | Emoji |
-   | -------- | :---: |
-   | trace    |  🔍   |
-   | debug    |  🐞   |
-   | info     |  ℹ️   |
-   | notice   |  📝   |
-   | warning  |  ⚠️   |
-   | error    |  ❗   |
-   | critical |  🚨   |
+| Level    | Emoji |
+| -------- | :---: |
+| trace    |  🔍   |
+| debug    |  🐞   |
+| info     |  ℹ️   |
+| notice   |  📝   |
+| warning  |  ⚠️   |
+| error    |  ❗   |
+| critical |  🚨   |
 
-   Each log level represents a different severity and use case. `verbose` messages map to the
-   `debug` level and are emitted at the same severity.
+Each log level represents a different severity and use case. `verbose` messages map to the
+`debug` level and are emitted at the same severity.
 
-   **trace** captures extremely fine-grained details such as function entry, exit, or loop
-   iterations—useful for deep troubleshooting during development but rarely enabled in production.
+**trace** captures extremely fine-grained details such as function entry, exit, or loop
+iterations—useful for deep troubleshooting during development but rarely enabled in production.
 
-   **debug** records diagnostic information like configuration values or request payloads. Enable it
-   when investigating issues or verifying behavior.
+**debug** records diagnostic information like configuration values or request payloads. Enable it
+when investigating issues or verifying behavior.
 
-   **info** notes general events in the application lifecycle, such as successful network calls or
-   completed tasks. These messages are useful for understanding normal operation.
+**info** notes general events in the application lifecycle, such as successful network calls or
+completed tasks. These messages are useful for understanding normal operation.
 
-   **notice** highlights notable events that aren't errors or warnings, like a user signing in or a
-   cache refresh. They call attention without implying a problem.
+**notice** highlights notable events that aren't errors or warnings, like a user signing in or a
+cache refresh. They call attention without implying a problem.
 
-   **warning** flags potential issues that might require attention, such as retrying a request or
-   using a deprecated API.
+**warning** flags potential issues that might require attention, such as retrying a request or
+using a deprecated API.
 
-   **error** indicates a failure in an operation that the app can often recover from, for example a
-   failed save that triggers a retry.
+**error** indicates a failure in an operation that the app can often recover from, for example a
+failed save that triggers a retry.
 
-   **critical** signals serious problems that usually halt execution or result in data loss and
-   should be addressed immediately.
+**critical** signals serious problems that usually halt execution or result in data loss and
+should be addressed immediately.
 
 4. **Disable or enable logging in production** 🔇
 

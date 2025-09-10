@@ -1,6 +1,6 @@
 @Metadata {
-  @Title("Backends Overview")
-  @PageKind(article)
+@Title("Backends Overview")
+@PageKind(article)
 }
 
 WrkstrmLog supports multiple output backends; pick one per logger or fan‑out to many.
@@ -43,4 +43,3 @@ Silences output completely.
 let quiet = Log(system: "App", category: "silent", backends: [DisabledLogBackend()])
 quiet.info("won't print")
 ```
-

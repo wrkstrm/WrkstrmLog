@@ -55,6 +55,7 @@
   - `Log.Inject.setBackend(.auto)` → omit, or set a single default backend explicitly.
 
 Notes:
+
 - Multi-backend is optional; default remains a single backend with identical
   behavior to prior releases when using the platform default.
 

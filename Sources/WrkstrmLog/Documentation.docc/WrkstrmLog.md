@@ -1,6 +1,6 @@
 @Metadata {
-  @Title("WrkstrmLog")
-  @PageKind(article)
+@Title("WrkstrmLog")
+@PageKind(article)
 }
 
 WrkstrmLog is a flexible, multi‑backend logging library. It is a flagship module for observability practices and documentation quality.
@@ -8,23 +8,27 @@ WrkstrmLog is a flexible, multi‑backend logging library. It is a flagship modu
 ## Topics
 
 ### Core
-- ``Log``
-- ``LogGroup``
-- ``LogBackend``
+
+- `Log`
+- `LogGroup`
+- `LogBackend`
 
 ### Guides
+
 - <doc:GettingStarted>
 - <doc:LogIndex>
 - <doc:BackendsOverview>
 - <doc:DecoratorsOverview>
 
 ### Decorators
-- ``Log/Decorator``
+
+- `Log/Decorator`
 
 ### Backends
-- ``PrintLogBackend``
-- ``SwiftLogBackend``
-#if canImport(os)
-- ``OSLogBackend``
-#endif
-- ``DisabledLogBackend``
+
+- `PrintLogBackend`
+- `SwiftLogBackend`
+  #if canImport(os)
+- `OSLogBackend`
+  #endif
+- `DisabledLogBackend`

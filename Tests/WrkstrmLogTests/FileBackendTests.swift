@@ -85,7 +85,9 @@ struct FileBackendTests {
     Log.globalExposureLevel = .trace
     let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("wrkstrmlog_rot")
     let backend = FileLogBackend(directory: dir, baseName: "rot", maxBytes: 32)
-    var log = Log(system: "sys", category: "file", maxExposureLevel: .trace, options: [.prod], backends: [backend])
+    var log = Log(
+      system: "sys", category: "file", maxExposureLevel: .trace, options: [.prod],
+      backends: [backend])
     log.decorator = Log.Decorator.Plain()
 
     // Each line + newline is > 16 bytes; two writes should force rotation beyond 32
@@ -104,10 +106,17 @@ struct FileBackendTests {
   func dailyRotation() throws {
     Log.reset()
     Log.globalExposureLevel = .trace
-    let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("wrkstrmlog_dayrot")
+    let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(
+      "wrkstrmlog_dayrot")
     // Freeze time to a known day then switch to next day
-    var day1 = DateComponents(calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(secondsFromGMT: 0), year: 2025, month: 9, day: 9, hour: 12).date!
-    var day2 = DateComponents(calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(secondsFromGMT: 0), year: 2025, month: 9, day: 10, hour: 0, minute: 1).date!
+    var day1 = DateComponents(
+      calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(secondsFromGMT: 0), year: 2025,
+      month: 9, day: 9, hour: 12
+    ).date!
+    var day2 = DateComponents(
+      calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(secondsFromGMT: 0), year: 2025,
+      month: 9, day: 10, hour: 0, minute: 1
+    ).date!
     var calls = 0
     FileLogBackend._now = {
       defer { calls += 1 }
@@ -116,7 +125,9 @@ struct FileBackendTests {
     defer { FileLogBackend._now = { Date() } }
 
     let backend = FileLogBackend(directory: dir, baseName: "day", maxBytes: nil, rollDaily: true)
-    var log = Log(system: "sys", category: "file", maxExposureLevel: .trace, options: [.prod], backends: [backend])
+    var log = Log(
+      system: "sys", category: "file", maxExposureLevel: .trace, options: [.prod],
+      backends: [backend])
     log.decorator = Log.Decorator.Plain()
 
     log.info("first-day")

@@ -1,6 +1,6 @@
 @Metadata {
-  @Title("Getting Started with WrkstrmLog")
-  @PageKind(article)
+@Title("Getting Started with WrkstrmLog")
+@PageKind(article)
 }
 
 Learn the basics of creating loggers, choosing backends, and formatting output.
@@ -57,4 +57,3 @@ fileLog.decorator = Log.Decorator.JSON()
 let both = LogGroup([log, fileLog])
 both.info("hello")
 ```
-

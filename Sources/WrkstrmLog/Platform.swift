@@ -13,4 +13,3 @@ internal func wrk_hostname() -> String {
   return "wasm"
   #endif
 }
-

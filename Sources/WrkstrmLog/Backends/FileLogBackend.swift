@@ -21,12 +21,14 @@ public struct FileLogBackend: LogBackend, Sendable {
     let timeZone: TimeZone
     var currentDayStamp: String?
 
-    init(url: URL,
-         rotationDirectory: URL? = nil,
-         rotationBaseName: String? = nil,
-         maxBytes: Int64? = nil,
-         rollDaily: Bool = false,
-         timeZone: TimeZone = TimeZone(secondsFromGMT: 0)!) {
+    init(
+      url: URL,
+      rotationDirectory: URL? = nil,
+      rotationBaseName: String? = nil,
+      maxBytes: Int64? = nil,
+      rollDaily: Bool = false,
+      timeZone: TimeZone = TimeZone(secondsFromGMT: 0)!
+    ) {
       self.url = url
       self.rotationDirectory = rotationDirectory
       self.rotationBaseName = rotationBaseName
@@ -89,15 +91,15 @@ public struct FileLogBackend: LogBackend, Sendable {
             // Size-based rotation
             if let limit = maxBytes, limit > 0 {
               let currentSize: Int64 = {
-                if #available(iOS 13.4, macOS 10.15.4, tvOS 13.4, watchOS 6.5, *) {
-                  do { return Int64(try h.offset()) } catch { return 0 }
-                } else {
+                guard #available(iOS 13.4, macOS 10.15.4, tvOS 13.4, watchOS 6.5, *) else {
                   return Int64(h.seekToEndOfFile())
                 }
+                do { return Int64(try h.offset()) } catch { return 0 }
               }()
               if currentSize + Int64(data.count) > limit,
-                 let dir = rotationDirectory,
-                 let base = rotationBaseName {
+                let dir = rotationDirectory,
+                let base = rotationBaseName
+              {
                 // Close current file
                 if #available(iOS 13.4, macOS 10.15.4, tvOS 13.4, watchOS 6.5, *) {
                   try? h.close()
@@ -150,7 +152,10 @@ public struct FileLogBackend: LogBackend, Sendable {
   /// Creates a new session log file in the given directory with a timestamped filename.
   /// The filename pattern is: `<baseName>-yyyyMMdd-HHmmss-UUID.log`.
   /// Optionally sets a maximum size in bytes; when exceeded, rolls to a new timestamped file.
-  public init(directory: URL, baseName: String = "log", maxBytes: Int64? = nil, rollDaily: Bool = false, timeZone: TimeZone = TimeZone(secondsFromGMT: 0)!) {
+  public init(
+    directory: URL, baseName: String = "log", maxBytes: Int64? = nil, rollDaily: Bool = false,
+    timeZone: TimeZone = TimeZone(secondsFromGMT: 0)!
+  ) {
     let df = DateFormatter()
     df.locale = Locale(identifier: "en_US_POSIX")
     df.timeZone = TimeZone(secondsFromGMT: 0)
@@ -159,7 +164,9 @@ public struct FileLogBackend: LogBackend, Sendable {
     let name = "\(baseName)-\(stamp)-\(UUID().uuidString).log"
     let url = directory.appendingPathComponent(name)
     // Do not share rotation-enabled sinks globally; keep per-backend instance
-    self.sink = Sink(url: url, rotationDirectory: directory, rotationBaseName: baseName, maxBytes: maxBytes, rollDaily: rollDaily, timeZone: timeZone)
+    self.sink = Sink(
+      url: url, rotationDirectory: directory, rotationBaseName: baseName, maxBytes: maxBytes,
+      rollDaily: rollDaily, timeZone: timeZone)
   }
 
   public func log(

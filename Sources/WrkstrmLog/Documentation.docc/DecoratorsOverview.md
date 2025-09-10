@@ -1,6 +1,6 @@
 @Metadata {
-  @Title("Decorators Overview")
-  @PageKind(article)
+@Title("Decorators Overview")
+@PageKind(article)
 }
 
 Decorators control how a `Log` formats its message body.
@@ -31,4 +31,3 @@ var log = Log(system: "App", category: "plain")
 log.decorator = Log.Decorator.Plain()
 log.info("hello")
 ```
-
