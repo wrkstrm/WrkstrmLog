@@ -25,6 +25,7 @@ import os
 public struct Log: Hashable, @unchecked Sendable {
   /// Concrete backend used by this logger instance.
   private let backend: any LogBackend
+  internal let contextID: UInt64
   /// Decorator for message formatting. Defaults to current style.
   public var decorator: any LogDecorator = Decorator.Current()
   // Backward-compatibility shim for projects still passing a runtime style.
@@ -130,12 +131,14 @@ public struct Log: Hashable, @unchecked Sendable {
     options: Options = [],
     backend: (any LogBackend)? = nil
   ) {
+    let contextID = Cache.shared.currentThreadContextID()
     self.system = system
     self.category = category
     self.options = options
     self.maxExposureLevelLimit = maxExposureLevel
     self.forceDisabled = false
     self.backend = backend ?? Log.makeDefaultBackend()
+    self.contextID = contextID
   }
 
   /// Initializes a new `Log` instance using an ordered list of backends.
@@ -147,17 +150,18 @@ public struct Log: Hashable, @unchecked Sendable {
     options: Options = [],
     backends: [any LogBackend]
   ) {
+    let contextID = Cache.shared.currentThreadContextID()
     self.system = system
     self.category = category
     self.options = options
     self.maxExposureLevelLimit = maxExposureLevel
     self.forceDisabled = false
-    // Use index 0 as the primary backend; fall back to default if empty.
     if let first = backends.first {
       self.backend = first
     } else {
       self.backend = Log.makeDefaultBackend()
     }
+    self.contextID = contextID
   }
 
   // Deprecated initializer retaining the old `style:` parameter for source compatibility.
@@ -169,6 +173,7 @@ public struct Log: Hashable, @unchecked Sendable {
     maxExposureLevel: Logging.Logger.Level = .critical,
     options: Options = []
   ) {
+    let contextID = Cache.shared.currentThreadContextID()
     self.system = system
     self.category = category
     self.options = options
@@ -189,6 +194,7 @@ public struct Log: Hashable, @unchecked Sendable {
     case .disabled: self.backend = DisabledLogBackend()
     }
     #endif
+    self.contextID = contextID
   }
 
   // Private designated initializer for factory helpers
@@ -198,7 +204,8 @@ public struct Log: Hashable, @unchecked Sendable {
     options: Options,
     maxExposureLevel: Logging.Logger.Level,
     forceDisabled: Bool,
-    backend: any LogBackend
+    backend: any LogBackend,
+    contextID: UInt64
   ) {
     self.system = system
     self.category = category
@@ -206,6 +213,7 @@ public struct Log: Hashable, @unchecked Sendable {
     self.maxExposureLevelLimit = maxExposureLevel
     self.forceDisabled = forceDisabled
     self.backend = backend
+    self.contextID = contextID
   }
 
   /// A convenience logger instance with logging disabled regardless of build configuration.
@@ -215,7 +223,8 @@ public struct Log: Hashable, @unchecked Sendable {
     options: [],
     maxExposureLevel: .critical,
     forceDisabled: true,
-    backend: Log.makeDefaultBackend()
+    backend: Log.makeDefaultBackend(),
+    contextID: Cache.shared.currentThreadContextID()
   )
 
   /// Maximum length for the function name in log messages.
@@ -226,6 +235,7 @@ public struct Log: Hashable, @unchecked Sendable {
       && lhs.options == rhs.options
       && lhs.maxExposureLevelLimit == rhs.maxExposureLevelLimit
       && lhs.forceDisabled == rhs.forceDisabled
+      && lhs.contextID == rhs.contextID
   }
 
   public func hash(into hasher: inout Hasher) {
@@ -234,6 +244,7 @@ public struct Log: Hashable, @unchecked Sendable {
     hasher.combine(options)
     hasher.combine(maxExposureLevelLimit)
     hasher.combine(forceDisabled)
+    hasher.combine(contextID)
   }
 
   /// Formats the function name to fit within the specified maximum length.
@@ -493,20 +504,22 @@ public struct Log: Hashable, @unchecked Sendable {
     column _: UInt,
     dso: UnsafeRawPointer
   ) {
-    guard isEnabled else { return }
-    guard effectiveLevel(for: level) != nil else { return }
-    let functionString = formattedFunction(function)
-    // Pass through to the selected concrete backend.
-    let context: any CommonLogContext = SwiftCommonLogContext()
-    backend.log(
-      level,
-      message: String(describing: describable),
-      logger: self,
-      file: file,
-      function: functionString,
-      line: line,
-      context: context
-    )
+    Cache.shared.withContext(contextID) {
+      guard isEnabled else { return }
+      guard effectiveLevel(for: level) != nil else { return }
+      let functionString = formattedFunction(function)
+      // Pass through to the selected concrete backend.
+      let context: any CommonLogContext = SwiftCommonLogContext()
+      backend.log(
+        level,
+        message: String(describing: describable),
+        logger: self,
+        file: file,
+        function: functionString,
+        line: line,
+        context: context
+      )
+    }
   }
 
   internal func effectiveLevel(
