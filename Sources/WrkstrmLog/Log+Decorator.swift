@@ -102,7 +102,7 @@ extension Log {
         var tid: UInt64 = 0
         if pthread_threadid_np(nil, &tid) == 0 { threadId = tid }
         #elseif canImport(Glibc)
-        let tid = syscall(SYS_gettid)
+        let tid = pthread_self()
         if tid > 0 { threadId = UInt64(tid) }
         #endif
 

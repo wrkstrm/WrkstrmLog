@@ -19,21 +19,26 @@ extension Log {
     /// Shared cache used across the library.
     static let shared = Cache()
 
+    private struct ContextState {
+      var swiftLoggers: [Log: Logging.Logger] = [:]
+      #if canImport(os)
+      var osLoggers: [Log: OSLog] = [:]
+      #endif
+      #if DEBUG
+      var overrideLevelMasks: [Log: Log.LevelMask] = [:]
+      var exposureLevel: Logging.Logger.Level = .trace
+      #else
+      var overrideLevelMasks: [Log: Log.LevelMask] = [:]
+      var exposureLevel: Logging.Logger.Level = .critical
+      #endif
+      var pathInfos: [String: PathInfo] = [:]
+    }
+
     private let queue = DispatchQueue(label: "wrkstrm.log.logger")
+    private var contexts: [UInt64: ContextState] = [0: ContextState()]
+    private var nextContextID: UInt64 = 1
 
-    private var swiftLoggers: [Log: Logging.Logger] = [:]
-    #if canImport(os)
-    private var osLoggers: [Log: OSLog] = [:]
-    #endif
-    #if DEBUG
-    private var overrideLevelMasks: [Log: Log.LevelMask] = [:]
-    #endif
-
-    #if DEBUG
-    private var exposureLevel: Logging.Logger.Level = .trace
-    #else
-    private var exposureLevel: Logging.Logger.Level = .critical
-    #endif
+    private static let threadContextKey = "WrkstrmLog.Cache.ContextID"
 
     struct PathInfo {
       let url: URL
@@ -41,20 +46,71 @@ extension Log {
       let lastPathComponent: String
     }
 
-    private var pathInfos: [String: PathInfo] = [:]
+    private init() {}
+
+    // MARK: - Context Management
+
+    func currentThreadContextID() -> UInt64 {
+      if let number = Thread.current.threadDictionary[Self.threadContextKey] as? NSNumber {
+        return number.uint64Value
+      }
+      return 0
+    }
+
+    func resetForCurrentThread() {
+      let newID = queue.sync { () -> UInt64 in
+        let identifier = nextContextID
+        nextContextID += 1
+        contexts[identifier] = ContextState()
+        return identifier
+      }
+      Thread.current.threadDictionary[Self.threadContextKey] = NSNumber(value: newID)
+    }
+
+    func withContext<T>(_ id: UInt64, _ body: () throws -> T) rethrows -> T {
+      let dictionary = Thread.current.threadDictionary
+      let previous = dictionary[Self.threadContextKey]
+      dictionary[Self.threadContextKey] = NSNumber(value: id)
+      defer {
+        if let previous {
+          dictionary[Self.threadContextKey] = previous
+        } else {
+          dictionary.removeObject(forKey: Self.threadContextKey)
+        }
+      }
+      return try body()
+    }
+
+    private func updateContext<R>(id: UInt64, _ body: (inout ContextState) -> R) -> R {
+      queue.sync {
+        var state = contexts[id] ?? ContextState()
+        let result = body(&state)
+        contexts[id] = state
+        return result
+      }
+    }
+
+    private func readContext<R>(id: UInt64, _ body: (ContextState) -> R) -> R {
+      queue.sync {
+        let state = contexts[id] ?? ContextState()
+        return body(state)
+      }
+    }
+
+    // MARK: - Logger Caches
 
     /// Returns the cached Swift logger for the provided `Log` instance, creating
     /// one if necessary and updating its log level to `effectiveLevel`.
     func logger(for log: Log, effectiveLevel: Logging.Logger.Level) -> Logging.Logger {
-      queue.sync {
-        if var existing = swiftLoggers[log] {
+      updateContext(id: log.contextID) { state in
+        if var existing = state.swiftLoggers[log] {
           existing.logLevel = effectiveLevel
-          swiftLoggers[log] = existing
+          state.swiftLoggers[log] = existing
           return existing
         }
         var newLogger = Logging.Logger(label: log.system)
         newLogger.logLevel = effectiveLevel
-        swiftLoggers[log] = newLogger
+        state.swiftLoggers[log] = newLogger
         return newLogger
       }
     }
@@ -63,76 +119,81 @@ extension Log {
     /// Returns the cached `OSLog` instance for the provided `Log`, creating one
     /// if necessary.
     func osLogger(for log: Log) -> OSLog {
-      queue.sync {
-        if let existing = osLoggers[log] {
+      updateContext(id: log.contextID) { state in
+        if let existing = state.osLoggers[log] {
           return existing
         }
         let created = OSLog(subsystem: log.system, category: log.category)
-        osLoggers[log] = created
+        state.osLoggers[log] = created
         return created
       }
     }
     #endif
 
     func pathInfo(for file: String) -> PathInfo {
-      queue.sync {
-        if let existing = pathInfos[file] {
+      let contextID = currentThreadContextID()
+      return updateContext(id: contextID) { state in
+        if let existing = state.pathInfos[file] {
           return existing
         }
         let url = URL(fileURLWithPath: file)
         let lastComponent = url.lastPathComponent
         let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
         let info = PathInfo(url: url, fileName: trimmed, lastPathComponent: lastComponent)
-        pathInfos[file] = info
+        state.pathInfos[file] = info
         return info
       }
     }
 
-    /// Removes all cached loggers and resets the global exposure level. Intended
-    /// primarily for tests.
+    /// Removes all cached loggers and resets the global exposure level for the
+    /// current thread context. Intended primarily for tests.
     func reset() {
-      queue.sync {
-        swiftLoggers.removeAll()
-        #if canImport(os)
-        osLoggers.removeAll()
-        #endif
-        #if DEBUG
-        overrideLevelMasks.removeAll()
-        #endif
-        #if DEBUG
-        exposureLevel = .trace
-        #else
-        exposureLevel = .critical
-        #endif
-        pathInfos.removeAll()
-      }
+      resetForCurrentThread()
     }
 
-    /// Current number of cached SwiftLog loggers. Used in tests.
-    var swiftCount: Int { queue.sync { swiftLoggers.count } }
+    /// Current number of cached SwiftLog loggers in the current context.
+    var swiftCount: Int {
+      let id = currentThreadContextID()
+      return readContext(id: id) { $0.swiftLoggers.count }
+    }
 
-    var pathInfoCount: Int { queue.sync { pathInfos.count } }
+    var pathInfoCount: Int {
+      let id = currentThreadContextID()
+      return readContext(id: id) { $0.pathInfos.count }
+    }
 
-    /// Returns whether a Swift logger exists for the given `Log`.
+    /// Returns whether a Swift logger exists for the given `Log` in its context.
     func hasSwiftLogger(for log: Log) -> Bool {
-      queue.sync { swiftLoggers[log] != nil }
+      readContext(id: log.contextID) { $0.swiftLoggers[log] != nil }
     }
 
     #if canImport(os)
-    /// Current number of cached OSLog loggers. Used in tests.
-    var osCount: Int { queue.sync { osLoggers.count } }
+    /// Current number of cached OSLog loggers in the current context.
+    var osCount: Int {
+      let id = currentThreadContextID()
+      return readContext(id: id) { $0.osLoggers.count }
+    }
 
-    /// Returns whether an OS logger exists for the given `Log`.
+    /// Returns whether an OS logger exists for the given `Log` in its context.
     func hasOSLogger(for log: Log) -> Bool {
-      queue.sync { osLoggers[log] != nil }
+      readContext(id: log.contextID) { $0.osLoggers[log] != nil }
     }
     #endif
 
-    /// Global log exposure level applied across all loggers. Clamped by each
-    /// logger's `maxExposureLevel`.
+    /// Global log exposure level applied across all loggers in the current context.
     var globalExposureLevel: Logging.Logger.Level {
-      get { queue.sync { exposureLevel } }
-      set { queue.sync { exposureLevel = newValue } }
+      get {
+        let id = currentThreadContextID()
+        return readContext(id: id) { $0.exposureLevel }
+      }
+      set {
+        let id = currentThreadContextID()
+        queue.sync {
+          var state = contexts[id] ?? ContextState()
+          state.exposureLevel = newValue
+          contexts[id] = state
+        }
+      }
     }
 
     /// Overrides the minimum logging level for the specified logger. Available
@@ -145,25 +206,25 @@ extension Log {
       to level: Logging.Logger.Level
     ) {
       #if DEBUG
-      queue.sync { overrideLevelMasks[logger] = Log.LevelMask.threshold(level) }
+      updateContext(id: logger.contextID) { state in
+        state.overrideLevelMasks[logger] = Log.LevelMask.threshold(level)
+      }
       #endif
     }
 
     #if DEBUG
     /// Returns the override mask for the specified logger, if any.
     func overrideMask(for logger: Log) -> Log.LevelMask? {
-      queue.sync { overrideLevelMasks[logger] }
+      readContext(id: logger.contextID) { $0.overrideLevelMasks[logger] }
     }
 
     /// Removes and returns the override mask for the specified logger.
     func removeOverride(for logger: Log) -> Log.LevelMask? {
-      queue.sync { overrideLevelMasks.removeValue(forKey: logger) }
+      updateContext(id: logger.contextID) { state in
+        state.overrideLevelMasks.removeValue(forKey: logger)
+      }
     }
     #endif
-
-    // MARK: - Private
-
-    private init() {}
   }
 }
 
