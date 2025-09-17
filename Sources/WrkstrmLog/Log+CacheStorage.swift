@@ -28,7 +28,6 @@ extension Log {
       var overrideLevelMasks: [Log: Log.LevelMask] = [:]
       var exposureLevel: Logging.Logger.Level = .trace
       #else
-      var overrideLevelMasks: [Log: Log.LevelMask] = [:]
       var exposureLevel: Logging.Logger.Level = .critical
       #endif
       var pathInfos: [String: PathInfo] = [:]
