@@ -1,4 +1,4 @@
-#if canImport(Foundation)
+#if canImport(Dispatch)
 import Foundation
 import Dispatch
 import Logging
