@@ -26,3 +26,9 @@ These instructions apply to all files in the WrkstrmLog repository unless a more
 WrkstrmLog releases are nicknamed after tree species in alphabetical order—a nod to logging. For
 example, v2.1.0 is "Aspen"; upcoming releases will continue with names like "Birch", "Cedar", etc.
 Use the codename in release notes, tags, and announcements.
+
+## Assistant Operating Mode
+
+- Git command approval: do not run any `git` commands without explicit user approval
+  (including but not limited to `clone`, `status`, `add`, `commit`, `reset`, `rebase`, `push`,
+  `submodule`, `config`). Prefer reading workspace files over invoking `git` when possible.
