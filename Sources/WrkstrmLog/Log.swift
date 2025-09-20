@@ -640,7 +640,12 @@ extension Log {
       // Fall through to platform default below
       #if os(WASI) || arch(wasm32)
       return PrintLogBackend()
-      #elseif canImport(os)
+      #elseif canImport(Foundation) && !os(WASI)
+      if !ProcessInfo.inXcodeEnvironment {
+        return PrintLogBackend()
+      }
+      #endif
+      #if canImport(os)
       return OSLogBackend()
       #else
       return SwiftLogBackend()
