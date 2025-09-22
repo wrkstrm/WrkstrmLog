@@ -119,6 +119,7 @@ public struct Log: Hashable, @unchecked Sendable {
   ///   - maxExposureLevel: The maximum log level permitted for this logger. Defaults to `.critical`.
   ///   - options: Configuration options for the logger. Use `.prod` to keep the
   ///     logger active in production. Defaults to an empty set.
+  ///   - backend: Provide a concrete backend to override the default platform selection.
   ///
   /// Example:
   /// ```
@@ -264,7 +265,7 @@ public struct Log: Hashable, @unchecked Sendable {
   /// This is to avoid clogging the console.
   ///
   /// - Parameters:
-  ///   - string: The message string to log.
+  ///   - describable: The object or value to log.
   ///   - file: The source file where the log message is generated.
   ///   - function: The name of the function where the log message is generated.
   ///   - line: The line number in the source file where the log message is generated.
@@ -297,7 +298,7 @@ public struct Log: Hashable, @unchecked Sendable {
   /// easily filtered separately from informational logs.
   ///
   /// - Parameters:
-  ///   - string: The message string to log.
+  ///   - describable: The object or value to log.
   ///   - file: The source file where the log message is generated.
   ///   - function: The name of the function where the log message is generated.
   ///   - line: The line number in the source file where the log message is generated.
@@ -439,7 +440,7 @@ public struct Log: Hashable, @unchecked Sendable {
   /// Logs an error message with the specified parameters.
   ///
   /// - Parameters:
-  ///   - string: The message string to log.
+  ///   - describable: The object or value to log.
   ///   - file: The source file where the log message is generated.
   ///   - function: The name of the function where the log message is generated.
   ///   - line: The line number in the source file where the log message is generated.
@@ -467,7 +468,7 @@ public struct Log: Hashable, @unchecked Sendable {
   /// Logs a critical message and triggers a fatal error.
   ///
   /// - Parameters:
-  ///   - string: The message string to log.
+  ///   - describable: The object or value to log.
   ///   - file: The source file where the log message is generated.
   ///   - function: The name of the function where the log message is generated.
   ///   - line: The line number in the source file where the log message is generated.

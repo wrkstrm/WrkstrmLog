@@ -1,7 +1,4 @@
-@Metadata {
-@Title("Backends Overview")
-@PageKind(article)
-}
+# Backends overview
 
 WrkstrmLog supports multiple output backends; pick one per logger or fan‑out to many.
 

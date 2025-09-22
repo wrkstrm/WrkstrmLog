@@ -16,6 +16,12 @@ These instructions apply to all files in the WrkstrmLog repository unless a more
 - Run the full test suite with `swift test` and ensure it passes.
 - Write descriptive commit messages and keep pull requests focused.
 
+## Documentation
+
+- Tutorials and how-to material for WrkstrmLog must live in this package's `.docc`
+  bundle. DocC keeps the guides human-grade and still approachable for LLMs, so do not park
+  them in standalone Markdown files.
+
 ## Platform notes
 
 - WASM (wasi) support: the library builds on WASM by excluding Foundation- and OSLog-dependent code via conditional compilation. Available backends on WASM: Print (and SwiftLog if available). OSLog backend and Xcode helpers are excluded.

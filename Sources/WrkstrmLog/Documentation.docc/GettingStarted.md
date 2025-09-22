@@ -1,7 +1,4 @@
-@Metadata {
-@Title("Getting Started with WrkstrmLog")
-@PageKind(article)
-}
+# Getting started with WrkstrmLog
 
 Learn the basics of creating loggers, choosing backends, and formatting output.
 

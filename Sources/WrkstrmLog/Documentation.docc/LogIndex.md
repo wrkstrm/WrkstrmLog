@@ -1,7 +1,4 @@
-@Metadata {
-@Title("Logging Index")
-@PageKind(article)
-}
+# Logging index
 
 Key logging symbols and structure in WrkstrmLog.
 
@@ -9,21 +6,19 @@ Key logging symbols and structure in WrkstrmLog.
 
 ### Loggers
 
-- `Log`
-- `LogGroup`
+- ``Log``
+- ``LogGroup``
 
 ### Backends
 
-- `LogBackend`
-- `PrintLogBackend`
-- `SwiftLogBackend`
-  #if canImport(os)
-- `OSLogBackend`
-  #endif
-- `DisabledLogBackend`
+- ``LogBackend``
+- ``PrintLogBackend``
+- ``SwiftLogBackend``
+- ``OSLogBackend``
+- ``DisabledLogBackend``
 
 ### Decoration
 
-- `Log/Decorator`
-- `Log/Decorator/JSON`
-- `Log/Decorator/Plain`
+- ``Log/Decorator``
+- ``Log/Decorator/JSON``
+- ``Log/Decorator/Plain``

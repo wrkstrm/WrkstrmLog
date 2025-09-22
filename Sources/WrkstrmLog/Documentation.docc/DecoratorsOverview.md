@@ -1,7 +1,4 @@
-@Metadata {
-@Title("Decorators Overview")
-@PageKind(article)
-}
+# Decorators overview
 
 Decorators control how a `Log` formats its message body.
 
