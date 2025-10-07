@@ -41,7 +41,7 @@ Use the codename in release notes, tags, and announcements.
 
 ## CLIA canonicals and first launch
 
-- Canonical loaders: JSON triads under `.wrkstrm/clia/agents/**`.
+- Canonical loaders: JSON triads under `.clia/agents/**`.
 - Canonical MD (human): persona and system‑instructions alongside triads.
 - Mirrors: `.generated/agent.md` is non‑canonical; use to validate rendering.
 - Default agent: `^codex` unless an explicit agent load is requested via
@@ -56,4 +56,4 @@ Diverge paths
 - If in submodule: stage a DocC request with diffs/rationale in parent repo.
 - Use CommonShell/CommonProcess; avoid `Foundation.Process`.
 
-DocC link: `code/.wrkstrm/clia/docc/agents-onboarding.docc` (preview from repo root).
+DocC link: `code/.clia/docc/agents-onboarding.docc` (preview from repo root).
