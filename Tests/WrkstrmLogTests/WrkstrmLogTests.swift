@@ -341,11 +341,15 @@ struct WrkstrmLogTests {
       logger.info(message, file: "Some.swift", function: "fn", line: 123)
     }.trimmingCharacters(in: .whitespacesAndNewlines)
 
+    // Swift Testing may print test-start lines to stdout concurrently.
+    // Validate only the line emitted by the logger.
+    let line = output.split(separator: "\n").last.map(String.init) ?? output
+
     // Should have no '|' separators and end with the message body.
-    #expect(!output.contains("|"))
-    #expect(output.hasSuffix(message))
+    #expect(!line.contains("|"))
+    #expect(line.hasSuffix(message))
     // Retains system/category header produced by Print backend.
-    #expect(output.hasPrefix("sys:cat:"))
+    #expect(line.hasPrefix("sys:cat:"))
   }
 
   #if canImport(Foundation)
