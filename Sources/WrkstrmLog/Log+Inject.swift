@@ -115,7 +115,7 @@ extension Log {
         selectedBackend = .auto
       } else {
         selectedBackends = filtered
-        selectedBackend = filtered.first!
+        selectedBackend = filtered.first ?? .auto
       }
       #endif
     }

@@ -1,12 +1,12 @@
 #if canImport(Foundation) && !os(WASI)
 import Foundation
-public let WRK_HAS_FOUNDATION = true
+public let wrkHasFoundation = true
 #else
-public let WRK_HAS_FOUNDATION = false
+public let wrkHasFoundation = false
 #endif
 
 @inline(__always)
-internal func wrk_hostname() -> String {
+internal func wrkHostname() -> String {
   #if canImport(Foundation) && !os(WASI)
   return ProcessInfo.processInfo.hostName
   #else
