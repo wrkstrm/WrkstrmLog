@@ -3,14 +3,12 @@
 Learn how to adopt WrkstrmLog in a new SwiftPM target and configure log exposure, backends, and
 decorators.
 
-## Add the dependency
+## Add the dependency (SwiftPM)
 
-### Inside the mono workspace
-
-Reference the local package so CI, sandboxes, and downstream tools stay aligned.
+Use the published package when adding WrkstrmLog to your project.
 
 ```swift
-.package(name: "WrkstrmLog", path: "../../universal/WrkstrmLog"),
+.package(url: "https://github.com/wrkstrm/WrkstrmLog.git", from: "2.0.0"),
 
 .target(
   name: "YourTarget",
@@ -18,16 +16,6 @@ Reference the local package so CI, sandboxes, and downstream tools stay aligned.
     .product(name: "WrkstrmLog", package: "WrkstrmLog")
   ]
 )
-```
-
-Adjust the relative path to match your package layout.
-
-### Outside todo3
-
-Use the published release when you consume WrkstrmLog from another repository.
-
-```swift
-.package(url: "https://github.com/wrkstrm/WrkstrmLog.git", from: "2.0.0"),
 ```
 
 ## Establish loggers

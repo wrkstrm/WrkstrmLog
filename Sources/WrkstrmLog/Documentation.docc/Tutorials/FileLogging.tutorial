@@ -1,0 +1,81 @@
+@Tutorial(time: 10) {
+  @Intro(title: "Persist Logs to Files") {
+    Learn how to write logs to files, enable rotation, and fan out messages to multiple destinations.
+  }
+
+  @Section(title: "Create a Session Log File") {
+    Use `FileLogBackend` to append lines to a file. Pair it with the JSON decorator for NDJSON.
+
+    @ContentAndMedia {
+    ```swift
+    #if canImport(Foundation)
+    import Foundation
+    import WrkstrmLog
+
+    let logsDir = URL(fileURLWithPath: NSTemporaryDirectory())
+    let fileBackend = FileLogBackend(directory: logsDir, baseName: "app")
+
+    var sessionLog = Log(
+      system: "ExampleApp",
+      category: "session",
+      maxExposureLevel: .info,
+      backends: [fileBackend]
+    )
+    sessionLog.decorator = Log.Decorator.JSON()
+
+    sessionLog.info("Session started")
+    #endif
+    ```
+    }
+  }
+
+  @Section(title: "Enable Rotation (Daily/Size)") {
+    `FileLogBackend` can roll logs by day or after a size threshold.
+
+    @ContentAndMedia {
+    ```swift
+    #if canImport(Foundation)
+    import Foundation
+    import WrkstrmLog
+
+    let dir = URL(fileURLWithPath: NSTemporaryDirectory())
+    // Daily roll + ~5 MB size cap
+    let rotating = FileLogBackend(
+      directory: dir,
+      baseName: "example",
+      maxBytes: 5 * 1024 * 1024,
+      rollDaily: true
+    )
+
+    var rotatingLog = Log(system: "ExampleApp", category: "rotate", backends: [rotating])
+    rotatingLog.decorator = Log.Decorator.JSON()
+    rotatingLog.notice("File rotation active")
+    #endif
+    ```
+    }
+  }
+
+  @Section(title: "Fan Out to File + Console") {
+    Combine a user-facing console log with a structured file log using `LogGroup`.
+
+    @ContentAndMedia {
+    ```swift
+    #if canImport(Foundation)
+    import Foundation
+    import WrkstrmLog
+
+    let dir = URL(fileURLWithPath: NSTemporaryDirectory())
+    let fileBackend = FileLogBackend(directory: dir, baseName: "example")
+
+    let userLog = Log(system: "ExampleApp", category: "ui", backends: [PrintLogBackend()])
+    var auditLog = Log(system: "ExampleApp", category: "audit", backends: [fileBackend])
+    auditLog.decorator = Log.Decorator.JSON()
+
+    let combined = LogGroup([userLog, auditLog])
+    combined.info("Launching…")
+    #endif
+    ```
+    }
+  }
+}
+
