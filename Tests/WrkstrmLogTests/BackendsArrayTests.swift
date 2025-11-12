@@ -137,9 +137,11 @@ struct BackendsArrayTests {
     let out = captureOutput {
       log.info("hello-decor")
     }
-    #expect(out.contains("sys:cat:"))
-    #expect(!out.contains("|"))
-    #expect(out.contains("hello-decor"))
+    // Focus on the logger's last emitted line to avoid concurrent noise.
+    let line = out.split(separator: "\n").last.map(String.init) ?? out
+    #expect(line.contains("sys:cat:"))
+    #expect(!line.contains("|"))
+    #expect(line.contains("hello-decor"))
   }
 
   /// Removing all custom backends resets to platform default selection.

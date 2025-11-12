@@ -1,4 +1,4 @@
-name: "🕸️ WASM Build"
+name: "🕸️ WASM Build | WrkstrmLog"
 
 on:
   pull_request:
