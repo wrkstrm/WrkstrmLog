@@ -224,41 +224,19 @@ WrkstrmLog is a flagship library. We treat it as a reference for logging APIs, o
 patterns, and documentation quality. DocC articles are being added; in the meantime, this README
 serves as the primary guide.
 
-Each level maps to a visual emoji for quick scanning:
+Each level maps to a visual emoji and purpose:
 
-| Level    | Emoji |
-| -------- | :---: |
-| trace    |  🔍   |
-| debug    |  🐞   |
-| info     |  ℹ️   |
-| notice   |  📝   |
-| warning  |  ⚠️   |
-| error    |  ❗   |
-| critical |  🚨   |
+| Level    | Emoji | Description |
+| -------- | :---: | ----------- |
+| trace    |  🔍   | Extremely fine‑grained details (function entry/exit, loops); rarely enabled in production. |
+| debug    |  🐞   | Diagnostic information (config, payloads); enable while investigating or verifying behavior. |
+| info     |  ℹ️   | General events in the application lifecycle (successful calls, completed tasks). |
+| notice   |  📝   | Notable events that aren’t errors or warnings (sign‑in, cache refresh). |
+| warning  |  ⚠️   | Potential issues that may require attention (retries, deprecated API). |
+| error    |  ❗   | Recoverable failures (e.g., a failed save that can be retried). |
+| critical |  🚨   | Serious problems that usually halt execution or risk data loss. |
 
-Each log level represents a different severity and use case. `verbose` messages map to the
-`debug` level and are emitted at the same severity.
-
-**trace** captures extremely fine-grained details such as function entry, exit, or loop
-iterations—useful for deep troubleshooting during development but rarely enabled in production.
-
-**debug** records diagnostic information like configuration values or request payloads. Enable it
-when investigating issues or verifying behavior.
-
-**info** notes general events in the application lifecycle, such as successful network calls or
-completed tasks. These messages are useful for understanding normal operation.
-
-**notice** highlights notable events that aren't errors or warnings, like a user signing in or a
-cache refresh. They call attention without implying a problem.
-
-**warning** flags potential issues that might require attention, such as retrying a request or
-using a deprecated API.
-
-**error** indicates a failure in an operation that the app can often recover from, for example a
-failed save that triggers a retry.
-
-**critical** signals serious problems that usually halt execution or result in data loss and
-should be addressed immediately.
+Note: the `verbose` helper maps to the `debug` level and is emitted at the same severity.
 
 4. **Disable or enable logging in production** 🔇
 
@@ -350,8 +328,8 @@ Project link: [https://github.com/wrkstrm/WrkstrmLog](https://github.com/wrkstrm
 
 Developed by [rismay](https://github.com/rismay)
 
-For a narrative overview of the project's goals 🎶, see
-[Sources/WrkstrmLog/Documentation.docc/Articles/UnifyingTheSymphony.md](Sources/WrkstrmLog/Documentation.docc/Articles/UnifyingTheSymphony.md).
+For a narrative overview of the project's goals 🎶, see the hosted DocC article:
+[The Problem Space](https://wrkstrm.github.io/WrkstrmLog/documentation/wrkstrmlog/theproblemspace).
 
 [build-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml/badge.svg
 [format-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml/badge.svg
