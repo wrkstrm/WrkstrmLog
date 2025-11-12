@@ -15,7 +15,7 @@
   <a href="#-key-features"><img alt="Features" src="https://img.shields.io/badge/📚%20Features-overview-informational?style=for-the-badge"></a>
 </div>
 
-| Workflow | Badge |
+| Workflow | Status |
 | -------------: | :----: |
 | DooC | [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml) |
 | Linting | [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml) | 
