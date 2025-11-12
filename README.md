@@ -13,6 +13,7 @@
   <a href="#📦-installation"><img alt="Install" src="https://img.shields.io/badge/⚙️%20Install-SPM-orange?style=for-the-badge"></a>
   <a href="CHANGELOG.md" target="_blank"><img alt="Changelog" src="https://img.shields.io/badge/🧾%20Changelog-latest-success?style=for-the-badge"></a>
   <a href="#-key-features"><img alt="Features" src="https://img.shields.io/badge/📚%20Features-overview-informational?style=for-the-badge"></a>
+  <a href="https://discord.gg/4KhTUbt3" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/💬%20Join-Discord-5865F2?style=for-the-badge"></a>
 </div>
 
 | Workflow | Status |
@@ -327,6 +328,8 @@ Distributed under the MIT License. See `LICENSE` for details.
 ## 📬 Contact & 🙏 Acknowledgments
 
 Developed by [rismay](https://github.com/rismay)
+
+- Community chat: join the Wrkstrm Discord — https://discord.gg/4KhTUbt3
 
 [build-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-build.yml/badge.svg
 [format-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift-format.yml/badge.svg
