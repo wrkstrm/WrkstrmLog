@@ -1,4 +1,4 @@
-// Xcode detection relies on Foundation; disable on WASM
+// Xcode detection relies on Foundation; only present when Foundation exists and not on WASM.
 #if canImport(Foundation) && !os(WASI)
 import Foundation
 
@@ -30,9 +30,4 @@ extension ProcessInfo {
   }
 }
 
-#else
-// WASM: provide a stable API surface with defaults
-extension ProcessInfo {
-  public static var inXcodeEnvironment: Bool { false }
-}
 #endif

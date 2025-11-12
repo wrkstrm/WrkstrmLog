@@ -48,6 +48,21 @@ extension Log {
       get { exposureLevel }
       set { exposureLevel = newValue }
     }
+
+    // MARK: - Compatibility surface with non-WASM Cache
+
+    /// Single-context identifier placeholder (non-threaded on WASM).
+    func currentThreadContextID() -> UInt64 { 0 }
+
+    /// Execute body without context switching (WASM single-context).
+    func withContext<T>(_ id: UInt64, _ body: () throws -> T) rethrows -> T { try body() }
+
+    /// Provide a SwiftLog logger for the given `Log`. No caching on WASM.
+    func logger(for log: Log, effectiveLevel: Logging.Logger.Level) -> Logging.Logger {
+      var logger = Logging.Logger(label: log.system)
+      logger.logLevel = effectiveLevel
+      return logger
+    }
   }
 }
 #endif

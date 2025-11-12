@@ -106,6 +106,14 @@ extension Log {
         if tid > 0 { threadId = UInt64(tid) }
         #endif
 
+        let isMainThreadFlag: Bool = {
+          #if canImport(Foundation)
+          return Thread.isMainThread
+          #else
+          return true
+          #endif
+        }()
+
         var dict: [String: Any] = [
           "level": String(describing: level),
           "message": String(describing: message()),
@@ -115,7 +123,7 @@ extension Log {
           "function": fn,
           "line": line,
           "timestamp": timestamp,
-          "isMainThread": Thread.isMainThread,
+          "isMainThread": isMainThreadFlag,
         ]
         if let threadId { dict["threadId"] = threadId }
         if let data = try? JSONSerialization.data(withJSONObject: dict, options: []) {
