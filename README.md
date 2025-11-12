@@ -34,6 +34,9 @@ operating system + development environment combination. Optimal backends are sel
 For development ease, logs are automatic in debug. For security, logs are disabled by default in release
 builds unless explicitly enabled.
 
+For a narrative overview of the project's goals 🎶, see the hosted DocC article:
+[The Problem Space](https://wrkstrm.github.io/WrkstrmLog/documentation/wrkstrmlog/theproblemspace).
+
 ## ✨ Key Features
 
 - 🌐 Adaptive logging across Linux, Xcode, macOS terminal, and WASM
@@ -324,16 +327,9 @@ Contributions are welcome.
 
 Distributed under the MIT License. See `LICENSE` for details.
 
-## 📬 Contact
-
-Project link: [https://github.com/wrkstrm/WrkstrmLog](https://github.com/wrkstrm/WrkstrmLog)
-
-## 🙏 Acknowledgments
+## 📬 Contact & 🙏 Acknowledgments
 
 Developed by [rismay](https://github.com/rismay)
-
-For a narrative overview of the project's goals 🎶, see the hosted DocC article:
-[The Problem Space](https://wrkstrm.github.io/WrkstrmLog/documentation/wrkstrmlog/theproblemspace).
 
 [build-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml/badge.svg
 [format-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml/badge.svg
