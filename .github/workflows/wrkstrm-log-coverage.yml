@@ -1,0 +1,89 @@
+name: "🧮 Coverage | WrkstrmLog"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'code/mono/apple/spm/universal/WrkstrmLog/**'
+      - '.github/workflows/wrkstrm-log-coverage.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'code/mono/apple/spm/universal/WrkstrmLog/**'
+
+permissions:
+  contents: write
+
+jobs:
+  coverage:
+    runs-on: macos-latest
+    env:
+      SPM_CI_USE_LOCAL_DEPS: 'false'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Swift test with coverage
+        run: |
+          swift test \
+            --package-path code/mono/apple/spm/universal/WrkstrmLog \
+            --enable-code-coverage \
+            --parallel
+
+      - name: Generate coverage report and badge
+        id: cov
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd code/mono/apple/spm/universal/WrkstrmLog
+          PROFILE=$(swift test --enable-code-coverage --show-codecov-path | tail -1)
+          BIN=$(swift build --show-bin-path)
+          TEST="$BIN/WrkstrmLogPackageTests.xctest/Contents/MacOS/WrkstrmLogPackageTests"
+
+          mkdir -p coverage-publish/badges/wrkstrm-log coverage-publish/coverage/wrkstrm-log/html
+
+          # LCOV + HTML
+          xcrun llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
+            -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/wrkstrm-log/lcov.info
+
+          xcrun llvm-cov show "$TEST" -instr-profile "$PROFILE" -format=html \
+            -o coverage-publish/coverage/wrkstrm-log/html \
+            -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' -tab-size=2
+
+          # Extract TOTAL coverage from llvm-cov report
+          PCT=$(xcrun llvm-cov report "$TEST" -instr-profile "$PROFILE" 2>/dev/null | awk '/TOTAL/ {print $NF}' | tail -1)
+          PCT_NUM=${PCT%%%} # strip %
+          COLOR=red
+          if (( ${PCT_NUM%.*} >= 90 )); then COLOR=green;
+          elif (( ${PCT_NUM%.*} >= 80 )); then COLOR=yellowgreen;
+          elif (( ${PCT_NUM%.*} >= 70 )); then COLOR=yellow;
+          else COLOR=orange; fi
+
+          cat > coverage-publish/badges/wrkstrm-log/coverage.json << JSON
+          {"schemaVersion":1,"label":"coverage","message":"$PCT","color":"$COLOR"}
+          JSON
+
+          echo "pct=$PCT" >> $GITHUB_OUTPUT
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: code/mono/apple/spm/universal/WrkstrmLog/coverage-publish/coverage/wrkstrm-log/lcov.info
+          flags: wrkstrm-log
+          name: wrkstrm-log
+          slug: wrkstrm/WrkstrmLog
+          fail_ci_if_error: true
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish badge + HTML to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: code/mono/apple/spm/universal/WrkstrmLog/coverage-publish
+          keep_files: true

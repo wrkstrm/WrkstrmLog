@@ -43,6 +43,26 @@ func expectFatalError(executing: @escaping @Sendable () -> Void) -> (String, Int
   return (String(data: data, encoding: .utf8) ?? "", 1)
 }
 
+// MARK: - CI sequence logging (opt-in)
+
+@inline(__always)
+func infoTraceEnabled() -> Bool {
+  #if canImport(Foundation)
+  let env = ProcessInfo.processInfo.environment
+  if let v = env["WRKSTRMLOG_INFO_TRACE"]?.lowercased() {
+    return v == "1" || v == "true" || v == "yes" || v == "on"
+  }
+  #endif
+  return false
+}
+
+@inline(__always)
+func sequenceInfo(_ msg: @autoclosure () -> String) {
+  var logger = Log(system: "WrkstrmLogTests", category: "sequence", maxExposureLevel: .trace, options: [.prod], backend: PrintLogBackend())
+  logger.decorator = Log.Decorator.Plain()
+  logger.info(msg())
+}
+
 // MARK: - Core Logging Behavior
 
 @Suite("WrkstrmLog", .serialized)
@@ -200,6 +220,7 @@ struct WrkstrmLogTests {
     Log.reset()
     Log.Inject.usePathInfoCache(false)
     Log.globalExposureLevel = .trace
+    sequenceInfo("cache off; count=\(Log.pathInfoCount)")
     let logger = Log(
       system: "",
       category: "",
@@ -208,15 +229,21 @@ struct WrkstrmLogTests {
       backend: PrintLogBackend()
     )
     #expect(Log.pathInfoCount == 0)
+    sequenceInfo("before first; count=\(Log.pathInfoCount)")
     logger.info("first")
+    sequenceInfo("after first; count=\(Log.pathInfoCount)")
     #expect(Log.pathInfoCount == 0)
     logger.info("second")
+    sequenceInfo("after second; count=\(Log.pathInfoCount)")
     #expect(Log.pathInfoCount == 0)
 
     Log.Inject.usePathInfoCache(true)
+    sequenceInfo("cache on")
     logger.info("third")
+    sequenceInfo("after third; count=\(Log.pathInfoCount)")
     #expect(Log.pathInfoCount == 1)
     logger.info("fourth")
+    sequenceInfo("after fourth; count=\(Log.pathInfoCount)")
     #expect(Log.pathInfoCount == 1)
   }
 

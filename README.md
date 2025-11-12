@@ -20,6 +20,7 @@
 | DocC | [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-docc.yml) |
 | Format | [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift-format.yml) |
 | Build | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-build.yml) [![WASM Build][wasm-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-wasm.yml) |
+| Coverage | [![Coverage][codecov-badge]](https://app.codecov.io/gh/wrkstrm/WrkstrmLog?flags%5B0%5D=wrkstrm-log) |
 | Test | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests.yml) |
 
 🚦 <a href="#-usage">Quick Start</a> 🎓 Tutorials: <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/loggingapis">Logging APIs</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/exposurelevels">Exposure Levels</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/filelogging">File Logging</a>
@@ -332,3 +333,4 @@ Developed by [rismay](https://github.com/rismay)
 [test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests.yml/badge.svg
 [docc-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-docc.yml/badge.svg
 [wasm-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-wasm.yml/badge.svg
+[codecov-badge]: https://codecov.io/gh/wrkstrm/WrkstrmLog/branch/main/graph/badge.svg?flag=wrkstrm-log

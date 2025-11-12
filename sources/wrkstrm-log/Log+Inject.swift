@@ -11,8 +11,10 @@ extension Log {
     /// Returns path information for a given file using the configured provider.
     internal static func pathInfo(for file: String) -> Cache.PathInfo {
       if pathInfoCacheEnabled {
+        LogTrace.log("pathInfo", "cache-on file=\(file)")
         return Cache.shared.pathInfo(for: file)
       } else {
+        LogTrace.log("pathInfo", "cache-off file=\(file)")
         #if os(WASI) || arch(wasm32)
         let last = file.split(separator: "/").last.map(String.init) ?? file
         let trimmed = last.hasSuffix(".swift") ? String(last.dropLast(6)) : last
@@ -38,6 +40,7 @@ extension Log {
     ///   path info is recalculated every time without updating the cache.
     public static func usePathInfoCache(_ useCache: Bool) {
       pathInfoCacheEnabled = useCache
+      LogTrace.log("inject", "usePathInfoCache=\(useCache)")
     }
 
     // MARK: - Backend Selection (Service Architecture)
