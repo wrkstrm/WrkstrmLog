@@ -47,12 +47,13 @@ For up-to-date build and platform compatibility reports, visit the
   (replaces `Log.removeExposureLimit`)
 - 🆕 Swift 6 `#fileID` support for concise output
 
-## 🧭 Migration
+## 🔌 Multiple backends
 
-WrkstrmLog now prefers explicit backend(s). Use single or multiple backends as needed; when
-supplying multiple, index 0 is treated as the primary.
+WrkstrmLog supports one or more backends per logger. Provide a single backend or
+an ordered list; when multiple are supplied the first entry (index 0) is treated
+as the primary.
 
-Examples:
+Examples
 
 ```swift
 // Single backend
@@ -63,11 +64,9 @@ let swiftLog = Log(system: "Srv", category: "Net", backends: [SwiftLogBackend()]
 let capture = /* CapturingLogBackend(...) */
 let composed = Log(system: "App", category: "UI", backends: [OSLogBackend(), capture])
 
-// Runtime selection of backend kinds
-Log.Inject.setBackends([.os])
+// Runtime selection of backend kinds is also available (see next section)
 ```
 
-Behavior remains unchanged unless you opt into multiple backends.
 
 ## ⚙️ Runtime Backend Selection
 
@@ -122,9 +121,9 @@ let userLog = Log(system: "App", category: "UI", maxExposureLevel: .info, backen
 
 // Basic log (plain body) to another sink (e.g., SwiftLog)
 let basicLog = {
-  var l = Log(system: "App", category: "basic", maxExposureLevel: .info, backends: [SwiftLogBackend()])
-  l.decorator = Log.Decorator.Plain()
-  return l
+  var logger = Log(system: "App", category: "basic", maxExposureLevel: .info, backends: [SwiftLogBackend()])
+  logger.decorator = Log.Decorator.Plain()
+  return logger
 }()
 
 let both = LogGroup([userLog, basicLog])
