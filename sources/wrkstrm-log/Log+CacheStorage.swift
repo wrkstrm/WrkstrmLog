@@ -130,11 +130,16 @@ extension Log {
     #endif
 
     func pathInfo(for file: String) -> PathInfo {
+      // Respect injection toggle even if callers reach the cache directly.
+      if !Log.Inject.pathInfoCacheEnabled {
+        let url = URL(fileURLWithPath: file)
+        let lastComponent = url.lastPathComponent
+        let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
+        return PathInfo(url: url, fileName: trimmed, lastPathComponent: lastComponent)
+      }
       let contextID = currentThreadContextID()
       return updateContext(id: contextID) { state in
-        if let existing = state.pathInfos[file] {
-          return existing
-        }
+        if let existing = state.pathInfos[file] { return existing }
         let url = URL(fileURLWithPath: file)
         let lastComponent = url.lastPathComponent
         let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
