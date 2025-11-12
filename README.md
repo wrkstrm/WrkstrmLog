@@ -11,7 +11,7 @@ Backends: OSLog (Apple), SwiftLog (portable), and Print (WASM‑friendly).
 [![GitHub Stars](https://img.shields.io/github/stars/wrkstrm/WrkstrmLog?style=social)](https://github.com/wrkstrm/WrkstrmLog/stargazers)
 
 <div>
-  <a href="[https://wrkstrm.github.io/WrkstrmLog](https://wrkstrm.github.io/WrkstrmLog/documentation/wrkstrmlog/)" target="_blank"><img alt="Docs" src="https://img.shields.io/badge/📖%20Docs-DocC-blue?style=for-the-badge"></a>
+  <a href="https://wrkstrm.github.io/WrkstrmLog/documentation/wrkstrmlog/" target="_blank"><img alt="Docs" src="https://img.shields.io/badge/📖%20Docs-DocC-blue?style=for-the-badge"></a>
   <a href="#📦-installation"><img alt="Install" src="https://img.shields.io/badge/⚙️%20Install-SPM-orange?style=for-the-badge"></a>
   <a href="CHANGELOG.md" target="_blank"><img alt="Changelog" src="https://img.shields.io/badge/🧾%20Changelog-latest-success?style=for-the-badge"></a>
   <a href="#-key-features"><img alt="Features" src="https://img.shields.io/badge/📚%20Features-overview-informational?style=for-the-badge"></a>
