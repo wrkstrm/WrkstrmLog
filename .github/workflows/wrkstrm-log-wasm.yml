@@ -1,0 +1,36 @@
+name: "🕸️ WASM Build"
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    tags: [ 'v*.*.*' ]
+
+jobs:
+  wasm-build:
+    name: wasm32-unknown-wasi (Docker)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Print versions
+        run: |
+          uname -a || true
+          docker --version || true
+
+      - name: Pull SPI WASM image
+        run: docker pull registry.gitlab.com/finestructure/spi-images:wasm-6.2-latest
+
+      - name: Build WrkstrmLog for wasm32-unknown-wasi
+        env:
+          WORKDIR: ${{ github.workspace }}
+        run: |
+          set -eu
+          docker run --rm \
+            -v "$WORKDIR":/host \
+            -w /host \
+            registry.gitlab.com/finestructure/spi-images:wasm-6.2-latest \
+            swift build --swift-sdk wasm32-unknown-wasi -c release
+
