@@ -25,9 +25,14 @@ let package = Package(
     .target(
       name: "WrkstrmLog",
       dependencies: [.product(name: "Logging", package: "swift-log")],
-      swiftSettings: Package.Inject.shared.swiftSettings,
+      path: "Sources/wrkstrm-log",
+      swiftSettings: Package.Inject.shared.swiftSettings
     ),
-    .testTarget(name: "WrkstrmLogTests", dependencies: ["WrkstrmLog"]),
+    .testTarget(
+      name: "WrkstrmLogTests",
+      dependencies: ["WrkstrmLog"],
+      path: "Tests/wrkstrm-log-tests"
+    ),
   ],
 )
 
