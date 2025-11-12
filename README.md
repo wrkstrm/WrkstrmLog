@@ -22,9 +22,12 @@ Backends: OSLog (Apple), SwiftLog (portable), and Print (WASM‑friendly).
 
 </div>
 
-| GitHub Actions | Status |
-| -------------- | ------ |
-| Workflows | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml) [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml) [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml) |
+| Workflow | Badge |
+| -------------: | :----: |
+| DooC | [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml) |
+| Linting | [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml) | 
+| Build | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml) |
+| Testing | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) |
 
 > "The most effective debugging tool is still careful thought, followed by judiciously placed print
 > statements." —Brian Kernighan
