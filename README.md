@@ -21,8 +21,7 @@
 | DocC | [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-docc.yml) |
 | Format | [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift-format.yml) |
 | Build | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-build.yml) [![WASM Build][wasm-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-wasm.yml) |
-| Coverage | [![codecov](https://codecov.io/gh/wrkstrm/WrkstrmLog/graph/badge.svg?token=LWN3RGU6U9)](https://codecov.io/gh/wrkstrm/WrkstrmLog) |
-| Test | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests.yml) |
+| Test / Coverage | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests.yml) [![codecov](https://codecov.io/gh/wrkstrm/WrkstrmLog/graph/badge.svg?token=LWN3RGU6U9)](https://codecov.io/gh/wrkstrm/WrkstrmLog) |
 
 🚦 <a href="#-usage">Quick Start</a> 🎓 Tutorials: <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/loggingapis">Logging APIs</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/exposurelevels">Exposure Levels</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/filelogging">File Logging</a>
 
