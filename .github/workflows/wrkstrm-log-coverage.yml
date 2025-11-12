@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   coverage:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       SPM_CI_USE_LOCAL_DEPS: 'false'
     steps:
@@ -25,27 +25,37 @@ jobs:
         run: |
           swift test --enable-code-coverage --parallel
 
-      - name: Generate coverage report and badge
+      - name: Generate coverage report and badge (Linux)
         id: cov
         shell: bash
         run: |
           set -euo pipefail
           PROFILE=$(swift test --enable-code-coverage --show-codecov-path | tail -1)
           BIN=$(swift build --show-bin-path)
-          TEST="$BIN/WrkstrmLogPackageTests.xctest/Contents/MacOS/WrkstrmLogPackageTests"
+          # Find a test runner binary in bin path (Linux-friendly)
+          TEST=$(find "$BIN" -maxdepth 1 -type f -executable \( -name '*PackageTests*' -o -name '*Tests.xctest' \) | head -n1)
+          if [[ -z "${TEST:-}" ]]; then
+            echo "Could not locate test binary under $BIN" >&2
+            ls -la "$BIN" || true
+            exit 1
+          fi
+          if ! command -v llvm-cov >/dev/null; then
+            echo "llvm-cov not found on runner" >&2
+            exit 1
+          fi
 
           mkdir -p coverage-publish/badges/wrkstrm-log coverage-publish/coverage/html
 
-          # LCOV + HTML
-          xcrun llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
+          # LCOV + HTML (Linux: call llvm-cov directly)
+          llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
             -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/lcov.info
 
-          xcrun llvm-cov show "$TEST" -instr-profile "$PROFILE" -format=html \
+          llvm-cov show "$TEST" -instr-profile "$PROFILE" -format=html \
             -o coverage-publish/coverage/html \
             -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' -tab-size=2
 
           # Extract TOTAL coverage from llvm-cov report
-          PCT=$(xcrun llvm-cov report "$TEST" -instr-profile "$PROFILE" 2>/dev/null | awk '/TOTAL/ {print $NF}' | tail -1)
+          PCT=$(llvm-cov report "$TEST" -instr-profile "$PROFILE" 2>/dev/null | awk '/TOTAL/ {print $NF}' | tail -1)
           PCT_NUM=${PCT%%%} # strip %
           COLOR=red
           if (( ${PCT_NUM%.*} >= 90 )); then COLOR=green;
