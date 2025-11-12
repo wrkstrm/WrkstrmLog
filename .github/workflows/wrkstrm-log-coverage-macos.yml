@@ -1,4 +1,4 @@
-name: "🧮 Coverage | WrkstrmLog"
+name: "🧮 Coverage macOS | WrkstrmLog"
 
 on:
   workflow_dispatch:
@@ -11,8 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  coverage-linux:
-    runs-on: ubuntu-latest
+  coverage-macos-local:
+    runs-on: [self-hosted, macOS]
     env:
       SPM_CI_USE_LOCAL_DEPS: 'false'
     steps:
@@ -21,18 +21,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install LLVM tools (Linux)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y llvm
-
-      - name: Swift test with coverage
+      - name: Swift test with coverage (macOS)
         id: test
         continue-on-error: true
         run: |
           swift test --enable-code-coverage --parallel
 
-      - name: Generate LCOV coverage (Linux)
+      - name: Generate LCOV coverage (macOS)
         id: lcov
         if: always()
         shell: bash
@@ -41,38 +36,38 @@ jobs:
           BIN_DIR=$(swift build --show-bin-path)
           PROFILE=$(find .build -type f -name 'default.profdata' | head -n1 || true)
           if [[ -z "${PROFILE:-}" ]]; then
-            echo "Searching for .profraw files to merge" >&2
+            echo "Searching for .profraw files to merge (macOS)" >&2
             readarray -d '' RAWS < <(find .build -type f -name '*.profraw' -print0 || true)
             if [[ ${#RAWS[@]} -gt 0 ]]; then
-              echo "Merging profraw into profdata" >&2
-              llvm-profdata merge -sparse "${RAWS[@]}" -o .build/default.profdata
+              echo "Merging profraw into profdata (macOS)" >&2
+              xcrun llvm-profdata merge -sparse "${RAWS[@]}" -o .build/default.profdata
               PROFILE=.build/default.profdata
             fi
           fi
           if [[ -z "${PROFILE:-}" ]]; then
-            echo "No coverage profile found; skipping LCOV generation." >&2
+            echo "No coverage profile found; creating empty lcov.info (macOS)." >&2
             mkdir -p coverage-publish/coverage
             : > coverage-publish/coverage/lcov.info
             exit 0
           fi
-          TEST=$(find "$BIN_DIR" .build -maxdepth 3 -type f -executable \
-                 \( -name '*PackageTests*' -o -name '*Tests*' \) | head -n1 || true)
+          TEST=$(find "$BIN_DIR" .build -maxdepth 5 -type f -perm -111 \
+                 \( -name '*PackageTests*' -o -name '*Tests.xctest' -o -name '*Tests' \) | head -n1 || true)
           if [[ -z "${TEST:-}" ]]; then
-            echo "No test binary found; skipping LCOV generation." >&2
+            echo "No test binary found; creating empty lcov.info (macOS)." >&2
             mkdir -p coverage-publish/coverage
             : > coverage-publish/coverage/lcov.info
             exit 0
           fi
           mkdir -p coverage-publish/coverage
-          llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
+          xcrun llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
             -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/lcov.info
 
-      - name: Upload coverage to Codecov (Linux)
+      - name: Upload coverage to Codecov (macOS)
         uses: codecov/codecov-action@v5
         if: always()
         with:
           files: coverage-publish/coverage/lcov.info
-          flags: wrkstrm-log,linux
+          flags: wrkstrm-log,macos
           name: wrkstrm-log
           slug: wrkstrm/WrkstrmLog
           fail_ci_if_error: false
@@ -80,8 +75,9 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Fail if tests failed (Linux)
+      - name: Fail if tests failed (macOS)
         if: ${{ steps.test.outcome == 'failure' }}
         run: |
-          echo "Tests failed, but coverage was uploaded. Failing job as requested." >&2
+          echo "Tests failed on macOS, but coverage was uploaded. Failing job as requested." >&2
           exit 1
+
