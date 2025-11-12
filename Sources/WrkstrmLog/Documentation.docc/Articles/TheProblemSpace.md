@@ -1,11 +1,11 @@
-# WrkstrmLog: Exploring the Problem Space of Swift Logging 🎶
+# WrkstrmLog: Exploring the Problem Space of Swift Logging
 
 ###### Synopsis
 
 Managing logs across different environments and configurations can quickly become complex.
 WrkstrmLog is a flexible and extensible logging utility designed to streamline this process.
 
-## 🎭 The Challenge: Cross-Platform Swift Logging
+## The Challenge: Cross-Platform Swift Logging
 
 In the world of Swift development, logging is a crucial aspect of debugging and monitoring
 applications. However, managing logs across different environments and configurations can quickly
@@ -69,7 +69,7 @@ When run from Xcode, you might see nicely formatted logs in the console. However
 same code from the command line or on a Linux server, the output might be different or even missing
 certain log levels. 😕
 
-## 🚀 Enter WrkstrmLog: A Swift Solution
+## Enter WrkstrmLog: A Swift Solution
 
 WrkstrmLog addresses these issues by providing a unified, flexible logging interface that ensures
 consistency across all environments. Here's a glimpse of how it works:
@@ -96,7 +96,7 @@ With WrkstrmLog, the logging experience remains consistent whether you're runnin
 Xcode, the command line, or on a Linux server. This consistency is achieved through intelligent
 handling of different environments and logging backends. 🌟
 
-## 💎 Core Features and Benefits
+## Core Features and Benefits
 
 1. 🎯 **Unified Interface**: Consistent logging across your entire project.
 2. 🌈 **Flexible Configuration**: Easy to set up for different environments (debug, release, etc.).
@@ -107,9 +107,9 @@ handling of different environments and logging backends. 🌟
    line, and Linux environments.
 6. 🔌 **Extensibility**: Can be easily extended to support additional logging destinations.
 
-## 🏁 Getting Started
+## Getting Started
 
-### 📦 Installation
+### Installation
 
 Add the following to your `Package.swift` file:
 
@@ -119,7 +119,7 @@ dependencies: [
 ]
 ```
 
-### 🔰 Basic Usage
+### Basic Usage
 
 ```swift
 import WrkstrmLog
@@ -193,7 +193,7 @@ if libraryLogger.maxExposureLevel >= .debug {
 The former `Log.removeExposureLimit` API has been removed, making explicit configuration of exposure
 levels a required step.
 
-## ⚡ Performance Considerations
+## Performance Considerations
 
 Developing WrkstrmLog presented its own set of challenges, particularly in terms of performance:
 
@@ -217,7 +217,7 @@ Developing WrkstrmLog presented its own set of challenges, particularly in terms
    development and deployment environments. Solution: Implemented environment detection and adaptive
    logging strategies to ensure uniform output regardless of the execution context.
 
-## 🔮 Conclusion and Next Steps
+## Conclusion and Next Steps
 
 WrkstrmLog transforms logging from a necessary chore into a powerful tool for understanding and
 debugging your Swift applications. By providing a flexible, consistent, and extensible logging
