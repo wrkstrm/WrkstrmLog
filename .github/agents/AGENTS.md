@@ -70,3 +70,9 @@ DocC link: `code/.clia/docc/agents-onboarding.docc` (preview from repo root).
 - Git command approval: do not run any `git` commands without explicit user approval
   (including but not limited to `clone`, `status`, `add`, `commit`, `reset`, `rebase`, `push`,
   `submodule`, `config`). Prefer reading workspace files over invoking `git` when possible.
+
+# WrkstrmLog Release Naming
+
+Releases adopt tree species codenames in alphabetical order to mirror logging. The series began with
+v2.1.0 "Aspen" and will continue with "Birch", "Cedar", etc. Include the codename alongside the
+semantic version in release pages and documentation.
