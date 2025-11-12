@@ -15,8 +15,6 @@
   <a href="#-key-features"><img alt="Features" src="https://img.shields.io/badge/📚%20Features-overview-informational?style=for-the-badge"></a>
 </div>
 
-🎓 Tutorials: <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/loggingapis">Logging APIs</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/exposurelevels">Exposure Levels</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/filelogging">File Logging</a>
-
 | Workflow | Status |
 | -------------: | :----: |
 | DooC | [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml) |
@@ -24,7 +22,7 @@
 | Build | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml) |
 | Testing | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) |
 
-🚦 <a href="#-usage">Quick Start</a>
+🚦 <a href="#-usage">Quick Start</a> 🎓 Tutorials: <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/loggingapis">Logging APIs</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/exposurelevels">Exposure Levels</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/filelogging">File Logging</a>
 
 </div>
 
