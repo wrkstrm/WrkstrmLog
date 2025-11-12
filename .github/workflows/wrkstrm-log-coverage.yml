@@ -4,13 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
-    paths:
-      - 'code/mono/apple/spm/universal/WrkstrmLog/**'
-      - '.github/workflows/wrkstrm-log-coverage.yml'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'code/mono/apple/spm/universal/WrkstrmLog/**'
 
 permissions:
   contents: write
@@ -28,29 +23,25 @@ jobs:
 
       - name: Swift test with coverage
         run: |
-          swift test \
-            --package-path code/mono/apple/spm/universal/WrkstrmLog \
-            --enable-code-coverage \
-            --parallel
+          swift test --enable-code-coverage --parallel
 
       - name: Generate coverage report and badge
         id: cov
         shell: bash
         run: |
           set -euo pipefail
-          cd code/mono/apple/spm/universal/WrkstrmLog
           PROFILE=$(swift test --enable-code-coverage --show-codecov-path | tail -1)
           BIN=$(swift build --show-bin-path)
           TEST="$BIN/WrkstrmLogPackageTests.xctest/Contents/MacOS/WrkstrmLogPackageTests"
 
-          mkdir -p coverage-publish/badges/wrkstrm-log coverage-publish/coverage/wrkstrm-log/html
+          mkdir -p coverage-publish/badges/wrkstrm-log coverage-publish/coverage/html
 
           # LCOV + HTML
           xcrun llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
-            -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/wrkstrm-log/lcov.info
+            -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/lcov.info
 
           xcrun llvm-cov show "$TEST" -instr-profile "$PROFILE" -format=html \
-            -o coverage-publish/coverage/wrkstrm-log/html \
+            -o coverage-publish/coverage/html \
             -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' -tab-size=2
 
           # Extract TOTAL coverage from llvm-cov report
@@ -71,7 +62,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: code/mono/apple/spm/universal/WrkstrmLog/coverage-publish/coverage/wrkstrm-log/lcov.info
+          files: coverage-publish/coverage/lcov.info
           flags: wrkstrm-log
           name: wrkstrm-log
           slug: wrkstrm/WrkstrmLog
@@ -85,5 +76,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: code/mono/apple/spm/universal/WrkstrmLog/coverage-publish
+          publish_dir: coverage-publish
           keep_files: true
