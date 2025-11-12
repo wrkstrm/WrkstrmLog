@@ -5,37 +5,39 @@ import Foundation
 extension Log {
   /// Runtime injection points for choosing alternate implementations.
   public enum Inject {
-    // Current path info provider. Defaults to using the shared cache.
-    internal nonisolated(unsafe) static var pathInfoProvider: @Sendable (String) -> Cache.PathInfo =
-      {
-        Cache.shared.pathInfo(for: $0)
-      }
+    // Toggle for path info cache usage. When false, compute path info without touching the cache.
+    internal nonisolated(unsafe) static var pathInfoCacheEnabled: Bool = true
 
     /// Returns path information for a given file using the configured provider.
     internal static func pathInfo(for file: String) -> Cache.PathInfo {
-      pathInfoProvider(file)
+      if pathInfoCacheEnabled {
+        return Cache.shared.pathInfo(for: file)
+      } else {
+        #if os(WASI) || arch(wasm32)
+        let last = file.split(separator: "/").last.map(String.init) ?? file
+        let trimmed = last.hasSuffix(".swift") ? String(last.dropLast(6)) : last
+        return Cache.PathInfo(url: file, fileName: trimmed, lastPathComponent: last)
+        #else
+        #if canImport(Foundation)
+        let url = URL(fileURLWithPath: file)
+        let lastComponent = url.lastPathComponent
+        let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
+        return Cache.PathInfo(url: url, fileName: trimmed, lastPathComponent: lastComponent)
+        #else
+        let last = file.split(separator: "/").last.map(String.init) ?? file
+        let trimmed = last.hasSuffix(".swift") ? String(last.dropLast(6)) : last
+        // Use the string form when Foundation URL isn't present
+        return Cache.PathInfo(url: file, fileName: trimmed, lastPathComponent: last)
+        #endif
+        #endif
+      }
     }
 
     /// Configures whether file path information should be cached or computed each call.
     /// - Parameter useCache: When `true`, path info results are cached and reused. When `false`,
     ///   path info is recalculated every time without updating the cache.
     public static func usePathInfoCache(_ useCache: Bool) {
-      if useCache {
-        pathInfoProvider = { Cache.shared.pathInfo(for: $0) }
-      } else {
-        pathInfoProvider = { file in
-          #if os(WASI) || arch(wasm32)
-          let last = file.split(separator: "/").last.map(String.init) ?? file
-          let trimmed = last.hasSuffix(".swift") ? String(last.dropLast(6)) : last
-          return Cache.PathInfo(url: file, fileName: trimmed, lastPathComponent: last)
-          #else
-          let url = URL(fileURLWithPath: file)
-          let lastComponent = url.lastPathComponent
-          let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
-          return Cache.PathInfo(url: url, fileName: trimmed, lastPathComponent: lastComponent)
-          #endif
-        }
-      }
+      pathInfoCacheEnabled = useCache
     }
 
     // MARK: - Backend Selection (Service Architecture)
