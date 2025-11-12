@@ -38,6 +38,12 @@ builds unless explicitly enabled.
 For a narrative overview of the project's goals 🎶, see the hosted DocC article:
 [The Problem Space](https://wrkstrm.github.io/WrkstrmLog/documentation/wrkstrmlog/theproblemspace).
 
+## 🏁 Flagship + Docs
+
+WrkstrmLog is a flagship library for wrkstrm. It is in every library we create. We treat it as a reference 
+for logging APIs, observability patterns, and documentation quality. DocC articles are added with every feature. 
+This README serves as an introductory guide.
+
 ## ✨ Key Features
 
 - 🌐 Adaptive logging across Linux, Xcode, macOS terminal, and WASM
@@ -218,13 +224,6 @@ targets: [
    logger.error("Error message")
    Log.guard("Critical error")
    ```
-
-## 🏁 Flagship + Docs
-
-WrkstrmLog is a flagship library. We treat it as a reference for logging APIs, observability
-patterns, and documentation quality. DocC articles are being added; in the meantime, this README
-serves as the primary guide.
-
 Each level maps to a visual emoji and purpose:
 
 | Level    | Emoji | Description |
