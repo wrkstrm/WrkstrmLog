@@ -26,11 +26,20 @@ jobs:
       - name: Build WrkstrmLog for wasm32-unknown-wasi
         env:
           WORKDIR: ${{ github.workspace }}
+          PKG_PATH: code/mono/apple/spm/universal/WrkstrmLog
         run: |
-          set -eu
+          set -euo pipefail
           docker run --rm \
             -v "$WORKDIR":/host \
-            -w /host \
+            -w "/host/$PKG_PATH" \
             registry.gitlab.com/finestructure/spi-images:wasm-6.2-latest \
-            swift build --swift-sdk wasm32-unknown-wasi -c release
-
+            bash -lc '
+              set -euo pipefail
+              echo "swift --version:"; swift --version || true
+              echo "swift sdk list:"; swift sdk list || true
+              if swift sdk list 2>/dev/null | grep -q wasm32-unknown-wasi; then
+                swift build --swift-sdk wasm32-unknown-wasi -c release
+              else
+                swift build --triple wasm32-unknown-wasi -c release
+              fi
+            '
