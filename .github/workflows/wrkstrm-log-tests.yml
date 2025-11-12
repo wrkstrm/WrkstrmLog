@@ -1,4 +1,4 @@
-name: "\U0001F3CE️ Swift Build| WrkstrmLog"
+name: "🧪 Test | WrkstrmLogTests"
 on:
   pull_request:
     branches:
@@ -9,7 +9,7 @@ on:
     paths:
     - '**'
 jobs:
-  swift-build:
+  swift-test:
     strategy:
       matrix:
         os:
@@ -23,14 +23,14 @@ jobs:
       id: cache-spm
       uses: actions/cache@v4
       with:
-        restore-keys: ${{ runner.os }}-spm-WrkstrmLog-
-        path: apple/WrkstrmLog/.build
         key: ${{ runner.os }}-spm-WrkstrmLog-${{ hashFiles('**/Package.resolved')
           }}
+        restore-keys: ${{ runner.os }}-spm-WrkstrmLog-
+        path: apple/WrkstrmLog/.build
     - name: Check Cache
       run: 'echo ''Cache hit: ${{ steps.cache-spm.outputs.cache-hit }}''' 
     - name: Setup Xcode
-      uses: maxim-lobanov/setup-xcode@v1.6.0
+      uses: maxim-lobanov/setup-xcode@v1
       if: matrix.os == 'macos-latest' || matrix.os == 'macos-15' || matrix.os == 'self-hosted'
       with:
         xcode-version: '16.4'
@@ -44,5 +44,8 @@ jobs:
         || echo "SPM_CI_USE_LOCAL_DEPS is set to ${SPM_CI_USE_LOCAL_DEPS}"'
       env:
         SPM_CI_USE_LOCAL_DEPS: ${{ env.SPM_CI_USE_LOCAL_DEPS }}
-    - name: Swift Build
-      run: swift build --target WrkstrmLog
+    - name: Swift Test (pinned 1 worker)
+      # NOTE: Temporary pin to a single worker to reduce flakiness from
+      # global logging state across suites. TODO: remove --num-workers 1 after
+      # refactoring tests to avoid global state coupling.
+      run: swift test --enable-code-coverage --parallel --num-workers 1 --filter WrkstrmLogTests
