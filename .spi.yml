@@ -2,7 +2,6 @@ version: 1
 builder:   
   configs:
   - documentation_targets: [WrkstrmLog]
-    custom_documentation_parameters: [--include-extended-types]
   - platform: watchos
     swift_version: '6.1'
   - platform: ios
