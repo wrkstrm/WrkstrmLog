@@ -1,9 +1,7 @@
 <div align="center">
 
-# WrkstrmLog
-
-Swift‑native, multi‑backend logging with decorators and exposure controls.  
-Backends: OSLog (Apple), SwiftLog (portable), and Print (WASM‑friendly).
+| WrkstrmLog | Swift‑native, multi‑backend logging with decorators and exposure controls. Backends: OSLog (Apple), SwiftLog (portable), and Print (WASM‑friendly). |
+| :----: | :---- |
 
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
@@ -15,11 +13,6 @@ Backends: OSLog (Apple), SwiftLog (portable), and Print (WASM‑friendly).
   <a href="#📦-installation"><img alt="Install" src="https://img.shields.io/badge/⚙️%20Install-SPM-orange?style=for-the-badge"></a>
   <a href="CHANGELOG.md" target="_blank"><img alt="Changelog" src="https://img.shields.io/badge/🧾%20Changelog-latest-success?style=for-the-badge"></a>
   <a href="#-key-features"><img alt="Features" src="https://img.shields.io/badge/📚%20Features-overview-informational?style=for-the-badge"></a>
-  
-</div>
-
-📚 <a href="#-key-features">Features</a> • ⚙️ <a href="#📦-installation">Installation</a> • 🚦 <a href="#-usage">Quick Start</a> • 🧾 <a href="https://wrkstrm.github.io/WrkstrmLog">Documentation</a>
-
 </div>
 
 | Workflow | Badge |
@@ -29,15 +22,17 @@ Backends: OSLog (Apple), SwiftLog (portable), and Print (WASM‑friendly).
 | Build | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml) |
 | Testing | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) |
 
+🚦 <a href="#-usage">Quick Start</a>
+
+</div>
+
 > "The most effective debugging tool is still careful thought, followed by judiciously placed print
 > statements." —Brian Kernighan
 
 WrkstrmLog is a logging framework for Swift that provides consistent, configurable log output across
-Linux, macOS, Xcode, and now WASM. Backends are selected at compile time and logs are disabled by
-default in release builds unless explicitly enabled. 🔧
-
-For up-to-date build and platform compatibility reports, visit the
-[Swift Package Index](https://swiftpackageindex.com/wrkstrm/WrkstrmLog).
+operating system + development environment combination. Optimal backends are selected at compile time. 
+For development ease, logs are automatic in debug. For security, logs are disabled by default in release
+builds unless explicitly enabled.
 
 ## ✨ Key Features
 
