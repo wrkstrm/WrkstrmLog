@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  coverage:
+  coverage-linux:
     runs-on: ubuntu-latest
     env:
       SPM_CI_USE_LOCAL_DEPS: 'false'
@@ -41,10 +41,11 @@ jobs:
           BIN_DIR=$(swift build --show-bin-path)
           PROFILE=$(find .build -type f -name 'default.profdata' | head -n1 || true)
           if [[ -z "${PROFILE:-}" ]]; then
-            RAW=$(find .build -type f -name '*.profraw' | paste -sd' ' - || true)
-            if [[ -n "${RAW:-}" ]]; then
+            echo "Searching for .profraw files to merge" >&2
+            readarray -d '' RAWS < <(find .build -type f -name '*.profraw' -print0 || true)
+            if [[ ${#RAWS[@]} -gt 0 ]]; then
               echo "Merging profraw into profdata" >&2
-              llvm-profdata merge -sparse ${RAW} -o .build/default.profdata
+              llvm-profdata merge -sparse "${RAWS[@]}" -o .build/default.profdata
               PROFILE=.build/default.profdata
             fi
           fi
@@ -66,12 +67,12 @@ jobs:
           llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
             -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/lcov.info
 
-      - name: Upload coverage to Codecov
+      - name: Upload coverage to Codecov (Linux)
         uses: codecov/codecov-action@v5
         if: always()
         with:
-          files: ${{ steps.cov.outputs.files }}
-          flags: wrkstrm-log
+          files: coverage-publish/coverage/lcov.info
+          flags: wrkstrm-log,linux
           name: wrkstrm-log
           slug: wrkstrm/WrkstrmLog
           fail_ci_if_error: false
@@ -79,8 +80,78 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Fail if tests failed
+      - name: Fail if tests failed (Linux)
         if: ${{ steps.test.outcome == 'failure' }}
         run: |
           echo "Tests failed, but coverage was uploaded. Failing job as requested." >&2
+          exit 1
+
+  coverage-macos-local:
+    runs-on: [self-hosted, macOS]
+    env:
+      SPM_CI_USE_LOCAL_DEPS: 'false'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Swift test with coverage (macOS)
+        id: test
+        continue-on-error: true
+        run: |
+          swift test --enable-code-coverage --parallel
+
+      - name: Generate LCOV coverage (macOS)
+        id: lcov
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          BIN_DIR=$(swift build --show-bin-path)
+          PROFILE=$(find .build -type f -name 'default.profdata' | head -n1 || true)
+          if [[ -z "${PROFILE:-}" ]]; then
+            echo "Searching for .profraw files to merge (macOS)" >&2
+            readarray -d '' RAWS < <(find .build -type f -name '*.profraw' -print0 || true)
+            if [[ ${#RAWS[@]} -gt 0 ]]; then
+              echo "Merging profraw into profdata (macOS)" >&2
+              xcrun llvm-profdata merge -sparse "${RAWS[@]}" -o .build/default.profdata
+              PROFILE=.build/default.profdata
+            fi
+          fi
+          if [[ -z "${PROFILE:-}" ]]; then
+            echo "No coverage profile found; creating empty lcov.info (macOS)." >&2
+            mkdir -p coverage-publish/coverage
+            : > coverage-publish/coverage/lcov.info
+            exit 0
+          fi
+          TEST=$(find "$BIN_DIR" .build -maxdepth 5 -type f -perm -111 \
+                 \( -name '*PackageTests*' -o -name '*Tests.xctest' -o -name '*Tests' \) | head -n1 || true)
+          if [[ -z "${TEST:-}" ]]; then
+            echo "No test binary found; creating empty lcov.info (macOS)." >&2
+            mkdir -p coverage-publish/coverage
+            : > coverage-publish/coverage/lcov.info
+            exit 0
+          fi
+          mkdir -p coverage-publish/coverage
+          xcrun llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
+            -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/lcov.info
+
+      - name: Upload coverage to Codecov (macOS)
+        uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          files: coverage-publish/coverage/lcov.info
+          flags: wrkstrm-log,macos
+          name: wrkstrm-log
+          slug: wrkstrm/WrkstrmLog
+          fail_ci_if_error: false
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Fail if tests failed (macOS)
+        if: ${{ steps.test.outcome == 'failure' }}
+        run: |
+          echo "Tests failed on macOS, but coverage was uploaded. Failing job as requested." >&2
           exit 1
