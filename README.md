@@ -16,11 +16,11 @@
 </div>
 
 | Workflow | Status |
-| -------------: | :----: |
-| DooC | [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml) |
-| Linting | [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml) | 
-| Build | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml) |
-| Testing | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) |
+| :------- | :----: |
+| DocC | [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-docc.yml) |
+| Format | [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift-format.yml) |
+| Build | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-build.yml) |
+| Test | [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests.yml) |
 
 🚦 <a href="#-usage">Quick Start</a> 🎓 Tutorials: <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/loggingapis">Logging APIs</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/exposurelevels">Exposure Levels</a> · <a href="https://wrkstrm.github.io/WrkstrmLog/tutorials/filelogging">File Logging</a>
 
@@ -331,7 +331,7 @@ Distributed under the MIT License. See `LICENSE` for details.
 
 Developed by [rismay](https://github.com/rismay)
 
-[build-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml/badge.svg
-[format-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml/badge.svg
-[test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml/badge.svg
-[docc-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml/badge.svg
+[build-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-build.yml/badge.svg
+[format-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift-format.yml/badge.svg
+[test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests.yml/badge.svg
+[docc-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-docc.yml/badge.svg
