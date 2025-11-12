@@ -21,6 +21,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install LLVM tools (Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y llvm
+
       - name: Swift test with coverage
         id: test
         continue-on-error: true
@@ -45,12 +50,16 @@ jobs:
           fi
           if [[ -z "${PROFILE:-}" ]]; then
             echo "No coverage profile found; skipping LCOV generation." >&2
+            mkdir -p coverage-publish/coverage
+            : > coverage-publish/coverage/lcov.info
             exit 0
           fi
           TEST=$(find "$BIN_DIR" .build -maxdepth 3 -type f -executable \
                  \( -name '*PackageTests*' -o -name '*Tests*' \) | head -n1 || true)
           if [[ -z "${TEST:-}" ]]; then
             echo "No test binary found; skipping LCOV generation." >&2
+            mkdir -p coverage-publish/coverage
+            : > coverage-publish/coverage/lcov.info
             exit 0
           fi
           mkdir -p coverage-publish/coverage
