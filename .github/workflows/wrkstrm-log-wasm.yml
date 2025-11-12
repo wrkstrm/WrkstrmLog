@@ -37,9 +37,10 @@ jobs:
               set -euo pipefail
               echo "swift --version:"; swift --version || true
               echo "swift sdk list:"; swift sdk list || true
-              if swift sdk list 2>/dev/null | grep -q wasm32-unknown-wasi; then
-                swift build --swift-sdk wasm32-unknown-wasi -c release
-              else
-                swift build --triple wasm32-unknown-wasi -c release
+              SDK_NAME=$(swift sdk list 2>/dev/null | awk "/_wasm(\-embedded)?$/ {print \$1; exit}")
+              if [ -z "${SDK_NAME:-}" ]; then
+                SDK_NAME=swift-6.2-RELEASE_wasm
               fi
+              echo "Using Swift SDK: $SDK_NAME"
+              swift build --swift-sdk "$SDK_NAME" -c release
             '
