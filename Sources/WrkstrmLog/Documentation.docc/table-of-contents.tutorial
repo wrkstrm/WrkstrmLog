@@ -1,0 +1,16 @@
+@Tutorials(name: "WrkstrmLog Tutorials") {
+  @Intro(title: "Learn WrkstrmLog") {
+    Start with the basics, manage exposure levels, then persist logs to files and fan them out.
+  }
+
+  @Chapter(name: "Logging Basics") {
+    @Image(source: "ExposureDiagram", alt: "WrkstrmLog tutorials overview")
+    @TutorialReference(tutorial: "doc:LoggingAPIs")
+    @TutorialReference(tutorial: "doc:ExposureLevels")
+  }
+
+  @Chapter(name: "Persistence & Fan‑out") {
+    @Image(source: "ExposureDiagram", alt: "Persist logs to files and fan out")
+    @TutorialReference(tutorial: "doc:FileLogging")
+  }
+}
