@@ -132,7 +132,9 @@ extension Log {
     func pathInfo(for file: String) -> PathInfo {
       // Respect injection toggle even if callers reach the cache directly.
       if !Log.Inject.pathInfoCacheEnabled {
+        #if WRKSTRMLOG_INTERNAL_TRACE
         LogTrace.log("cache", "bypass-cache file=\(file)")
+        #endif
         let url = URL(fileURLWithPath: file)
         let lastComponent = url.lastPathComponent
         let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
@@ -141,7 +143,9 @@ extension Log {
       let contextID = currentThreadContextID()
       return updateContext(id: contextID) { state in
         if let existing = state.pathInfos[file] {
+          #if WRKSTRMLOG_INTERNAL_TRACE
           LogTrace.log("cache", "hit file=\(file)")
+          #endif
           return existing
         }
         let url = URL(fileURLWithPath: file)
@@ -149,7 +153,9 @@ extension Log {
         let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
         let info = PathInfo(url: url, fileName: trimmed, lastPathComponent: lastComponent)
         state.pathInfos[file] = info
+        #if WRKSTRMLOG_INTERNAL_TRACE
         LogTrace.log("cache", "miss+insert file=\(file) count=\(state.pathInfos.count)")
+        #endif
         return info
       }
     }

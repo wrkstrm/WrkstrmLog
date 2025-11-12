@@ -42,4 +42,3 @@ enum LogTrace {
     #endif
   }
 }
-

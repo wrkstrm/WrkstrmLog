@@ -58,7 +58,13 @@ func infoTraceEnabled() -> Bool {
 
 @inline(__always)
 func sequenceInfo(_ msg: @autoclosure () -> String) {
-  var logger = Log(system: "WrkstrmLogTests", category: "sequence", maxExposureLevel: .trace, options: [.prod], backend: PrintLogBackend())
+  var logger = Log(
+    system: "WrkstrmLogTests",
+    category: "sequence",
+    maxExposureLevel: .trace,
+    options: [.prod],
+    backend: PrintLogBackend()
+  )
   logger.decorator = Log.Decorator.Plain()
   logger.info(msg())
 }

@@ -469,10 +469,12 @@ public struct Log: Hashable, @unchecked Sendable {
       ? globalExposure : self.maxExposureLevelLimit
     resolvedMask.formIntersection(.threshold(clampedExposure))
     let contains = resolvedMask.contains(.single(level))
+    #if WRKSTRMLOG_INTERNAL_TRACE
     LogTrace.log(
       "effective",
       "level=\(level) global=\(globalExposure) max=\(self.maxExposureLevelLimit) resolved.contains=\(contains) min=\(String(describing: resolvedMask.minimumLevel))"
     )
+    #endif
     guard contains else { return nil }
     return resolvedMask.minimumLevel
     #else
@@ -488,10 +490,12 @@ public struct Log: Hashable, @unchecked Sendable {
       effectiveLevel = configuredLevel
     }
     let allowed = level >= effectiveLevel
+    #if WRKSTRMLOG_INTERNAL_TRACE
     LogTrace.log(
       "effective",
       "level=\(level) global=\(globalExposure) max=\(self.maxExposureLevelLimit) effective=\(effectiveLevel) allow=\(allowed)"
     )
+    #endif
     guard allowed else { return nil }
     return effectiveLevel
     #endif
