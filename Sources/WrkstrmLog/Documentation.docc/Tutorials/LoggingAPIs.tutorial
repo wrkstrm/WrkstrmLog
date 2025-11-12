@@ -17,8 +17,8 @@
 
   @Section(title: "Control Global Exposure") {
     WrkstrmLog hides messages more verbose than `critical` by default. Raise
-    the global exposure level with `Log.globalExposureLevel` to view additional details. The previous
-    `Log.removeExposureLimit` API has been removed; configure the level explicitly.
+    the global exposure level with `Log.globalExposureLevel` to view additional details.
+    Configure the global exposure level explicitly.
 
     @ContentAndMedia {
     ```swift

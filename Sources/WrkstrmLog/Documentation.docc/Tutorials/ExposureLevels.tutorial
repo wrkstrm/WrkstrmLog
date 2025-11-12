@@ -4,8 +4,8 @@
   }
 
   @Section(title: "Set a Global Level") {
-    Define the minimum level that should be visible across the application. The former
-    `Log.removeExposureLimit` API has been removed, so configure the global level explicitly.
+    Define the minimum level that should be visible across the application.
+    Configure the global level explicitly with `Log.globalExposureLevel`.
 
     @ContentAndMedia {
     ```swift

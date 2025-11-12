@@ -190,8 +190,8 @@ if libraryLogger.maxExposureLevel >= .debug {
 }
 ```
 
-The former `Log.removeExposureLimit` API has been removed, making explicit configuration of exposure
-levels a required step.
+Configure exposure levels explicitly using `Log.globalExposureLevel` together with each logger’s
+`maxExposureLevel`.
 
 ## Performance Considerations
 
@@ -236,11 +236,11 @@ options in WrkstrmLog! 📚🔍
 For more information, visit our [GitHub repository](https://github.com/wrkstrm/WrkstrmLog) or the
 [SPI site](https://swiftpackageindex.com/wrkstrm/WrkstrmLog). Happy logging! 🎉📝
 
-## Planned changes (next major)
+## 3.0 changes
 
-WrkstrmLog is transitioning away from the legacy “style” naming toward explicit
-backend/backend(s) selection. In the next major release, `Log.Style` and
-`init(style:)` will be removed in favor of constructors that accept explicit
-backends. Multi-backend fan-out will be supported (primary = index 0).
+WrkstrmLog now uses explicit
+backend/backend(s) selection. `Log.Style` and `init(style:)` are no longer
+available; construct logs with a specific backend or an ordered list of
+backends. Multi-backend fan-out is supported (primary = index 0).
 
-See the project’s `MIGRATION.md` and changelog for mappings and examples.
+See the project’s changelog for mappings and examples.

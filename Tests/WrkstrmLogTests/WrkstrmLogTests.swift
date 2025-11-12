@@ -367,9 +367,12 @@ struct WrkstrmLogTests {
     )
     logger.decorator = Log.Decorator.JSON()
 
-    let output = captureOutput {
+    let raw = captureOutput {
       logger.info("json-msg", file: "File.swift", function: "funcName()", line: 42)
     }.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    // Swift Testing may interleave lines; use the logger's last emitted line.
+    let output = raw.split(separator: "\n").last.map(String.init) ?? raw
 
     // Strip the Print backend prefix "sys:cat:ℹ️ "
     guard let spaceIdx = output.firstIndex(of: " ") else {

@@ -46,7 +46,6 @@ For a narrative overview of the project's goals 🎶, see the hosted DocC articl
 - 🚀 Simple integration with Swift Package Manager
 - 🔕 Optional disabled mode to silence logs
 - 🚦 Global and per-logger exposure levels via `Log.globalExposureLevel` and `maxExposureLevel`
-  (replaces `Log.removeExposureLimit`)
 - 🆕 Swift 6 `#fileID` support for concise output
 
 ## 🔌 Multiple backends
@@ -284,12 +283,9 @@ Note: the `verbose` helper maps to the `debug` level and is emitted at the same 
    }
    ```
 
-   The global level is configured via `Log.globalExposureLevel`. Each logger exposes its opt-in
+   The global level is configured via `Log.globalExposureLevel`. Each logger exposes its opt‑in
    ceiling through `maxExposureLevel`, ensuring verbose logs are only emitted when both the global
-   and per-logger levels allow. When raising the global level, compare it with each logger's
-   `maxExposureLevel` to avoid surfacing unintended verbosity from loggers that opt in to higher
-   levels. The former `Log.removeExposureLimit` API has been removed, making explicit configuration
-   of `Log.globalExposureLevel` a required step.
+   and per‑logger levels allow. Configure `Log.globalExposureLevel` explicitly during startup.
 
 ## 🕸️ WASM targeting
 

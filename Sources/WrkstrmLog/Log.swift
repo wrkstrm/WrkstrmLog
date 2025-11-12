@@ -28,27 +28,6 @@ public struct Log: Hashable, @unchecked Sendable {
   internal let contextID: UInt64
   /// Decorator for message formatting. Defaults to current style.
   public var decorator: any LogDecorator = Decorator.Current()
-  // Backward-compatibility shim for projects still passing a runtime style.
-  @available(
-    *, deprecated, message: "Use Log.Inject.setBackend(_:) to select a backend at runtime."
-  )
-  public enum Style: Sendable {
-    /// Print style, logs messages to standard output.
-    /// Typically used for debugging in local or development environments.
-    case print
-    #if canImport(os)
-    /// OSLog style, logs messages using Apple's Unified Logging System (OSLog).
-    /// Recommended for production use on Apple platforms for detailed and performant logging.
-    case os  // swiftlint:disable:this identifier_name
-    #endif  // canImport(os)
-    /// Swift style, logs messages using Swift's built-in logging framework (SwiftLog).
-    /// Ideal for server-side Swift applications or when consistent logging behavior across
-    /// platforms is desired.
-    case swift
-    /// Disabled style that suppresses all logging. Recommended for release builds when
-    /// log output is not desired.
-    case disabled
-  }
 
   /// Configuration options for a logger instance.
   public struct Options: OptionSet, Hashable, Sendable {
@@ -90,25 +69,6 @@ public struct Log: Hashable, @unchecked Sendable {
     #else
     return options.contains(.prod)
     #endif
-  }
-
-  // Best-effort style reporting for compatibility. In release without `.prod`, reports `.disabled`.
-  @available(
-    *, deprecated, message: "Use Log.Inject.currentBackend() to inspect the active backend."
-  )
-  public var style: Style {
-    guard isEnabled else { return .disabled }
-    switch Inject.currentBackend() {
-    case .print: return .print
-    case .swift: return .swift
-    #if canImport(os)
-    case .os: return .os
-    #endif
-    case .disabled: return .disabled
-    case .auto:
-      // Map to resolved default
-      return Self(system: system, category: category).style
-    }
   }
 
   /// Initializes a new `Log` instance.
@@ -162,39 +122,6 @@ public struct Log: Hashable, @unchecked Sendable {
     } else {
       self.backend = Log.makeDefaultBackend()
     }
-    self.contextID = contextID
-  }
-
-  // Deprecated initializer retaining the old `style:` parameter for source compatibility.
-  @available(*, deprecated, message: "Pass only system/category; backend is compile-time selected.")
-  public init(
-    system: String = "",
-    category: String = "",
-    style: Style,
-    maxExposureLevel: Logging.Logger.Level = .critical,
-    options: Options = []
-  ) {
-    let contextID = Cache.shared.currentThreadContextID()
-    self.system = system
-    self.category = category
-    self.options = options
-    self.maxExposureLevelLimit = maxExposureLevel
-    self.forceDisabled = (style == .disabled)
-    // Map the legacy style selection to a concrete backend.
-    #if canImport(os)
-    switch style {
-    case .print: self.backend = PrintLogBackend()
-    case .swift: self.backend = SwiftLogBackend()
-    case .os: self.backend = OSLogBackend()
-    case .disabled: self.backend = DisabledLogBackend()
-    }
-    #else
-    switch style {
-    case .print: self.backend = PrintLogBackend()
-    case .swift: self.backend = SwiftLogBackend()
-    case .disabled: self.backend = DisabledLogBackend()
-    }
-    #endif
     self.contextID = contextID
   }
 

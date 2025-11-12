@@ -27,8 +27,8 @@
 
 - Backend-first API surface with support for multi-backend fan-out (primary =
   index 0). Injection APIs support setting an ordered list of backends.
-- Soft deprecation wrappers retained for `Log.Style` and `Inject.setBackend(_:)` to
-  enable incremental migration; new `Log.init(backends:)` and `Inject.setBackends(_:)` added.
+  `Log.init(backends:)` and `Inject.setBackends(_:)` added. `Inject.setBackend(_:)` remains as a
+  thin convenience over `setBackends([kind])`.
 
 ### Changed
 
@@ -39,6 +39,7 @@
 - `Log.Style` and `init(style:)`.
 - Any remaining `style` accessors in the public API; prefer backend inspection
   helpers instead.
+ - Legacy `FanoutLog`/`TeeLog` typealiases; use `LogGroup` directly.
 
 ### Migration
 
@@ -46,13 +47,13 @@
   - `init(style: .os)` → `init(backends: [OSLogBackend()])`
   - `init(style: .swift)` → `init(backends: [SwiftLogBackend()])`
   - `init(style: .print)` → `init(backends: [PrintLogBackend()])`
-  - `style == .os` → `primaryBackendKind == .os`
+  - Inspect active backend via `Log.Inject.currentBackend()`.
 
 - Injection:
-  - `Log.Inject.setBackend(.os)` → `Log.Inject.setBackends([OSLogBackend()])`
-  - `Log.Inject.setBackend(.swift)` → `Log.Inject.setBackends([SwiftLogBackend()])`
-  - `Log.Inject.setBackend(.print)` → `Log.Inject.setBackends([PrintLogBackend()])`
-  - `Log.Inject.setBackend(.auto)` → omit, or set a single default backend explicitly.
+  - `Log.Inject.setBackend(.os)` → `Log.Inject.setBackends([.os])` (or keep using `setBackend`)
+  - `Log.Inject.setBackend(.swift)` → `Log.Inject.setBackends([.swift])` (or keep using `setBackend`)
+  - `Log.Inject.setBackend(.print)` → `Log.Inject.setBackends([.print])` (or keep using `setBackend`)
+  - `Log.Inject.setBackend(.auto)` → omit; rely on platform defaults when no selection is set.
 
 Notes:
 

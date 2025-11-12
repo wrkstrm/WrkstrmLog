@@ -58,8 +58,4 @@ extension DisabledLogBackend {
   }
 }
 
-// Backwards compat aliases (remove after downstreams migrate)
-@available(*, deprecated, message: "Use LogGroup instead of FanoutLog/TeeLog.")
-public typealias FanoutLog = LogGroup
-@available(*, deprecated, message: "Use LogGroup.")
-public typealias TeeLog = LogGroup
+// Typealiases removed in 3.0.0: use LogGroup directly.
