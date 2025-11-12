@@ -1,4 +1,6 @@
+#if canImport(Foundation)
 import Foundation
+#endif
 
 extension Log {
   /// Runtime injection points for choosing alternate implementations.
@@ -22,10 +24,16 @@ extension Log {
         pathInfoProvider = { Cache.shared.pathInfo(for: $0) }
       } else {
         pathInfoProvider = { file in
+          #if os(WASI) || arch(wasm32)
+          let last = file.split(separator: "/").last.map(String.init) ?? file
+          let trimmed = last.hasSuffix(".swift") ? String(last.dropLast(6)) : last
+          return Cache.PathInfo(url: file, fileName: trimmed, lastPathComponent: last)
+          #else
           let url = URL(fileURLWithPath: file)
           let lastComponent = url.lastPathComponent
           let trimmed = lastComponent.replacingOccurrences(of: ".swift", with: "")
           return Cache.PathInfo(url: url, fileName: trimmed, lastPathComponent: lastComponent)
+          #endif
         }
       }
     }
