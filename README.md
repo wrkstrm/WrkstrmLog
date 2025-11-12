@@ -267,10 +267,16 @@ Note: the `verbose` helper maps to the `debug` level and is emitted at the same 
    ```swift
    Log.globalExposureLevel = .warning
 
-   // Inspect how far this logger is willing to expose messages
-   print(logger.maxExposureLevel) // .info
-   if logger.maxExposureLevel >= .debug {
-       print("Debug logs may be exposed")
+   // Use the logging APIs to check/act on exposure
+   if logger.isEnabled(for: .debug) {
+       logger.debug("Debug logs may be exposed")
+   } else {
+       logger.info("Debug logs are currently suppressed")
+   }
+
+   // Or execute work only when enabled at a level
+   logger.ifEnabled(for: .notice) { log in
+       log.notice("Performing notice‑level operation…")
    }
    ```
 
