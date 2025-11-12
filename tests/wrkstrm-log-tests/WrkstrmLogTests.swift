@@ -226,7 +226,8 @@ struct WrkstrmLogTests {
     Log.reset()
     Log.Inject.usePathInfoCache(false)
     Log.globalExposureLevel = .trace
-    sequenceInfo("cache off; count=\(Log.pathInfoCount)")
+    let baseline = Log.pathInfoCount
+    sequenceInfo("cache off; baseline=\(baseline)")
     let logger = Log(
       system: "",
       category: "",
@@ -234,23 +235,23 @@ struct WrkstrmLogTests {
       options: [.prod],
       backend: PrintLogBackend()
     )
-    #expect(Log.pathInfoCount == 0)
+    #expect(Log.pathInfoCount == baseline)
     sequenceInfo("before first; count=\(Log.pathInfoCount)")
     logger.info("first")
     sequenceInfo("after first; count=\(Log.pathInfoCount)")
-    #expect(Log.pathInfoCount == 0)
+    #expect(Log.pathInfoCount == baseline)
     logger.info("second")
     sequenceInfo("after second; count=\(Log.pathInfoCount)")
-    #expect(Log.pathInfoCount == 0)
+    #expect(Log.pathInfoCount == baseline)
 
     Log.Inject.usePathInfoCache(true)
     sequenceInfo("cache on")
     logger.info("third")
     sequenceInfo("after third; count=\(Log.pathInfoCount)")
-    #expect(Log.pathInfoCount == 1)
+    #expect(Log.pathInfoCount == baseline + 1)
     logger.info("fourth")
     sequenceInfo("after fourth; count=\(Log.pathInfoCount)")
-    #expect(Log.pathInfoCount == 1)
+    #expect(Log.pathInfoCount == baseline + 1)
   }
 
   /// Checks that increasing global exposure filters messages below the threshold.
