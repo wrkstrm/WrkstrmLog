@@ -107,7 +107,7 @@ extension Log {
         #endif
 
         let isMainThreadFlag: Bool = {
-          #if canImport(Foundation)
+          #if canImport(Foundation) && !os(WASI)
           return Thread.isMainThread
           #else
           return true
