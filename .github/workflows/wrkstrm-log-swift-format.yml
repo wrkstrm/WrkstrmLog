@@ -1,4 +1,4 @@
-name: "\U0001F9F9 Swift Format| WrkstrmLog"
+name: "🧹 Swift Format | WrkstrmLog"
 on:
   pull_request:
     branches:

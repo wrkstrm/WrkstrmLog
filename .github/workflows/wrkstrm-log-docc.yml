@@ -1,4 +1,4 @@
-name: Deploy DocC
+name: "📖 DocC | WrkstrmLog"
 
 on:
   push:
