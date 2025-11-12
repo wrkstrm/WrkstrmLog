@@ -22,69 +22,56 @@ jobs:
           fetch-depth: 0
 
       - name: Swift test with coverage
+        id: test
+        continue-on-error: true
         run: |
           swift test --enable-code-coverage --parallel
 
-      - name: Generate coverage report and badge (Linux)
-        id: cov
+      - name: Generate LCOV coverage (Linux)
+        id: lcov
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
-          PROFILE=$(swift test --enable-code-coverage --show-codecov-path | tail -1)
-          BIN=$(swift build --show-bin-path)
-          # Find a test runner binary in bin path (Linux-friendly)
-          TEST=$(find "$BIN" -maxdepth 1 -type f -executable \( -name '*PackageTests*' -o -name '*Tests.xctest' \) | head -n1)
+          BIN_DIR=$(swift build --show-bin-path)
+          PROFILE=$(find .build -type f -name 'default.profdata' | head -n1 || true)
+          if [[ -z "${PROFILE:-}" ]]; then
+            RAW=$(find .build -type f -name '*.profraw' | paste -sd' ' - || true)
+            if [[ -n "${RAW:-}" ]]; then
+              echo "Merging profraw into profdata" >&2
+              llvm-profdata merge -sparse ${RAW} -o .build/default.profdata
+              PROFILE=.build/default.profdata
+            fi
+          fi
+          if [[ -z "${PROFILE:-}" ]]; then
+            echo "No coverage profile found; skipping LCOV generation." >&2
+            exit 0
+          fi
+          TEST=$(find "$BIN_DIR" .build -maxdepth 3 -type f -executable \
+                 \( -name '*PackageTests*' -o -name '*Tests*' \) | head -n1 || true)
           if [[ -z "${TEST:-}" ]]; then
-            echo "Could not locate test binary under $BIN" >&2
-            ls -la "$BIN" || true
-            exit 1
+            echo "No test binary found; skipping LCOV generation." >&2
+            exit 0
           fi
-          if ! command -v llvm-cov >/dev/null; then
-            echo "llvm-cov not found on runner" >&2
-            exit 1
-          fi
-
-          mkdir -p coverage-publish/badges/wrkstrm-log coverage-publish/coverage/html
-
-          # LCOV + HTML (Linux: call llvm-cov directly)
+          mkdir -p coverage-publish/coverage
           llvm-cov export -format=lcov -instr-profile "$PROFILE" "$TEST" \
             -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' > coverage-publish/coverage/lcov.info
 
-          llvm-cov show "$TEST" -instr-profile "$PROFILE" -format=html \
-            -o coverage-publish/coverage/html \
-            -ignore-filename-regex '(.*/Tests/.*|.*/\.build/.*)' -tab-size=2
-
-          # Extract TOTAL coverage from llvm-cov report
-          PCT=$(llvm-cov report "$TEST" -instr-profile "$PROFILE" 2>/dev/null | awk '/TOTAL/ {print $NF}' | tail -1)
-          PCT_NUM=${PCT%%%} # strip %
-          COLOR=red
-          if (( ${PCT_NUM%.*} >= 90 )); then COLOR=green;
-          elif (( ${PCT_NUM%.*} >= 80 )); then COLOR=yellowgreen;
-          elif (( ${PCT_NUM%.*} >= 70 )); then COLOR=yellow;
-          else COLOR=orange; fi
-
-          cat > coverage-publish/badges/wrkstrm-log/coverage.json << JSON
-          {"schemaVersion":1,"label":"coverage","message":"$PCT","color":"$COLOR"}
-          JSON
-
-          echo "pct=$PCT" >> $GITHUB_OUTPUT
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        if: always()
         with:
           files: coverage-publish/coverage/lcov.info
           flags: wrkstrm-log
           name: wrkstrm-log
           slug: wrkstrm/WrkstrmLog
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           verbose: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Publish badge + HTML to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: coverage-publish
-          keep_files: true
+      - name: Fail if tests failed
+        if: ${{ steps.test.outcome == 'failure' }}
+        run: |
+          echo "Tests failed, but coverage was uploaded. Failing job as requested." >&2
+          exit 1
