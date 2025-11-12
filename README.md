@@ -1,9 +1,30 @@
-# WrkstrmLog 🗂️
+<div align="center">
 
-| CI System            | Status                                                                                                                                                                                                                                                                                                                                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Swift Package Index  | [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog) |
-| GitHub Action Status | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml) [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml) [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml) |
+# WrkstrmLog
+
+Swift‑native, multi‑backend logging with decorators and exposure controls.  
+Backends: OSLog (Apple), SwiftLog (portable), and Print (WASM‑friendly).
+
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fwrkstrm%2FWrkstrmLog%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/wrkstrm/WrkstrmLog)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/wrkstrm/WrkstrmLog?style=social)](https://github.com/wrkstrm/WrkstrmLog/stargazers)
+
+<div>
+  <a href="https://wrkstrm.github.io/WrkstrmLog" target="_blank"><img alt="Docs" src="https://img.shields.io/badge/📖%20Docs-DocC-blue?style=for-the-badge"></a>
+  <a href="#📦-installation"><img alt="Install" src="https://img.shields.io/badge/⚙️%20Install-SPM-orange?style=for-the-badge"></a>
+  <a href="CHANGELOG.md" target="_blank"><img alt="Changelog" src="https://img.shields.io/badge/🧾%20Changelog-latest-success?style=for-the-badge"></a>
+  <a href="#-key-features"><img alt="Features" src="https://img.shields.io/badge/📚%20Features-overview-informational?style=for-the-badge"></a>
+  
+</div>
+
+📚 <a href="#-key-features">Features</a> • ⚙️ <a href="#📦-installation">Installation</a> • 🚦 <a href="#-usage">Quick Start</a> • 🧾 <a href="https://wrkstrm.github.io/WrkstrmLog">Documentation</a>
+
+</div>
+
+| GitHub Actions | Status |
+| -------------- | ------ |
+| Workflows | [![Build][build-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift.yml) [![Tests][test-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests-swift.yml) [![Format][format-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift_format.yml) [![DocC][docc-badge]](https://github.com/wrkstrm/WrkstrmLog/actions/workflows/deploy-docc.yml) |
 
 > "The most effective debugging tool is still careful thought, followed by judiciously placed print
 > statements." —Brian Kernighan
