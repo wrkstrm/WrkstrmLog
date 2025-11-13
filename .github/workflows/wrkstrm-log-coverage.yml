@@ -51,16 +51,12 @@ jobs:
           fi
           if [[ -z "${PROFILE:-}" ]]; then
             echo "No coverage profile found; skipping LCOV generation." >&2
-            mkdir -p coverage-publish/coverage
-            : > coverage-publish/coverage/lcov.info
             exit 0
           fi
           TEST=$(find "$BIN_DIR" .build -maxdepth 3 -type f -executable \
                  \( -name '*PackageTests*' -o -name '*Tests*' \) | head -n1 || true)
           if [[ -z "${TEST:-}" ]]; then
             echo "No test binary found; skipping LCOV generation." >&2
-            mkdir -p coverage-publish/coverage
-            : > coverage-publish/coverage/lcov.info
             exit 0
           fi
           mkdir -p coverage-publish/coverage
@@ -69,10 +65,10 @@ jobs:
 
       - name: Upload coverage to Codecov (Linux)
         uses: codecov/codecov-action@v5
-        if: always()
+        if: always() && hashFiles('coverage-publish/coverage/lcov.info') != ''
         with:
           files: coverage-publish/coverage/lcov.info
-          flags: wrkstrm-log,linux
+          flags: linux
           name: wrkstrm-log
           slug: wrkstrm/WrkstrmLog
           fail_ci_if_error: false

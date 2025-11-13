@@ -45,17 +45,13 @@ jobs:
             fi
           fi
           if [[ -z "${PROFILE:-}" ]]; then
-            echo "No coverage profile found; creating empty lcov.info (macOS)." >&2
-            mkdir -p coverage-publish/coverage
-            : > coverage-publish/coverage/lcov.info
+            echo "No coverage profile found; skipping LCOV generation (macOS)." >&2
             exit 0
           fi
           TEST=$(find "$BIN_DIR" .build -maxdepth 5 -type f -perm -111 \
                  \( -name '*PackageTests*' -o -name '*Tests.xctest' -o -name '*Tests' \) | head -n1 || true)
           if [[ -z "${TEST:-}" ]]; then
-            echo "No test binary found; creating empty lcov.info (macOS)." >&2
-            mkdir -p coverage-publish/coverage
-            : > coverage-publish/coverage/lcov.info
+            echo "No test binary found; skipping LCOV generation (macOS)." >&2
             exit 0
           fi
           mkdir -p coverage-publish/coverage
@@ -64,10 +60,10 @@ jobs:
 
       - name: Upload coverage to Codecov (macOS)
         uses: codecov/codecov-action@v5
-        if: always()
+        if: always() && hashFiles('coverage-publish/coverage/lcov.info') != ''
         with:
           files: coverage-publish/coverage/lcov.info
-          flags: wrkstrm-log,macos
+          flags: macos
           name: wrkstrm-log
           slug: wrkstrm/WrkstrmLog
           fail_ci_if_error: false
@@ -80,4 +76,3 @@ jobs:
         run: |
           echo "Tests failed on macOS, but coverage was uploaded. Failing job as requested." >&2
           exit 1
-
