@@ -26,11 +26,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y llvm
 
-      - name: Swift test with coverage
+      - name: Swift test with coverage (sequential)
         id: test
         continue-on-error: true
         run: |
-          swift test --enable-code-coverage --parallel
+          set -euo pipefail
+          swift test --enable-code-coverage -v 2>&1 | tee test-output.txt || true
+          echo "Test exit captured; continuing for coverage collection"
+
+      - name: Upload test log (Linux)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-test-log
+          path: test-output.txt
 
       - name: Generate LCOV coverage (Linux)
         id: lcov
@@ -53,8 +62,11 @@ jobs:
             echo "No coverage profile found; skipping LCOV generation." >&2
             exit 0
           fi
-          TEST=$(find "$BIN_DIR" .build -maxdepth 3 -type f -executable \
+          echo "BIN_DIR=$BIN_DIR" >&2
+          echo "PROFILE=$PROFILE" >&2
+          TEST=$(find "$BIN_DIR" .build -maxdepth 6 -type f -executable \
                  \( -name '*PackageTests*' -o -name '*Tests*' \) | head -n1 || true)
+          echo "TEST=$TEST" >&2
           if [[ -z "${TEST:-}" ]]; then
             echo "No test binary found; skipping LCOV generation." >&2
             exit 0

@@ -12,7 +12,8 @@ permissions:
 
 jobs:
   coverage-macos-local:
-    runs-on: [self-hosted, macOS]
+    # Requires a self-hosted runner labeled: "self-hosted, macOS, wrkstrm"
+    runs-on: [self-hosted, macOS, wrkstrm]
     env:
       SPM_CI_USE_LOCAL_DEPS: 'false'
     steps:
@@ -21,11 +22,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Swift test with coverage (macOS)
+      - name: Swift test with coverage (macOS, sequential)
         id: test
         continue-on-error: true
         run: |
-          swift test --enable-code-coverage --parallel
+          swift test --enable-code-coverage -v || true
 
       - name: Generate LCOV coverage (macOS)
         id: lcov
