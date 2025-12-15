@@ -1,4 +1,4 @@
-@Tutorials(name: "WrkstrmLog Tutorials") {
+@Tutorials(name: "WrkstrmLog") {
   @Intro(title: "Learn WrkstrmLog") {
     Start with the basics, manage exposure levels, then persist logs to files and fan them out.
   }

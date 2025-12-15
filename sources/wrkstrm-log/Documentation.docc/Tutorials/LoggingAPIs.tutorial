@@ -4,80 +4,89 @@
   }
 
   @Section(title: "Create a Logger") {
-    Instantiate a logger with a system, category, and optional `maxExposureLevel` to opt in to additional logs.
+    @Steps {
+      @Step {
+        Instantiate a logger with a system, category, and optional `maxExposureLevel` to opt in to additional logs. Type this into a Swift file to follow along.
 
-    @ContentAndMedia {
-    ```swift
-    import WrkstrmLog
+        @Code(name: "CreateLogger") {
+        import WrkstrmLog
 
-    let logger = Log(system: "ExampleApp", category: "Networking", maxExposureLevel: .info)
-    ```
+        let logger = Log(system: "ExampleApp", category: "Networking", maxExposureLevel: .info)
+        }
+      }
     }
   }
 
   @Section(title: "Control Global Exposure") {
-    WrkstrmLog hides messages more verbose than `critical` by default. Raise
-    the global exposure level with `Log.globalExposureLevel` to view additional details.
-    Configure the global exposure level explicitly.
+    @Steps {
+      @Step {
+        WrkstrmLog hides messages more verbose than `critical` by default. Raise the global exposure level with `Log.globalExposureLevel` to view additional details.
 
-    @ContentAndMedia {
-    ```swift
-    Log.globalExposureLevel = .debug
-    ```
+        @Code(name: "GlobalExposureLevel") {
+        Log.globalExposureLevel = .debug
+        }
+      }
     }
   }
 
   @Section(title: "Choose Backends") {
-    Select the backend(s) appropriate for your platform or environment. When multiple are supplied,
-    index 0 is treated as the primary.
+    @Steps {
+      @Step {
+        Select the backend(s) appropriate for your platform or environment. When multiple are supplied, index 0 is treated as the primary.
 
-    @ContentAndMedia {
-    ```swift
-    let osLogger = Log(system: "ExampleApp", category: "Startup", backends: [OSLogBackend()])
-    let printLogger = Log(system: "ExampleApp", category: "Startup", backends: [PrintLogBackend()])
-    ```
+        @Code(name: "Backends") {
+        let osLogger = Log(system: "ExampleApp", category: "Startup", backends: [OSLogBackend()])
+        let printLogger = Log(system: "ExampleApp", category: "Startup", backends: [PrintLogBackend()])
+        }
+      }
     }
   }
 
   @Section(title: "Runtime Backend Selection") {
-    Adjust the active backend kinds at runtime. When multiple are set, index 0 is treated as
-    the primary.
+    @Steps {
+      @Step {
+        Adjust the active backend kinds at runtime. When multiple are set, index 0 is treated as the primary.
 
-    @ContentAndMedia {
-    ```swift
-    // Set an ordered list of kinds
-    Log.Inject.setBackends([.os, .swift])
+        @Code(name: "RuntimeBackends") {
+        // Set an ordered list of kinds
+        Log.Inject.setBackends([.os, .swift])
 
-    // Convenience: set a single kind
-    Log.Inject.setBackend(.os)
+        // Convenience: set a single kind
+        Log.Inject.setBackend(.os)
 
-    // Append/remove kinds
-    Log.Inject.appendBackend(.print)
-    Log.Inject.removeBackend(.swift)
+        // Append/remove kinds
+        Log.Inject.appendBackend(.print)
+        Log.Inject.removeBackend(.swift)
 
-    // Clear custom selection; revert to platform default
-    Log.Inject.removeAllCustomBackends()
-    ```
+        // Clear custom selection; revert to platform default
+        Log.Inject.removeAllCustomBackends()
+        }
+      }
     }
   }
 
   @Section(title: "Record Messages") {
-    Each logger provides methods for standard log levels.
+    @Steps {
+      @Step {
+        Each logger provides methods for standard log levels. Type these calls to see level-specific output.
 
-    @ContentAndMedia {
-    ```swift
-    logger.verbose("Request started")  // 🔍
-    logger.debug("Parsing response")   // 🐞
-    logger.info("Request progress")    // ℹ️
-    logger.notice("Request finished")  // 📝
-    logger.warning("Slow response")    // ⚠️
-    logger.error("Request failed: \(error)") // ❗
-    ```
+        @Code(name: "RecordMessages") {
+        logger.verbose("Request started")  // 🔍
+        logger.debug("Parsing response")   // 🐞
+        logger.info("Request progress")    // ℹ️
+        logger.notice("Request finished")  // 📝
+        logger.warning("Slow response")    // ⚠️
+        logger.error("Request failed: \(error)") // ❗
+        }
+      }
     }
   }
 
   @Section(title: "Understand Log Levels") {
-    For a deeper explanation of each level and example messages, see
-    <doc:LogLevels>.
+    @Steps {
+      @Step {
+        For a deeper explanation of each level and example messages, see <doc:LogLevels>.
+      }
+    }
   }
 }

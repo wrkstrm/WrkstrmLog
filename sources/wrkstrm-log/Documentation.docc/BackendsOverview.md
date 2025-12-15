@@ -1,3 +1,5 @@
+![A diagram illustrating the different logging backends and the fan-out concept.](Backends.svg)
+
 # Backends overview
 
 WrkstrmLog supports multiple output backends; pick one per logger or fan‑out to many.

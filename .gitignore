@@ -104,3 +104,7 @@ node_modules/
 package-lock.json
 yarn.lock
 
+# DoCC
+**/.docc-build/**
+**/.docc-derived/**
+**/.docc-publish/**

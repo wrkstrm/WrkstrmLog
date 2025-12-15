@@ -1,3 +1,5 @@
+![A diagram illustrating the different logging decorators.](Decorators.svg)
+
 # Decorators overview
 
 Decorators control how a `Log` formats its message body.
