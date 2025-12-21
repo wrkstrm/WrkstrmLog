@@ -39,7 +39,7 @@
 - `Log.Style` and `init(style:)`.
 - Any remaining `style` accessors in the public API; prefer backend inspection
   helpers instead.
- - Legacy `FanoutLog`/`TeeLog` typealiases; use `LogGroup` directly.
+- Legacy `FanoutLog`/`TeeLog` typealiases; use `LogGroup` directly.
 
 ### Migration
 

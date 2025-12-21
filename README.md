@@ -31,7 +31,7 @@
 > statements." —Brian Kernighan
 
 WrkstrmLog is a logging framework for Swift that provides consistent, configurable log output across
-operating system + development environment combination. Optimal backends are selected at compile time. 
+operating system + development environment combination. Optimal backends are selected at compile time.
 For development ease, logs are automatic in debug. For security, logs are disabled by default in release
 builds unless explicitly enabled.
 
@@ -40,8 +40,8 @@ For a narrative overview of the project's goals 🎶, see the hosted DocC articl
 
 ## 🏁 Flagship + Docs
 
-WrkstrmLog is a flagship library for wrkstrm. It is in every library we create. We treat it as a reference 
-for logging APIs, observability patterns, and documentation quality. DocC articles are added with every feature. 
+WrkstrmLog is a flagship library for wrkstrm. It is in every library we create. We treat it as a reference
+for logging APIs, observability patterns, and documentation quality. DocC articles are added with every feature.
 This README serves as an introductory guide.
 
 ## ✨ Key Features
@@ -73,7 +73,6 @@ let composed = Log(system: "App", category: "UI", backends: [OSLogBackend(), cap
 
 // Runtime selection of backend kinds is also available (see next section)
 ```
-
 
 ## ⚙️ Runtime Backend Selection
 
@@ -224,6 +223,7 @@ targets: [
    logger.error("Error message")
    Log.guard("Critical error")
    ```
+
 Each level maps to a visual emoji and purpose:
 
 | Level    | Emoji | Description |
@@ -317,11 +317,10 @@ See `CONTRIBUTING.md` for guidelines and the PR checklist.
 
 Developed by [rismay](https://github.com/rismay)
 
-- Community chat: join the Wrkstrm Discord — https://discord.gg/4KhTUbt3
+- Community chat: join the Wrkstrm Discord — <https://discord.gg/4KhTUbt3>
 
 [build-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-build.yml/badge.svg
 [format-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-swift-format.yml/badge.svg
 [test-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-tests.yml/badge.svg
 [docc-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-docc.yml/badge.svg
 [wasm-badge]: https://github.com/wrkstrm/WrkstrmLog/actions/workflows/wrkstrm-log-wasm.yml/badge.svg
-[codecov-badge]: https://codecov.io/gh/wrkstrm/WrkstrmLog/branch/main/graph/badge.svg?flag=wrkstrm-log
