@@ -37,4 +37,3 @@ swift format lint --configuration code/mono/apple/spm/configs/linting/.swift-for
 ## Code of conduct
 
 Be kind and constructive. We value clarity, small PRs, and good test coverage.
-
